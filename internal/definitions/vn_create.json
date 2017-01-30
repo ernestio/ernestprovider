@@ -1,0 +1,16 @@
+{
+  "id": "id",
+  "name": "testing_resource",
+  "address_space": ["10.1.2.0/24"],
+  "dns_server_names": ["8.8.8.8", "4.4.4.4"],
+  "subnets": [{
+    "name": "subnet1",
+    "address_prefix": "10.1.2.0/24"
+  }],
+  "location": "westus",
+  "resource_group_name": "ernest",
+  "tags": {
+    "t1": "one",
+    "t2": "two"
+  }
+}

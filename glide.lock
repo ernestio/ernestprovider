@@ -1,0 +1,31 @@
+hash: 58543371cd5f36fd7b2ec4796b966c0aadb0b0ed822a3842349e85ffab9767fe
+updated: 2017-01-26T11:41:40.613175665+01:00
+imports:
+- name: github.com/Azure/azure-sdk-for-go
+  version: 0984e0641ae43b89283223034574d6465be93bf4
+  subpackages:
+  - arm/network
+  - management
+  - management/networksecuritygroup
+  - management/virtualnetwork
+- name: github.com/Azure/go-autorest
+  version: d7c034a8af24eda120dd6460bfcd6d9ed14e43ca
+  subpackages:
+  - autorest
+  - autorest/azure
+  - autorest/date
+  - autorest/to
+  - autorest/validation
+- name: github.com/dgrijalva/jwt-go
+  version: a601269ab70c205d26370c16f7c81e9017c14e04
+- name: github.com/ernestio/crypto
+  version: fa0fc393bc2487562c72fbbfa8a08862b39a6c0a
+  subpackages:
+  - aes
+- name: golang.org/x/crypto
+  version: 41d678d1df78cd0410143162dff954e6dc09300f
+  subpackages:
+  - pbkdf2
+  - pkcs12
+  - pkcs12/internal/rc2
+testImports: []

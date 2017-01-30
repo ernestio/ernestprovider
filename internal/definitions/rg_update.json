@@ -1,0 +1,8 @@
+{
+  "name": "rg_test",
+  "location": "westus",
+  "tags": {
+    "t1": "one_x",
+    "t2": "two_x"
+  }
+}
