@@ -77,6 +77,11 @@ type ArmClient struct {
 
 	RivieraClient *riviera.Client
 
+	SubnetClient        network.SubnetsClient
+	ResourceGroupClient resources.GroupsClient
+	VnetClient          network.VirtualNetworksClient
+	IfaceClient         network.InterfacesClient
+
 	availSetClient         compute.AvailabilitySetsClient
 	usageOpsClient         compute.UsageOperationsClient
 	vmExtensionImageClient compute.VirtualMachineExtensionImagesClient
@@ -86,17 +91,14 @@ type ArmClient struct {
 	vmClient               compute.VirtualMachinesClient
 
 	appGatewayClient             network.ApplicationGatewaysClient
-	ifaceClient                  network.InterfacesClient
 	loadBalancerClient           network.LoadBalancersClient
 	localNetConnClient           network.LocalNetworkGatewaysClient
 	publicIPClient               network.PublicIPAddressesClient
 	secGroupClient               network.SecurityGroupsClient
 	secRuleClient                network.SecurityRulesClient
-	SubnetClient                 network.SubnetsClient
 	netUsageClient               network.UsagesClient
 	vnetGatewayConnectionsClient network.VirtualNetworkGatewayConnectionsClient
 	vnetGatewayClient            network.VirtualNetworkGatewaysClient
-	VnetClient                   network.VirtualNetworksClient
 	vnetPeeringsClient           network.VirtualNetworkPeeringsClient
 	routeTablesClient            network.RouteTablesClient
 	routesClient                 network.RoutesClient
@@ -110,10 +112,9 @@ type ArmClient struct {
 	eventHubConsumerGroupClient eventhub.ConsumerGroupsClient
 	eventHubNamespacesClient    eventhub.NamespacesClient
 
-	providers           resources.ProvidersClient
-	ResourceGroupClient resources.GroupsClient
-	tagsClient          resources.TagsClient
-	resourceFindClient  resources.Client
+	providers          resources.ProvidersClient
+	tagsClient         resources.TagsClient
+	resourceFindClient resources.Client
 
 	jobsClient            scheduler.JobsClient
 	jobsCollectionsClient scheduler.JobCollectionsClient
@@ -297,7 +298,7 @@ func (c *Config) getArmClient() (*ArmClient, error) {
 	setUserAgent(&ifc.Client)
 	ifc.Authorizer = spt
 	ifc.Sender = autorest.CreateSender(withRequestLogging())
-	client.ifaceClient = ifc
+	client.IfaceClient = ifc
 
 	lbc := network.NewLoadBalancersClientWithBaseURI(endpoint, c.SubscriptionID)
 	setUserAgent(&lbc.Client)

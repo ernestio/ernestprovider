@@ -1,0 +1,14 @@
+{
+  "name": "ni_test",
+  "resource_group_name": "rg_test",
+  "location": "westus",
+  "ip_configurations": [{
+    "name": "ip_conf_test",
+    "subnet": "test_subnet",
+    "private_ip_address_allocation": "10.1.1.0"
+  }],
+  "tags": {
+    "t1": "one",
+    "t2": "three"
+  }
+}
