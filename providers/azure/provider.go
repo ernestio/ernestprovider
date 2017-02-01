@@ -92,7 +92,7 @@ type ArmClient struct {
 	publicIPClient               network.PublicIPAddressesClient
 	secGroupClient               network.SecurityGroupsClient
 	secRuleClient                network.SecurityRulesClient
-	subnetClient                 network.SubnetsClient
+	SubnetClient                 network.SubnetsClient
 	netUsageClient               network.UsagesClient
 	vnetGatewayConnectionsClient network.VirtualNetworkGatewayConnectionsClient
 	vnetGatewayClient            network.VirtualNetworkGatewaysClient
@@ -333,7 +333,7 @@ func (c *Config) getArmClient() (*ArmClient, error) {
 	setUserAgent(&snc.Client)
 	snc.Authorizer = spt
 	snc.Sender = autorest.CreateSender(withRequestLogging())
-	client.subnetClient = snc
+	client.SubnetClient = snc
 
 	vgcc := network.NewVirtualNetworkGatewayConnectionsClientWithBaseURI(endpoint, c.SubscriptionID)
 	setUserAgent(&vgcc.Client)

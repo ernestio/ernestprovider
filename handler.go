@@ -10,6 +10,7 @@ import (
 
 	"github.com/ernestio/ernestprovider/event"
 	"github.com/ernestio/ernestprovider/providers/azure/resourcegroup"
+	"github.com/ernestio/ernestprovider/providers/azure/subnet"
 	"github.com/ernestio/ernestprovider/providers/azure/virtualnetwork"
 )
 
@@ -94,6 +95,8 @@ func getAzureEvent(subject string, data []byte, key string) *event.Event {
 		ev = virtualnetwork.New(subject, data, key, val)
 	case "azure_resource_group":
 		ev = resourcegroup.New(subject, data, key, val)
+	case "azure_subnet":
+		ev = subnet.New(subject, data, key, val)
 	}
 	return &ev
 }

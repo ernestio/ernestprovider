@@ -52,6 +52,9 @@ func init() {
 	})
 
 	Then(`^I should get a "(.+?)" response with "(.+?)" as "(.+?)"$`, func(subject string, k string, v string) {
+		if lastSubject != subject {
+			T.Errorf("Last subject was: \n" + lastSubject)
+		}
 		value := gjson.Get(string(lastBody), k).String()
 		if v != value {
 			fmt.Println(string(lastBody))
