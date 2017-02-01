@@ -1,0 +1,10 @@
+{
+  "name": "sa_test",
+  "resource_group_name": "rg_test",
+  "location": "westus",
+  "account_type": "test",
+  "tags": {
+    "t1": "one",
+    "t2": "two"
+  }
+}

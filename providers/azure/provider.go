@@ -77,10 +77,11 @@ type ArmClient struct {
 
 	RivieraClient *riviera.Client
 
-	SubnetClient        network.SubnetsClient
-	ResourceGroupClient resources.GroupsClient
-	VnetClient          network.VirtualNetworksClient
-	IfaceClient         network.InterfacesClient
+	SubnetClient         network.SubnetsClient
+	ResourceGroupClient  resources.GroupsClient
+	VnetClient           network.VirtualNetworksClient
+	IfaceClient          network.InterfacesClient
+	StorageServiceClient storage.AccountsClient
 
 	availSetClient         compute.AvailabilitySetsClient
 	usageOpsClient         compute.UsageOperationsClient
@@ -119,8 +120,7 @@ type ArmClient struct {
 	jobsClient            scheduler.JobsClient
 	jobsCollectionsClient scheduler.JobCollectionsClient
 
-	storageServiceClient storage.AccountsClient
-	storageUsageClient   storage.UsageOperationsClient
+	storageUsageClient storage.UsageOperationsClient
 
 	deploymentsClient resources.DeploymentsClient
 
@@ -412,7 +412,7 @@ func (c *Config) getArmClient() (*ArmClient, error) {
 	setUserAgent(&ssc.Client)
 	ssc.Authorizer = spt
 	ssc.Sender = autorest.CreateSender(withRequestLogging())
-	client.storageServiceClient = ssc
+	client.StorageServiceClient = ssc
 
 	suc := storage.NewUsageOperationsClientWithBaseURI(endpoint, c.SubscriptionID)
 	setUserAgent(&suc.Client)
@@ -484,7 +484,7 @@ func (c *Config) getArmClient() (*ArmClient, error) {
 }
 
 func (armClient *ArmClient) getKeyForStorageAccount(resourceGroupName, storageAccountName string) (string, bool, error) {
-	accountKeys, err := armClient.storageServiceClient.ListKeys(resourceGroupName, storageAccountName)
+	accountKeys, err := armClient.StorageServiceClient.ListKeys(resourceGroupName, storageAccountName)
 	if accountKeys.StatusCode == http.StatusNotFound {
 		return "", false, nil
 	}
