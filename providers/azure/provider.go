@@ -502,7 +502,8 @@ func (armClient *ArmClient) getKeyForStorageAccount(resourceGroupName, storageAc
 	return *keys[0].Value, true, nil
 }
 
-func (armClient *ArmClient) getBlobStorageClientForStorageAccount(resourceGroupName, storageAccountName string) (*mainStorage.BlobStorageClient, bool, error) {
+// GetBlobStorageClientForStorageAccount : ..
+func (armClient *ArmClient) GetBlobStorageClientForStorageAccount(resourceGroupName, storageAccountName string) (*mainStorage.BlobStorageClient, bool, error) {
 	key, accountExists, err := armClient.getKeyForStorageAccount(resourceGroupName, storageAccountName)
 	if err != nil {
 		return nil, accountExists, err

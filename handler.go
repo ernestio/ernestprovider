@@ -12,6 +12,7 @@ import (
 	"github.com/ernestio/ernestprovider/providers/azure/networkinterface"
 	"github.com/ernestio/ernestprovider/providers/azure/resourcegroup"
 	"github.com/ernestio/ernestprovider/providers/azure/storageaccount"
+	"github.com/ernestio/ernestprovider/providers/azure/storagecontainer"
 	"github.com/ernestio/ernestprovider/providers/azure/subnet"
 	"github.com/ernestio/ernestprovider/providers/azure/virtualnetwork"
 )
@@ -103,6 +104,8 @@ func getAzureEvent(subject string, data []byte, key string) *event.Event {
 		ev = networkinterface.New(subject, data, key, val)
 	case "azure_storage_account":
 		ev = storageaccount.New(subject, data, key, val)
+	case "azure_storage_container":
+		ev = storagecontainer.New(subject, data, key, val)
 	}
 	return &ev
 }
