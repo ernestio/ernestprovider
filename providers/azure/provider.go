@@ -82,6 +82,7 @@ type ArmClient struct {
 	VnetClient           network.VirtualNetworksClient
 	IfaceClient          network.InterfacesClient
 	StorageServiceClient storage.AccountsClient
+	VMClient             compute.VirtualMachinesClient
 
 	availSetClient         compute.AvailabilitySetsClient
 	usageOpsClient         compute.UsageOperationsClient
@@ -89,7 +90,6 @@ type ArmClient struct {
 	vmExtensionClient      compute.VirtualMachineExtensionsClient
 	vmScaleSetClient       compute.VirtualMachineScaleSetsClient
 	vmImageClient          compute.VirtualMachineImagesClient
-	vmClient               compute.VirtualMachinesClient
 
 	appGatewayClient             network.ApplicationGatewaysClient
 	loadBalancerClient           network.LoadBalancersClient
@@ -262,7 +262,7 @@ func (c *Config) getArmClient() (*ArmClient, error) {
 	setUserAgent(&vmc.Client)
 	vmc.Authorizer = spt
 	vmc.Sender = autorest.CreateSender(withRequestLogging())
-	client.vmClient = vmc
+	client.VMClient = vmc
 
 	agc := network.NewApplicationGatewaysClientWithBaseURI(endpoint, c.SubscriptionID)
 	setUserAgent(&agc.Client)
