@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-package resourcegroup
+package virtualmachine
 
 import (
 	"encoding/json"
@@ -17,14 +17,86 @@ import (
 	"github.com/ernestio/ernestprovider/event"
 )
 
-// Event : This is the Ernest representation of an azure resource
-//         group
+// Event : This is the Ernest representation of an azure networkinterface
 type Event struct {
 	event.Base
-	ID       string            `json:"id"`
-	Name     string            `json:"name" validate:"required"`
-	Location string            `json:"location" validate:"required"`
-	Tags     map[string]string `json:"tags"`
+	ID                           string   `json:"id"`
+	Name                         string   `json:"name" validate:"required"`
+	ResourceGroupName            string   `json:"resource_group_name" validate:"required"`
+	Location                     string   `json:"location" validate:"required"`
+	AvailabilitySetID            string   `json:"availability_set_id"`
+	LicenseType                  string   `json:"license_type"`
+	VMSize                       string   `json:"vm_size"`
+	DeleteOSDiskOnTermination    bool     `json:"delete_os_disk_on_termination"`
+	DeleteDataDisksOnTermination bool     `json:"delete_data_disks_on_termination"`
+	NetworkInterfaceIDs          []string `json:"network_interface_ids"`
+	Plans                        []struct {
+		Name      string `json:"name" validate:"required"`
+		Publisher string `json:"publisher" validate:"required"`
+		Product   string `json:"product" validate:"required"`
+	} `json:"plan" validate:"dive"`
+	StorageImageReferences []struct {
+		Publisher string `json:"publisher" validate:"required"`
+		Offer     string `json:"offer" validate:"offer"`
+		Sku       string `json:"sku" validate:"required"`
+		Version   string `json:"version"`
+	} `json:"storage_image_reference" validate:"dive"`
+	StorageOSDisk struct {
+		Name         string `json:"name" validate:"required"`
+		VhdURI       string `json:"vhd_uri" validate:"required"`
+		CreateOption string `json:"create_option" validate:"required"`
+		OSType       string `json:"os_type"`
+		ImageURI     string `json:"image_uri"`
+		Caching      string `json:"caching"`
+	} `json:"storage_os_disk" validate:"dive"`
+	StorageDataDisks []struct {
+		Name         string `json:"name" validate:"required"`
+		VhdURI       string `json:"vhd_uri" validate:"required"`
+		CreateOption string `json:"create_option" validate:"required"`
+		Size         int32  `json:"disk_size_gb" validate:"required"`
+		Lun          int32  `json:"lun"`
+	} `json:"storage_data_disk"`
+	DiagnosticsProfiles []struct {
+		BootDiagnostics []struct {
+			Enabled bool   `json:"enabled"`
+			URI     string `json:"storage_uri"`
+		} `json:"boot_diagnostics"`
+	} `json:"diagnostics_profile"`
+	OSProfiles []struct {
+		ComputerName  string `json:"computer_name" validation:"required"`
+		AdminUsername string `json:"admin_username" validation:"required"`
+		AdminPassword string `json:"admin_password" validation:"required"`
+		CustomData    string `json:"custom_data"`
+	} `json:"os_profile"`
+	OSProfileWindowsConfigs []struct {
+		ProvisionVMAgent        bool `json:"provision_vm_agent"`
+		EnableAutomaticUpgrades bool `json:"enable_automatic_upgrades"`
+		WinRm                   []struct {
+			Protocol       string `json:"protocol" validate:"required"`
+			CertificateURL string `json:"certificate_url" validate:"required"`
+		} `json:"winrm"`
+		AdditionalUnattendConfig []struct {
+			Pass        string `json:"pass" validate:"required"`
+			Component   string `json:"component" validate:"required"`
+			SettingName string `json:"setting_name" validate:"required"`
+			Content     string `json:"content" validate:"required"`
+		} `json:"additional_unattend_config"`
+	} `json:"os_profile_windows_config"`
+	OSProfileLinuxConfigs []struct {
+		DisablePasswordAuthentication bool `json:"disable_password_authentication"`
+		SSHKeys                       []struct {
+			Path    string `json:"path" validate:"required"`
+			KeyData string `json:"key_data"`
+		} `json:"ssh_keys"`
+	} `json:"os_profile_linux_config"`
+	OSProfileSecrets []struct {
+		SourceVaultID           string `json:"source_vault_id"`
+		SourceVaultCertificates []struct {
+			CertificateURL   string `json:"certificate_url"`
+			CertificateStore string `json:"certificate_store"`
+		} `json:"vault_certificates"`
+	} `json:"os_profile_secrets"`
+	Tags map[string]string `json:"tags"`
 
 	ClientID       string `json:"azure_client_id"`
 	ClientSecret   string `json:"azure_client_secret"`
@@ -32,15 +104,15 @@ type Event struct {
 	SubscriptionID string `json:"azure_subscription_id"`
 	Environment    string `json:"environment"`
 
-	Provider     *schema.Provider          `json:"-"`
-	Component    *schema.Resource          `json:"-"`
-	ResourceData *schema.ResourceData      `json:"-"`
-	Schema       map[string]*schema.Schema `json:"-"`
-	ErrorMessage string                    `json:"error,omitempty"`
-	Subject      string                    `json:"-"`
-	Body         []byte                    `json:"-"`
-	CryptoKey    string                    `json:"-"`
-	Validator    *event.Validator          `json:"-"`
+	Provider     *schema.Provider
+	Component    *schema.Resource
+	ResourceData *schema.ResourceData
+	Schema       map[string]*schema.Schema
+	ErrorMessage string           `json:"error,omitempty"`
+	Subject      string           `json:"-"`
+	Body         []byte           `json:"-"`
+	CryptoKey    string           `json:"-"`
+	Validator    *event.Validator `json:"-"`
 }
 
 // New : Constructor
@@ -48,7 +120,7 @@ func New(subject string, body []byte, cryptoKey string, val *event.Validator) (e
 	var err error
 	n := Event{Subject: subject, Body: body, CryptoKey: cryptoKey, Validator: val}
 	n.Provider = azurerm.Provider().(*schema.Provider)
-	n.Component = n.Provider.ResourcesMap["azurerm_resource_group"]
+	n.Component = n.Provider.ResourcesMap["azurerm_virtual_machine"]
 	n.Schema = n.schema()
 	n.Body = body
 	n.Subject = subject
@@ -72,7 +144,7 @@ func (ev *Event) Find() error {
 	return errors.New(ev.Subject + " not supported")
 }
 
-// Create : Creates a Resource Group on Azure using terraform
+// Create : Creates a Virtual Network on Azure using terraform
 // providers
 func (ev *Event) Create() error {
 	c, err := ev.client()
@@ -84,20 +156,17 @@ func (ev *Event) Create() error {
 		ev.Log("error", err.Error())
 		return err
 	}
-	ev.ID = ev.ResourceData.Id()
-	ev.Log("debug", "Created resource group : "+ev.ID)
 
 	return nil
 }
 
-// Update : Updates an existing Resource Group on Azure
+// Update : Updates an existing Virtual Network on Azure
 // by using azurerm terraform provider resource
 func (ev *Event) Update() error {
 	c, err := ev.client()
 	if err != nil {
 		return err
 	}
-	ev.ResourceData.SetId(ev.ID)
 	if err := ev.Component.Update(ev.ResourceData, c); err != nil {
 		err := fmt.Errorf("Error creating the requestd resource : %s", err)
 		ev.Log("error", err.Error())
@@ -114,11 +183,9 @@ func (ev *Event) Get() error {
 	if err != nil {
 		return err
 	}
-	ev.ResourceData.SetId(ev.ID)
 	if err := ev.Component.Read(ev.ResourceData, c); err != nil {
-		err := fmt.Errorf("Error getting resource group : %s", err)
+		err := fmt.Errorf("Error getting virtual network : %s", err)
 		ev.Log("error", err.Error())
-		ev.Log("debug", "Original message: "+string(ev.Body))
 		return err
 	}
 
@@ -133,7 +200,6 @@ func (ev *Event) Delete() error {
 	if err != nil {
 		return err
 	}
-	ev.ResourceData.SetId(ev.ID)
 	if err := ev.Component.Delete(ev.ResourceData, c); err != nil {
 		err := fmt.Errorf("Error deleting the requested resource : %s", err)
 		ev.Log("error", err.Error())
@@ -147,8 +213,7 @@ func (ev *Event) Delete() error {
 func (ev *Event) GetBody() []byte {
 	var err error
 	if ev.Body, err = json.Marshal(ev); err != nil {
-		ev.Log("error", err.Error())
-		panic(err)
+		log.Println(err.Error())
 	}
 	return ev.Body
 }
@@ -178,14 +243,14 @@ func (ev *Event) Error(err error) {
 
 // Translates a ResourceData on a valid Ernest Event
 func (ev *Event) toEvent() {
-	ev.ID = ev.ResourceData.Id()
 	ev.Name = ev.ResourceData.Get("name").(string)
+	ev.ResourceGroupName = ev.ResourceData.Get("resource_group_name").(string)
 	ev.Location = ev.ResourceData.Get("location").(string)
-	tags := ev.ResourceData.Get("tags").(map[string]interface{})
-	ev.Tags = make(map[string]string, 0)
-	for k, v := range tags {
-		ev.Tags[k] = v.(string)
-	}
+	ev.AvailabilitySetID = ev.ResourceData.Get("availability_set_id").(string)
+	ev.LicenseType = ev.ResourceData.Get("license_type").(string)
+	ev.VMSize = ev.ResourceData.Get("vm_size").(string)
+	ev.DeleteOSDiskOnTermination = ev.ResourceData.Get("delete_os_disk_on_termination").(bool)
+	ev.Tags = ev.ResourceData.Get("tags").(map[string]string)
 }
 
 // Translates the current event on a valid ResourceData

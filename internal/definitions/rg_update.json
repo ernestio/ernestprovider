@@ -2,7 +2,8 @@
   "name": "rg_test",
   "location": "westus",
   "tags": {
-    "t1": "one_x",
-    "t2": "two_x"
+    "t1": "one",
+    "t2": "two",
+    "t3": "three"
   }
 }

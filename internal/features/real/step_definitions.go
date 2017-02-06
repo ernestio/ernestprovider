@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"strings"
 
 	aes "github.com/ernestio/crypto/aes"
 	"github.com/ernestio/ernestprovider"
@@ -16,6 +17,7 @@ import (
 )
 
 var lastSubject string
+var lastID string
 var lastBody []byte
 var key string
 
@@ -45,12 +47,45 @@ func init() {
 		j["azure_tenant_id"], _ = crypto.Encrypt(os.Getenv("AZURE_TENANT_ID"), key)
 		j["azure_subscription_id"], _ = crypto.Encrypt(os.Getenv("AZURE_SUBSCRIPTION_ID"), key)
 		j["environment"], _ = crypto.Encrypt(os.Getenv("AZURE_ENVIRONMENT"), key)
+		j["id"] = lastID
 
 		dat, _ = json.Marshal(j)
 
 		lastSubject, lastBody = ernestprovider.GetAndHandle(subject, dat, key)
+		var component struct {
+			ID string `json:"id"`
+		}
+		_ = json.Unmarshal(lastBody, &component)
+		parts := strings.Split(lastSubject, ".")
+		if parts[1] == "create" {
+			lastID = component.ID
+		}
 	})
 
+	Then(`^I should get a "(.+?)" response with "(.+?)" containing "(.+?)"$`, func(subject string, k string, v string) {
+		if lastSubject != subject {
+			T.Errorf("Last subject was: \n" + lastSubject)
+		}
+		value := gjson.Get(string(lastBody), k).String()
+		if strings.Contains(v, value) {
+			fmt.Println(string(lastBody))
+			T.Errorf("Value " + v + " is not equal to " + value)
+		}
+	})
+
+	Then(`^I should get a "(.+?)" response with "(.+?)" as "(.+?)"$`, func(subject string, k string, v string) {
+		if lastSubject != subject {
+			T.Errorf("Last subject was: \n" + lastSubject)
+		}
+		value := gjson.Get(string(lastBody), k).String()
+		if v != value {
+			fmt.Println(string(lastBody))
+			T.Errorf("Value " + v + " is not equal to " + value)
+		}
+	})
+
+	And(`^I have no messages on the buffer$`, func() {
+	})
 	Then(`^I should get a "(.+?)" response with "(.+?)" as "(.+?)"$`, func(subject string, k string, v string) {
 		if lastSubject != subject {
 			T.Errorf("Last subject was: \n" + lastSubject)
