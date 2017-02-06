@@ -5,6 +5,7 @@
 package ernestprovider
 
 import (
+	"errors"
 	"log"
 	"strings"
 
@@ -68,7 +69,11 @@ func Handle(ev *event.Event) (string, []byte) {
 
 // GetAndHandle : Gets an event and Handles its results
 func GetAndHandle(subject string, data []byte, key string) (string, []byte) {
-	ev := GetEvent(subject, data, key)
+	ev, err := GetEvent(subject, data, key)
+	if err != nil {
+		log.Println("[ERROR] : Event not found")
+		return subject + ".error", data
+	}
 	if *ev == nil {
 		log.Println("[ERROR] : Event not found")
 		return subject + ".error", data
@@ -78,7 +83,7 @@ func GetAndHandle(subject string, data []byte, key string) (string, []byte) {
 }
 
 // GetEvent : Gets a valid event based on a subject
-func GetEvent(subject string, data []byte, key string) *event.Event {
+func GetEvent(subject string, data []byte, key string) (*event.Event, error) {
 	parts := strings.Split(subject, ".")
 	switch parts[2] {
 	case "aws":
@@ -86,30 +91,31 @@ func GetEvent(subject string, data []byte, key string) *event.Event {
 	case "azure":
 		return getAzureEvent(subject, data, key)
 	}
-	return nil
+	return nil, errors.New("Unkown provider")
 }
 
-func getAzureEvent(subject string, data []byte, key string) *event.Event {
+func getAzureEvent(subject string, data []byte, key string) (*event.Event, error) {
 	var ev event.Event
+	var err error
 	parts := strings.Split(subject, ".")
 	val := event.NewValidator()
 	switch parts[0] {
 	case "azure_virtualnetwork":
-		ev = virtualnetwork.New(subject, data, key, val)
+		ev, err = virtualnetwork.New(subject, data, key, val)
 	case "azure_resource_group":
-		ev = resourcegroup.New(subject, data, key, val)
+		ev, err = resourcegroup.New(subject, data, key, val)
 	case "azure_subnet":
-		ev = subnet.New(subject, data, key, val)
+		ev, err = subnet.New(subject, data, key, val)
 	case "azure_network_interface":
-		ev = networkinterface.New(subject, data, key, val)
+		ev, err = networkinterface.New(subject, data, key, val)
 	case "azure_storage_account":
-		ev = storageaccount.New(subject, data, key, val)
+		ev, err = storageaccount.New(subject, data, key, val)
 	case "azure_storage_container":
-		ev = storagecontainer.New(subject, data, key, val)
+		ev, err = storagecontainer.New(subject, data, key, val)
 	}
-	return &ev
+	return &ev, err
 }
 
-func getAWSEvent(subject string, data []byte, key string) *event.Event {
-	return nil
+func getAWSEvent(subject string, data []byte, key string) (*event.Event, error) {
+	return nil, errors.New("Unconfigured provider")
 }
