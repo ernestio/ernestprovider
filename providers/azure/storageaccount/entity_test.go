@@ -8,9 +8,8 @@ import (
 )
 
 func validEvent() Event {
-	tags := make(map[string]*string)
-	one := "one"
-	tags["t1"] = &one
+	tags := make(map[string]string)
+	tags["t1"] = "one"
 
 	return Event{
 		Name:              "supu",
