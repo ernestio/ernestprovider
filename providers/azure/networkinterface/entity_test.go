@@ -11,9 +11,8 @@ func validEvent() Event {
 	var dns []string
 	var ips []IPConfiguration
 
-	tags := make(map[string]*string)
-	one := "one"
-	tags["t1"] = &one
+	tags := make(map[string]string)
+	tags["t1"] = "one"
 
 	dns = append(dns, "8.8.8.8")
 	dns = append(dns, "4.4.4.4")
