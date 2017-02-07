@@ -71,11 +71,11 @@ func Handle(ev *event.Event) (string, []byte) {
 func GetAndHandle(subject string, data []byte, key string) (string, []byte) {
 	ev, err := GetEvent(subject, data, key)
 	if err != nil {
-		log.Println("[ERROR] : Event not found")
+		log.Println("[ERROR] : Event not found (A) - " + err.Error())
 		return subject + ".error", data
 	}
 	if *ev == nil {
-		log.Println("[ERROR] : Event not found")
+		log.Println("[ERROR] : Event not found (B) ")
 		return subject + ".error", data
 	}
 
@@ -103,7 +103,7 @@ func getAzureEvent(subject string, data []byte, key string) (*event.Event, error
 	case "azure_virtualnetwork":
 		ev, err = virtualnetwork.New(subject, data, key, val)
 	case "azure_resource_group":
-		ev, err = resourcegroup.New(subject, data, key, val)
+		ev, err = resourcegroup.New(subject, key, data, val)
 	case "azure_subnet":
 		ev, err = subnet.New(subject, data, key, val)
 	case "azure_network_interface":

@@ -28,14 +28,13 @@ func NewValidator() *Validator {
 }
 
 // Validate : ...
-func (v *Validator) Validate(ev Event) error {
+func (v *Validator) Validate(ev interface{}) error {
 	err := v.Val.Struct(ev)
 	if err != nil {
 		msg := ""
 		errs := err.(validator.ValidationErrors)
 		for _, e := range errs {
 			msg += e.Translate(v.Trans) + "\n"
-			ev.Log("debug", e.Translate(v.Trans))
 		}
 		return errors.New(msg)
 	}
