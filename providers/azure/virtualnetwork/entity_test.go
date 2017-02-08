@@ -26,14 +26,14 @@ func validEvent() Event {
 		AddressSpace:   address,
 		DNSServerNames: dns,
 		Subnets:        subnets,
-		Validator:      event.NewValidator(),
 	}
 }
 
 func TestRequiredName(t *testing.T) {
 	ev := validEvent()
 	ev.Name = ""
-	err := ev.Validate()
+	val := event.NewValidator()
+	err := val.Validate(ev)
 
 	if err == nil {
 		t.Error("No error has been received!")
@@ -47,7 +47,8 @@ func TestRequiredName(t *testing.T) {
 func TestEmptyAddressSpace(t *testing.T) {
 	ev := validEvent()
 	ev.AddressSpace = []string{}
-	err := ev.Validate()
+	val := event.NewValidator()
+	err := val.Validate(ev)
 
 	if err == nil {
 		t.Error("No error has been received!")
@@ -62,7 +63,8 @@ func TestEmptyAddressSpace(t *testing.T) {
 func TestEmptySubnets(t *testing.T) {
 	ev := validEvent()
 	ev.Subnets = []subnet{}
-	err := ev.Validate()
+	val := event.NewValidator()
+	err := val.Validate(ev)
 
 	if err == nil {
 		t.Error("No error has been received!")
@@ -77,7 +79,8 @@ func TestEmptySubnets(t *testing.T) {
 func TestSubnetsEmptyName(t *testing.T) {
 	ev := validEvent()
 	ev.Subnets[0].Name = ""
-	err := ev.Validate()
+	val := event.NewValidator()
+	err := val.Validate(ev)
 
 	if err == nil {
 		t.Error("No error has been received!")
@@ -92,7 +95,8 @@ func TestSubnetsEmptyName(t *testing.T) {
 func TestSubnetsInvalidPrefix(t *testing.T) {
 	ev := validEvent()
 	ev.Subnets[0].AddressPrefix = "supu"
-	err := ev.Validate()
+	val := event.NewValidator()
+	err := val.Validate(ev)
 
 	if err == nil {
 		t.Error("No error has been received!")
@@ -107,7 +111,8 @@ func TestSubnetsInvalidPrefix(t *testing.T) {
 func TestInvalidDNSServers(t *testing.T) {
 	ev := validEvent()
 	ev.DNSServerNames[0] = "supu"
-	err := ev.Validate()
+	val := event.NewValidator()
+	err := val.Validate(ev)
 
 	if err == nil {
 		t.Error("No error has been received!")
@@ -121,8 +126,9 @@ func TestInvalidDNSServers(t *testing.T) {
 
 func TestHappyPath(t *testing.T) {
 	ev := validEvent()
+	val := event.NewValidator()
+	err := val.Validate(ev)
 
-	err := ev.Validate()
 	if err != nil {
 		println(err.Error())
 		t.Error("I'm in a bad mood.")

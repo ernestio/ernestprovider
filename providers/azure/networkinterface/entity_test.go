@@ -31,14 +31,15 @@ func validEvent() Event {
 		IPConfigurations:  ips,
 		DNSServers:        dns,
 		Tags:              tags,
-		Validator:         event.NewValidator(),
 	}
 }
 
 func TestRequiredName(t *testing.T) {
 	ev := validEvent()
 	ev.Name = ""
-	err := ev.Validate()
+
+	val := event.NewValidator()
+	err := val.Validate(ev)
 
 	if err == nil {
 		t.Error("No error has been received!")
@@ -52,7 +53,9 @@ func TestRequiredName(t *testing.T) {
 func TestRequiredLocation(t *testing.T) {
 	ev := validEvent()
 	ev.Location = ""
-	err := ev.Validate()
+
+	val := event.NewValidator()
+	err := val.Validate(ev)
 
 	if err == nil {
 		t.Error("No error has been received!")
@@ -66,7 +69,9 @@ func TestRequiredLocation(t *testing.T) {
 func TestRequiredResourceGroupName(t *testing.T) {
 	ev := validEvent()
 	ev.ResourceGroupName = ""
-	err := ev.Validate()
+
+	val := event.NewValidator()
+	err := val.Validate(ev)
 
 	if err == nil {
 		t.Error("No error has been received!")
@@ -81,7 +86,9 @@ func TestRequiredIPConfigurations(t *testing.T) {
 	var ips []IPConfiguration
 	ev := validEvent()
 	ev.IPConfigurations = ips
-	err := ev.Validate()
+
+	val := event.NewValidator()
+	err := val.Validate(ev)
 
 	if err == nil {
 		t.Error("No error has been received!")
@@ -95,7 +102,9 @@ func TestRequiredIPConfigurations(t *testing.T) {
 func TestRequiredIPConfigurationsName(t *testing.T) {
 	ev := validEvent()
 	ev.IPConfigurations[0].Name = ""
-	err := ev.Validate()
+
+	val := event.NewValidator()
+	err := val.Validate(ev)
 
 	if err == nil {
 		t.Error("No error has been received!")
@@ -110,7 +119,9 @@ func TestRequiredIPConfigurationsSubnet(t *testing.T) {
 	var str string
 	ev := validEvent()
 	ev.IPConfigurations[0].Subnet = str
-	err := ev.Validate()
+
+	val := event.NewValidator()
+	err := val.Validate(ev)
 
 	if err == nil {
 		t.Error("No error has been received!")
@@ -125,7 +136,9 @@ func TestRequiredIPConfigurationsPrivateIPAddressAllocation(t *testing.T) {
 	var str string
 	ev := validEvent()
 	ev.IPConfigurations[0].PrivateIPAddressAllocation = str
-	err := ev.Validate()
+
+	val := event.NewValidator()
+	err := val.Validate(ev)
 
 	if err == nil {
 		t.Error("No error has been received!")
@@ -139,7 +152,9 @@ func TestRequiredIPConfigurationsPrivateIPAddressAllocation(t *testing.T) {
 func TestInvalidDNS(t *testing.T) {
 	ev := validEvent()
 	ev.DNSServers[0] = "no ip"
-	err := ev.Validate()
+
+	val := event.NewValidator()
+	err := val.Validate(ev)
 
 	if err == nil {
 		t.Error("No error has been received!")
@@ -153,7 +168,8 @@ func TestInvalidDNS(t *testing.T) {
 func TestHappyPath(t *testing.T) {
 	ev := validEvent()
 
-	err := ev.Validate()
+	val := event.NewValidator()
+	err := val.Validate(ev)
 	if err != nil {
 		println(err.Error())
 		t.Error("I'm in a bad mood.")

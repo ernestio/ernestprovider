@@ -2,7 +2,7 @@
   "name": "ni_test",
   "resource_group_name": "rg_test",
   "location": "westus",
-  "ip_configurations": [{
+  "ip_configuration": [{
     "name": "ip_conf_test",
     "subnet_id": "test_subnet",
     "private_ip_address_allocation": "dynamic"

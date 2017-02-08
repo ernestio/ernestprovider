@@ -3,7 +3,5 @@
   "resource_group_name": "rg_test",
   "virtual_network_name": "vn_test",
   "address_prefix": "10.1.2.0/24",
-  "network_security_group_id": "net_sec",
-  "route_table_id": "rt_test",
   "ip_configurations": ["a", "b"]
 }

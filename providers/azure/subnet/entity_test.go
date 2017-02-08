@@ -20,14 +20,14 @@ func validEvent() Event {
 		NetworkSecurityGroup: "sec",
 		RouteTable:           "route",
 		IPConfigurations:     configs,
-		Validator:            event.NewValidator(),
 	}
 }
 
 func TestRequiredName(t *testing.T) {
 	ev := validEvent()
 	ev.Name = ""
-	err := ev.Validate()
+	val := event.NewValidator()
+	err := val.Validate(ev)
 
 	if err == nil {
 		t.Error("No error has been received!")
@@ -41,7 +41,8 @@ func TestRequiredName(t *testing.T) {
 func TestRequiredResourceGroupName(t *testing.T) {
 	ev := validEvent()
 	ev.ResourceGroupName = ""
-	err := ev.Validate()
+	val := event.NewValidator()
+	err := val.Validate(ev)
 
 	if err == nil {
 		t.Error("No error has been received!")
@@ -55,7 +56,8 @@ func TestRequiredResourceGroupName(t *testing.T) {
 func TestRequiredVirtualNetworkName(t *testing.T) {
 	ev := validEvent()
 	ev.VirtualNetworkName = ""
-	err := ev.Validate()
+	val := event.NewValidator()
+	err := val.Validate(ev)
 
 	if err == nil {
 		t.Error("No error has been received!")
@@ -69,7 +71,8 @@ func TestRequiredVirtualNetworkName(t *testing.T) {
 func TestRequiredAddressPrefix(t *testing.T) {
 	ev := validEvent()
 	ev.AddressPrefix = ""
-	err := ev.Validate()
+	val := event.NewValidator()
+	err := val.Validate(ev)
 
 	if err == nil {
 		t.Error("No error has been received!")
@@ -83,7 +86,8 @@ func TestRequiredAddressPrefix(t *testing.T) {
 func TestHappyPath(t *testing.T) {
 	ev := validEvent()
 
-	err := ev.Validate()
+	val := event.NewValidator()
+	err := val.Validate(ev)
 	if err != nil {
 		println(err.Error())
 		t.Error("I'm in a bad mood.")

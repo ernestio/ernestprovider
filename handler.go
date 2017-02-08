@@ -101,17 +101,17 @@ func getAzureEvent(subject string, data []byte, key string) (*event.Event, error
 	val := event.NewValidator()
 	switch parts[0] {
 	case "azure_virtualnetwork":
-		ev, err = virtualnetwork.New(subject, data, key, val)
+		ev, err = virtualnetwork.New(subject, key, data, val)
 	case "azure_resource_group":
 		ev, err = resourcegroup.New(subject, key, data, val)
 	case "azure_subnet":
-		ev, err = subnet.New(subject, data, key, val)
+		ev, err = subnet.New(subject, key, data, val)
 	case "azure_network_interface":
-		ev, err = networkinterface.New(subject, data, key, val)
+		ev, err = networkinterface.New(subject, key, data, val)
 	case "azure_storage_account":
-		ev, err = storageaccount.New(subject, data, key, val)
+		ev, err = storageaccount.New(subject, key, data, val)
 	case "azure_storage_container":
-		ev, err = storagecontainer.New(subject, data, key, val)
+		ev, err = storagecontainer.New(subject, key, data, val)
 	}
 	return &ev, err
 }

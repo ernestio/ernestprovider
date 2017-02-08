@@ -19,14 +19,14 @@ func validEvent() Event {
 		ResourceGroupName:  "rg_test",
 		StorageAccountName: "sa_test",
 		Properties:         properties,
-		Validator:          event.NewValidator(),
 	}
 }
 
 func TestRequiredName(t *testing.T) {
 	ev := validEvent()
 	ev.Name = ""
-	err := ev.Validate()
+	val := event.NewValidator()
+	err := val.Validate(ev)
 
 	if err == nil {
 		t.Error("No error has been received!")
@@ -40,7 +40,8 @@ func TestRequiredName(t *testing.T) {
 func TestRequiredStorageAccountName(t *testing.T) {
 	ev := validEvent()
 	ev.StorageAccountName = ""
-	err := ev.Validate()
+	val := event.NewValidator()
+	err := val.Validate(ev)
 
 	if err == nil {
 		t.Error("No error has been received!")
@@ -54,7 +55,8 @@ func TestRequiredStorageAccountName(t *testing.T) {
 func TestRequiredResourceGroupName(t *testing.T) {
 	ev := validEvent()
 	ev.ResourceGroupName = ""
-	err := ev.Validate()
+	val := event.NewValidator()
+	err := val.Validate(ev)
 
 	if err == nil {
 		t.Error("No error has been received!")
@@ -68,7 +70,8 @@ func TestRequiredResourceGroupName(t *testing.T) {
 func TestHappyPath(t *testing.T) {
 	ev := validEvent()
 
-	err := ev.Validate()
+	val := event.NewValidator()
+	err := val.Validate(ev)
 	if err != nil {
 		println(err.Error())
 		t.Error("I'm in a bad mood.")

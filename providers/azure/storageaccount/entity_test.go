@@ -17,14 +17,14 @@ func validEvent() Event {
 		Location:          "westus",
 		AccountType:       "atype",
 		Tags:              tags,
-		Validator:         event.NewValidator(),
 	}
 }
 
 func TestRequiredName(t *testing.T) {
 	ev := validEvent()
 	ev.Name = ""
-	err := ev.Validate()
+	val := event.NewValidator()
+	err := val.Validate(ev)
 
 	if err == nil {
 		t.Error("No error has been received!")
@@ -38,7 +38,8 @@ func TestRequiredName(t *testing.T) {
 func TestRequiredLocation(t *testing.T) {
 	ev := validEvent()
 	ev.Location = ""
-	err := ev.Validate()
+	val := event.NewValidator()
+	err := val.Validate(ev)
 
 	if err == nil {
 		t.Error("No error has been received!")
@@ -52,7 +53,8 @@ func TestRequiredLocation(t *testing.T) {
 func TestRequiredResourceGroupName(t *testing.T) {
 	ev := validEvent()
 	ev.ResourceGroupName = ""
-	err := ev.Validate()
+	val := event.NewValidator()
+	err := val.Validate(ev)
 
 	if err == nil {
 		t.Error("No error has been received!")
@@ -66,7 +68,8 @@ func TestRequiredResourceGroupName(t *testing.T) {
 func TestRequiredAccounttype(t *testing.T) {
 	ev := validEvent()
 	ev.AccountType = ""
-	err := ev.Validate()
+	val := event.NewValidator()
+	err := val.Validate(ev)
 
 	if err == nil {
 		t.Error("No error has been received!")
@@ -80,7 +83,8 @@ func TestRequiredAccounttype(t *testing.T) {
 func TestHappyPath(t *testing.T) {
 	ev := validEvent()
 
-	err := ev.Validate()
+	val := event.NewValidator()
+	err := val.Validate(ev)
 	if err != nil {
 		println(err.Error())
 		t.Error("I'm in a bad mood.")
