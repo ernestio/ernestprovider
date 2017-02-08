@@ -22,7 +22,7 @@ type Event struct {
 	Name                   string            `json:"name" validate:"required"`
 	ResourceGroupName      string            `json:"resource_group_name" validate:"required"`
 	Location               string            `json:"location" validate:"required"`
-	NetworkSecurityGroup   string            `json:"network_security_group_id"`
+	AccountKind            string            `json:"account_kind"`
 	AccountType            string            `json:"account_type" validate:"required"`
 	PrimaryLocation        string            `json:"primary_location"`
 	SecondaryLocation      string            `json:"secondary_location"`
@@ -73,7 +73,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.Location = d.Get("location").(string)
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)
 	ev.Location = d.Get("location").(string)
-	ev.NetworkSecurityGroup = d.Get("network_security_group_id").(string)
+	ev.AccountKind = d.Get("account_kind").(string)
 	ev.AccountType = d.Get("account_type").(string)
 	ev.PrimaryLocation = d.Get("primary_location").(string)
 	ev.SecondaryLocation = d.Get("secondary_location").(string)
@@ -86,7 +86,11 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.PrimaryFileEndpoint = d.Get("primary_file_endpoint").(string)
 	ev.PrimaryAccessKey = d.Get("primary_access_key").(string)
 	ev.SecondaryAccessKey = d.Get("secondary_access_key").(string)
-	ev.Tags = d.Get("tags").(map[string]string)
+	tags := make(map[string]string, 0)
+	for k, v := range d.Get("tags").(map[string]interface{}) {
+		tags[k] = v.(string)
+	}
+	ev.Tags = tags
 
 	return nil
 }
@@ -119,7 +123,7 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	fields["name"] = ev.Name
 	fields["resource_group_name"] = ev.ResourceGroupName
 	fields["location"] = ev.Location
-	fields["network_security_group"] = ev.NetworkSecurityGroup
+	fields["account_kind"] = ev.AccountKind
 	fields["account_type"] = ev.AccountType
 	fields["primary_location"] = ev.PrimaryLocation
 	fields["secondary_location"] = ev.SecondaryLocation

@@ -1,10 +1,11 @@
 {
-  "name": "sa_test",
+  "name": "satest1082376408127",
   "resource_group_name": "rg_test",
   "location": "westus",
-  "account_type": "test",
+  "account_type": "Standard_LRS",
   "tags": {
     "t1": "one",
-    "t2": "three"
+    "t2": "two",
+    "t3": "three"
   }
 }
