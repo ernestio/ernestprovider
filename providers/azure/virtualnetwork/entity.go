@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
 
 	aes "github.com/ernestio/crypto/aes"
@@ -26,13 +25,13 @@ type Event struct {
 	DNSServerNames    []string          `json:"dns_server_names" validate:"dive,ip"`
 	Subnets           []subnet          `json:"subnets" validate:"min=1"`
 	Location          string            `json:"location"`
+	ResourceGroupName string            `json:"resource_group_name"`
+	Tags              map[string]string `json:"tags"`
 	ClientID          string            `json:"azure_client_id"`
 	ClientSecret      string            `json:"azure_client_secret"`
 	TenantID          string            `json:"azure_tenant_id"`
 	SubscriptionID    string            `json:"azure_subscription_id"`
 	Environment       string            `json:"environment"`
-	ResourceGroupName string            `json:"resource_group_name"`
-	Tags              map[string]string `json:"tags"`
 	ErrorMessage      string            `json:"error,omitempty"`
 	CryptoKey         string            `json:"-"`
 }
@@ -68,11 +67,37 @@ func (ev *Event) GetID() string {
 // ResourceDataToEvent : Translates a ResourceData on a valid Ernest Event
 func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.Name = d.Get("name").(string)
-	ev.AddressSpace = d.Get("address_space").([]string)
-	ev.DNSServerNames = d.Get("dns_servers").([]string)
+
+	prefixes := []string{}
+	for _, prefix := range d.Get("address_space").([]interface{}) {
+		prefixes = append(prefixes, prefix.(string))
+	}
+	ev.AddressSpace = prefixes
+
+	dnses := []string{}
+	for _, dns := range d.Get("dns_servers").([]interface{}) {
+		dnses = append(dnses, dns.(string))
+	}
+	ev.DNSServerNames = dnses
 	ev.Location = d.Get("location").(string)
-	ev.Subnets = d.Get("subnet").([]subnet)
-	ev.Tags = d.Get("tags").(map[string]string)
+
+	subnets := []subnet{}
+	for _, sub := range d.Get("subnet").(*schema.Set).List() {
+		m := sub.(map[string]interface{})
+		s := subnet{
+			Name:          m["name"].(string),
+			AddressPrefix: m["address_prefix"].(string),
+			SecurityGroup: m["security_group"].(string),
+		}
+		subnets = append(subnets, s)
+	}
+	ev.Subnets = subnets
+
+	tags := make(map[string]string, 0)
+	for k, v := range d.Get("tags").(map[string]interface{}) {
+		tags[k] = v.(string)
+	}
+	ev.Tags = tags
 
 	return nil
 }
@@ -103,6 +128,7 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 
 	fields := make(map[string]interface{})
 	fields["name"] = ev.Name
+	fields["resource_group_name"] = ev.ResourceGroupName
 	fields["address_space"] = ev.AddressSpace
 	fields["dns_servers"] = ev.DNSServerNames
 	fields["location"] = ev.Location
@@ -120,25 +146,14 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 }
 
 // Maps the event subnets to a valid ResourceData List
-func (ev *Event) mapSubnets() *schema.Set {
-	list := &schema.Set{
-		F: resourceAzureSubnetHash,
-	}
+func (ev *Event) mapSubnets() []map[string]interface{} {
+	subnets := make([]map[string]interface{}, 0)
 	for _, sub := range ev.Subnets {
 		s := map[string]interface{}{}
 		s["name"] = sub.Name
 		s["address_prefix"] = sub.AddressPrefix
-		list.Add(s)
+		s["security_group"] = sub.SecurityGroup
+		subnets = append(subnets, s)
 	}
-	return list
-}
-
-func resourceAzureSubnetHash(v interface{}) int {
-	m := v.(map[string]interface{})
-	subnet := m["name"].(string) + m["address_prefix"].(string)
-	if securityGroup, present := m["security_group"]; present {
-		subnet = subnet + securityGroup.(string)
-	}
-
-	return hashcode.String(subnet)
+	return subnets
 }

@@ -112,9 +112,14 @@ func (ev *Event) Get() error {
 	}
 	ev.ResourceData.SetId(ev.Resource.GetID())
 	if err := ev.Component.Read(ev.ResourceData, c); err != nil {
-		err := fmt.Errorf("Error getting resource group : %s", err)
+		err := fmt.Errorf("Error getting resource : %s", err)
 		ev.Log("error", err.Error())
 		ev.Log("debug", "Original message: "+string(ev.Body))
+		return err
+	}
+	if ev.ResourceData.Id() == "" {
+		err := fmt.Errorf("Resource not found")
+		ev.Log("warning", err.Error())
 		return err
 	}
 

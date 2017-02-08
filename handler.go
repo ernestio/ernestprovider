@@ -100,7 +100,7 @@ func getAzureEvent(subject string, data []byte, key string) (*event.Event, error
 	parts := strings.Split(subject, ".")
 	val := event.NewValidator()
 	switch parts[0] {
-	case "azure_virtualnetwork":
+	case "azure_virtual_network":
 		ev, err = virtualnetwork.New(subject, key, data, val)
 	case "azure_resource_group":
 		ev, err = resourcegroup.New(subject, key, data, val)

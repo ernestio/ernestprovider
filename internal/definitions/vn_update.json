@@ -1,16 +1,17 @@
 {
   "id": "id",
-  "name": "testing_resource",
-  "address_space": ["10.1.2.0/24", "10.1.3.0/24"],
-  "dns_server_names": ["8.8.8.8", "4.4.4.4"],
+  "name": "vn_test",
+  "address_space": ["10.0.0.0/16", "10.1.3.0/24"],
+  "dns_server_names": ["10.0.0.4", "10.0.0.5"],
   "subnets": [{
-    "name": "subnet1",
-    "address_prefix": "10.1.2.0/24"
+    "name": "sub_test",
+    "address_prefix": "10.0.1.0/24"
   }],
   "location": "westus",
-  "resource_group_name": "ernest",
+  "resource_group_name": "rg_test",
   "tags": {
     "t1": "one",
-    "t2": "three"
+    "t2": "two",
+    "t3": "three"
   }
 }
