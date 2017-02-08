@@ -28,4 +28,15 @@ The following attributes are exported:
 
 Rsource group does not have any dependency
 
+## Example
 
+You'll find a json example [here](../../../internal/definitions/rg_create.json)
+
+## Running "real" tests
+
+This library is provided with a suite of "real" tests to be ran against Azure. In order to run virtual network specific tests, you'll need to setup your test suite as [described here](../../../internal/)
+
+And then run virtual network specific tests from the root of the project with:
+
+```
+$ gucumber --tags=@resource_group

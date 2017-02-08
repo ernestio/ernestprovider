@@ -106,3 +106,9 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 
 	return nil
 }
+
+// Error : will mark the event as errored
+func (ev *Event) Error(err error) {
+	ev.ErrorMessage = err.Error()
+	ev.Body, err = json.Marshal(ev)
+}

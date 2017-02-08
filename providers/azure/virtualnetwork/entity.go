@@ -157,3 +157,9 @@ func (ev *Event) mapSubnets() []map[string]interface{} {
 	}
 	return subnets
 }
+
+// Error : will mark the event as errored
+func (ev *Event) Error(err error) {
+	ev.ErrorMessage = err.Error()
+	ev.Body, err = json.Marshal(ev)
+}

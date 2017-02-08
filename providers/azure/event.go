@@ -18,6 +18,7 @@ type Resource interface {
 	GetID() string
 	ResourceDataToEvent(d *schema.ResourceData) error
 	EventToResourceData(d *schema.ResourceData) error
+	Error(err error)
 }
 
 // Event : ...
@@ -119,7 +120,7 @@ func (ev *Event) Get() error {
 	}
 	if ev.ResourceData.Id() == "" {
 		err := fmt.Errorf("Resource not found")
-		ev.Log("warning", err.Error())
+		ev.Log("warn", err.Error())
 		return err
 	}
 
@@ -175,9 +176,7 @@ func (ev *Event) Process() (err error) {
 // Error : Will respond the current event with an error
 func (ev *Event) Error(err error) {
 	log.Printf("Error: %s", err.Error())
-	ev.ErrorMessage = err.Error()
-
-	ev.Body, err = json.Marshal(ev)
+	ev.Resource.Error(err)
 }
 
 // Azure virtual network client

@@ -65,7 +65,12 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.AddressPrefix = d.Get("address_prefix").(string)
 	ev.NetworkSecurityGroup = d.Get("network_security_group_id").(string)
 	ev.RouteTable = d.Get("route_table_id").(string)
-	ev.IPConfigurations = d.Get("ip_configurations").([]string)
+
+	configs := []string{}
+	for _, config := range d.Get("ip_configurations").(*schema.Set).List() {
+		configs = append(configs, config.(string))
+	}
+	ev.IPConfigurations = configs
 
 	return nil
 }
@@ -111,4 +116,10 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	}
 
 	return nil
+}
+
+// Error : will mark the event as errored
+func (ev *Event) Error(err error) {
+	ev.ErrorMessage = err.Error()
+	ev.Body, err = json.Marshal(ev)
 }
