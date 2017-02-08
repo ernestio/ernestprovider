@@ -18,19 +18,19 @@ import (
 // Event : This is the Ernest representation of an azure networkinterface
 type Event struct {
 	event.Base
-	ID                 string                 `json:"id"`
-	Name               string                 `json:"name" validate:"required"`
-	ResourceGroupName  string                 `json:"resource_group_name" validate:"required"`
-	StorageAccountName string                 `json:"storage_account_name" validate:"required"`
-	StorageType        string                 `json:"container_access_type"`
-	Properties         map[string]interface{} `json:"properties"`
-	ClientID           string                 `json:"azure_client_id"`
-	ClientSecret       string                 `json:"azure_client_secret"`
-	TenantID           string                 `json:"azure_tenant_id"`
-	SubscriptionID     string                 `json:"azure_subscription_id"`
-	Environment        string                 `json:"environment"`
-	ErrorMessage       string                 `json:"error,omitempty"`
-	CryptoKey          string                 `json:"-"`
+	ID                  string            `json:"id"`
+	Name                string            `json:"name" validate:"required"`
+	ResourceGroupName   string            `json:"resource_group_name" validate:"required"`
+	StorageAccountName  string            `json:"storage_account_name" validate:"required"`
+	ContainerAccessType string            `json:"container_access_type"`
+	Properties          map[string]string `json:"properties"`
+	ClientID            string            `json:"azure_client_id"`
+	ClientSecret        string            `json:"azure_client_secret"`
+	TenantID            string            `json:"azure_tenant_id"`
+	SubscriptionID      string            `json:"azure_subscription_id"`
+	Environment         string            `json:"environment"`
+	ErrorMessage        string            `json:"error,omitempty"`
+	CryptoKey           string            `json:"-"`
 }
 
 // New : Constructor
@@ -60,8 +60,13 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.Name = d.Get("name").(string)
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)
 	ev.StorageAccountName = d.Get("storage_account_name").(string)
-	ev.StorageType = d.Get("storage_type").(string)
-	ev.Properties = d.Get("properties").(map[string]interface{})
+	ev.ContainerAccessType = d.Get("container_access_type").(string)
+
+	properties := make(map[string]string, 0)
+	for k, v := range d.Get("properties").(map[string]interface{}) {
+		properties[k] = v.(string)
+	}
+	ev.Properties = properties
 
 	return nil
 }
@@ -94,7 +99,7 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	fields["name"] = ev.Name
 	fields["resource_group_name"] = ev.ResourceGroupName
 	fields["storage_account_name"] = ev.StorageAccountName
-	fields["storage_type"] = ev.StorageType
+	fields["container_access_type"] = ev.ContainerAccessType
 	fields["properties"] = ev.Properties
 	for k, v := range fields {
 		if err := d.Set(k, v); err != nil {

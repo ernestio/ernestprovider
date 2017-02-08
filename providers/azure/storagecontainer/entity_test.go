@@ -12,7 +12,7 @@ import (
 )
 
 func validEvent() Event {
-	properties := make(map[string]interface{})
+	properties := make(map[string]string)
 
 	return Event{
 		Name:               "supu",

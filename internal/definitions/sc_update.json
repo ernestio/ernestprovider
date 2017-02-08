@@ -1,6 +1,0 @@
-{
-  "name": "sa_test",
-  "resource_group_name": "rg_test",
-  "storage_account_name": "sa_name",
-  "container_access_type": "public"
-}

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"reflect"
 
 	"github.com/ernestio/ernestprovider/event"
 	"github.com/fatih/color"
@@ -95,6 +96,10 @@ func (ev *Event) Update() error {
 		return err
 	}
 	ev.ResourceData.SetId(ev.Resource.GetID())
+	st := reflect.TypeOf(ev.Component)
+	if _, ok := st.MethodByName("Update"); !ok {
+		return errors.New("Not supported")
+	}
 	if err := ev.Component.Update(ev.ResourceData, c); err != nil {
 		err := fmt.Errorf("Error creating the requestd resource : %s", err)
 		ev.Log("error", err.Error())
