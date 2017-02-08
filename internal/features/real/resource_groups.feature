@@ -1,4 +1,4 @@
-@real @resource_group
+@real @azure @resource_group
 
 Feature: Resource group
 

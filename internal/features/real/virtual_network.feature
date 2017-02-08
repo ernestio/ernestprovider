@@ -1,4 +1,4 @@
-@real @virtual_network
+@real @azure @virtual_network
 
 Feature: Virtual network
 
