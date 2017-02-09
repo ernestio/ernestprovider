@@ -4,11 +4,12 @@
   "location": "westus",
   "ip_configuration": [{
     "name": "ip_conf_test",
-    "subnet_id": "test_subnet",
+    "subnet_id": "$(subnetID)",
     "private_ip_address_allocation": "dynamic"
   }],
   "tags": {
     "t1": "one",
-    "t2": "two"
+    "t2": "two",
+    "t3": "three"
   }
 }

@@ -20,6 +20,7 @@ var lastSubject string
 var lastID string
 var lastBody []byte
 var key string
+var subnetID string
 
 func init() {
 	key = os.Getenv("ERNEST_CRYPTO_KEY")
@@ -35,6 +36,7 @@ func init() {
 		if err != nil {
 			log.Println(err.Error())
 		}
+		dat = []byte(strings.Replace(string(dat), "$(subnetID)", subnetID, -1))
 
 		var j map[string]interface{}
 		if err := json.Unmarshal(dat, &j); err != nil {
@@ -59,6 +61,9 @@ func init() {
 		parts := strings.Split(lastSubject, ".")
 		if parts[1] == "create" {
 			lastID = component.ID
+			if parts[0] == "azure_subnet" {
+				subnetID = component.ID
+			}
 		}
 	})
 

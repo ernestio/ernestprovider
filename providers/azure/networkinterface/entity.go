@@ -87,12 +87,42 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.MacAddress = d.Get("mac_address").(string)
 	ev.PrivateIPAddress = d.Get("private_ip_address").(string)
 	ev.VirtualMachineID = d.Get("virtual_machine_id").(string)
-	ev.IPConfigurations = d.Get("ip_configuration").([]IPConfiguration)
-	ev.DNSServers = d.Get("dns_servers").([]string)
+
+	configs := []IPConfiguration{}
+	for _, cfg := range d.Get("ip_configuration").(*schema.Set).List() {
+		m := cfg.(map[string]interface{})
+		s := IPConfiguration{
+			Name:                       m["name"].(string),
+			Subnet:                     m["subnet_id"].(string),
+			PrivateIPAddress:           m["private_ip_address"].(string),
+			PrivateIPAddressAllocation: m["private_ip_address_allocation"].(string),
+			PublicIPAddress:            m["public_ip_address_id"].(string),
+		}
+		s.LoadBalancerBackendAddressPools = make([]string, 0)
+		for _, v := range m["load_balancer_backend_address_pools_ids"].(*schema.Set).List() {
+			s.LoadBalancerBackendAddressPools = append(s.LoadBalancerBackendAddressPools, v.(string))
+		}
+		s.LoadBalancerInboundNatRules = make([]string, 0)
+		for _, v := range m["load_balancer_inbound_nat_rules_ids"].(*schema.Set).List() {
+			s.LoadBalancerInboundNatRules = append(s.LoadBalancerInboundNatRules, v.(string))
+		}
+		configs = append(configs, s)
+	}
+	ev.IPConfigurations = configs
+	ev.DNSServers = make([]string, 0)
+	for _, v := range d.Get("dns_servers").(*schema.Set).List() {
+		ev.DNSServers = append(ev.DNSServers, v.(string))
+	}
+
 	ev.InternalDNSNameLabel = d.Get("internal_dns_name_label").(string)
-	ev.AppliedDNSServers = d.Get("applied_dns_servers").([]string)
+	ev.AppliedDNSServers = make([]string, 0)
+	for _, v := range d.Get("applied_dns_servers").(*schema.Set).List() {
+		ev.AppliedDNSServers = append(ev.AppliedDNSServers, v.(string))
+	}
+
 	ev.InternalFQDN = d.Get("internal_fqdn").(string)
 	ev.EnableIPForwarding = d.Get("enable_ip_forwarding").(bool)
+
 	tags := d.Get("tags").(map[string]interface{})
 	ev.Tags = make(map[string]string, 0)
 	for k, v := range tags {

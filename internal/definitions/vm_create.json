@@ -1,0 +1,38 @@
+{
+  "name": "vm_test",
+  "location": "westus",
+  "resource_group_name": "rg_test",
+  "network_interface_ids": ["id1", "id2"],
+  "vm_size": "Standard_A0",
+  "storage_image_reference": {
+    "publisher": "Canonical",
+    "offer": "UbuntuServer",
+    "sku": "14.04.2-LTS",
+    "version": "latest"
+  },
+  "storage_os_disk": {
+    "name": "myosdisk",
+    "vhd_uri": "mydisk1.vhd",
+    "caching": "ReadWrite",
+    "create_option": "FromImage"
+  },
+  "storage_data_disk": {
+    "name": "datadisk0",
+    "vhd_uri": "mydisk1.vhd",
+    "disk_size_gb": "1024",
+    "create_option": "empty",
+    "lun": 0
+  },
+  "os_profile": {
+    "computer_name": "hostname",
+    "admin_username": "admin",
+    "admin_password": "Password123"
+  },
+  "os_profile_linux_config": {
+    "disable_password_authentication": false
+  }
+  "tags": {
+    "t1": "one",
+    "t2": "two"
+  }
+}
