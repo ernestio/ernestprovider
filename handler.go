@@ -11,6 +11,7 @@ import (
 
 	"github.com/ernestio/ernestprovider/event"
 	"github.com/ernestio/ernestprovider/providers/azure/lb"
+	"github.com/ernestio/ernestprovider/providers/azure/localnetworkgateway"
 	"github.com/ernestio/ernestprovider/providers/azure/networkinterface"
 	"github.com/ernestio/ernestprovider/providers/azure/publicip"
 	"github.com/ernestio/ernestprovider/providers/azure/resourcegroup"
@@ -124,6 +125,8 @@ func getAzureEvent(subject string, data []byte, key string) (*event.Event, error
 		ev, err = lb.New(subject, key, data, val)
 	case "azure_sql_server":
 		ev, err = sqlserver.New(subject, key, data, val)
+	case "azure_local_network_gateway":
+		ev, err = localnetworkgateway.New(subject, key, data, val)
 	}
 	return &ev, err
 }
