@@ -78,7 +78,7 @@ func (ev *Event) Create() error {
 		return err
 	}
 	if err := ev.Component.Create(ev.ResourceData, c); err != nil {
-		err := fmt.Errorf("Error creating the requestd resource : %s", err)
+		err := fmt.Errorf("Error creating the requested resource : %s", err)
 		ev.Log("error", err.Error())
 		return err
 	}
@@ -102,7 +102,7 @@ func (ev *Event) Update() error {
 		// return errors.New("Not supported")
 	}
 	if err := ev.Component.Update(ev.ResourceData, c); err != nil {
-		err := fmt.Errorf("Error creating the requestd resource : %s", err)
+		err := fmt.Errorf("Error creating the requested resource : %s", err)
 		ev.Log("error", err.Error())
 		return err
 	}
