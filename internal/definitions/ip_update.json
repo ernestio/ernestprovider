@@ -1,0 +1,11 @@
+{
+  "name": "mytestingIP",
+  "location": "westus",
+  "resource_group_name": "rg_test",
+  "public_ip_address_allocation": "static",
+  "tags": {
+    "t1": "one",
+    "t2": "two",
+    "t3": "three"
+  }
+}

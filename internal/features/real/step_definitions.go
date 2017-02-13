@@ -22,6 +22,7 @@ var lastBody []byte
 var key string
 var subnetID string
 var niID string
+var publicIPID string
 var blobEndpoint string
 
 func init() {
@@ -40,6 +41,7 @@ func init() {
 		}
 		dat = []byte(strings.Replace(string(dat), "$(subnetID)", subnetID, -1))
 		dat = []byte(strings.Replace(string(dat), "$(networkInterfaceID)", niID, -1))
+		dat = []byte(strings.Replace(string(dat), "$(publicIPID)", publicIPID, -1))
 		dat = []byte(strings.Replace(string(dat), "$(blobEndpoint)", blobEndpoint, -1))
 
 		var j map[string]interface{}
@@ -72,6 +74,8 @@ func init() {
 				subnetID = component.ID
 			case "azure_network_interface":
 				niID = component.ID
+			case "azure_public_ip":
+				publicIPID = component.ID
 			case "azure_storage_account":
 				blobEndpoint = component.BlobEndpoint
 			}

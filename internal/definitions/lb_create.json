@@ -1,0 +1,13 @@
+{
+  "name": "mytestingLB",
+  "location": "westus",
+  "resource_group_name": "rg_test",
+  "frontend_ip_configuration": {
+      "name":"PublicIPAddress",
+      "public_ip_address_id": "$(publicIPID)"
+    },
+  "tags": {
+    "t1": "one",
+    "t2": "two"
+  }
+}
