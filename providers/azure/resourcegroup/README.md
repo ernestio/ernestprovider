@@ -12,17 +12,17 @@ See azure doumentation for [resource groups](https://docs.microsoft.com/en-us/az
 
 The following arguments are supported:
 
-- **name : ** (Required) The name of the resource group. Must be unique on your Azure subscription.
+- **name** :  (Required) The name of the resource group. Must be unique on your Azure subscription.
 
-- **location : ** (Required) The location where the resource group should be created. For a list of all Azure locations, please consult [this link](https://azure.microsoft.com/en-us/regions/).
+- **location** :  (Required) The location where the resource group should be created. For a list of all Azure locations, please consult [this link](https://azure.microsoft.com/en-us/regions/).
 
-- **tags : ** (Optional) A mapping of tags to assign to the resource.
+- **tags** :  (Optional) A mapping of tags to assign to the resource.
 
 ## Attributes reference
 
 The following attributes are exported:
 
-**id : ** The resource group ID.
+**id** : The resource group ID.
 
 ## Dependencies
 

@@ -1,0 +1,12 @@
+{
+  "name": "mysqlserver",
+  "location": "westus",
+  "resource_group_name": "rg_test",
+  "version": "12.0",
+  "administrator_login": "sql_admin",
+  "administrator_login_password": "P4ssw0rd",
+  "tags": {
+    "t1": "one",
+    "t2": "two"
+  }
+}
