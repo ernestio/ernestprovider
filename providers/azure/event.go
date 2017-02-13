@@ -98,7 +98,8 @@ func (ev *Event) Update() error {
 	ev.ResourceData.SetId(ev.Resource.GetID())
 	st := reflect.TypeOf(ev.Component)
 	if _, ok := st.MethodByName("Update"); !ok {
-		return errors.New("Not supported")
+		println("Not supported")
+		// return errors.New("Not supported")
 	}
 	if err := ev.Component.Update(ev.ResourceData, c); err != nil {
 		err := fmt.Errorf("Error creating the requestd resource : %s", err)

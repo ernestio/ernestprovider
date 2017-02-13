@@ -21,6 +21,8 @@ var lastID string
 var lastBody []byte
 var key string
 var subnetID string
+var niID string
+var blobEndpoint string
 
 func init() {
 	key = os.Getenv("ERNEST_CRYPTO_KEY")
@@ -37,10 +39,13 @@ func init() {
 			log.Println(err.Error())
 		}
 		dat = []byte(strings.Replace(string(dat), "$(subnetID)", subnetID, -1))
+		dat = []byte(strings.Replace(string(dat), "$(networkInterfaceID)", niID, -1))
+		dat = []byte(strings.Replace(string(dat), "$(blobEndpoint)", blobEndpoint, -1))
 
 		var j map[string]interface{}
 		if err := json.Unmarshal(dat, &j); err != nil {
 			T.Errorf("Could not unmarshal definition " + fileName)
+			panic("problem with your json on file " + fileName)
 		}
 
 		crypto := aes.New()
@@ -55,14 +60,20 @@ func init() {
 
 		lastSubject, lastBody = ernestprovider.GetAndHandle(subject, dat, key)
 		var component struct {
-			ID string `json:"id"`
+			ID           string `json:"id"`
+			BlobEndpoint string `json:"primary_blob_endpoint"`
 		}
 		_ = json.Unmarshal(lastBody, &component)
 		parts := strings.Split(lastSubject, ".")
 		if parts[1] == "create" {
 			lastID = component.ID
-			if parts[0] == "azure_subnet" {
+			switch parts[0] {
+			case "azure_subnet":
 				subnetID = component.ID
+			case "azure_network_interface":
+				niID = component.ID
+			case "azure_storage_account":
+				blobEndpoint = component.BlobEndpoint
 			}
 		}
 	})

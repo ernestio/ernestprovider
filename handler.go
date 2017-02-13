@@ -15,6 +15,7 @@ import (
 	"github.com/ernestio/ernestprovider/providers/azure/storageaccount"
 	"github.com/ernestio/ernestprovider/providers/azure/storagecontainer"
 	"github.com/ernestio/ernestprovider/providers/azure/subnet"
+	"github.com/ernestio/ernestprovider/providers/azure/virtualmachine"
 	"github.com/ernestio/ernestprovider/providers/azure/virtualnetwork"
 )
 
@@ -112,6 +113,8 @@ func getAzureEvent(subject string, data []byte, key string) (*event.Event, error
 		ev, err = storageaccount.New(subject, key, data, val)
 	case "azure_storage_container":
 		ev, err = storagecontainer.New(subject, key, data, val)
+	case "azure_virtual_machine":
+		ev, err = virtualmachine.New(subject, key, data, val)
 	}
 	return &ev, err
 }
