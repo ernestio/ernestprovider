@@ -1,5 +1,5 @@
 {
-  "name": "mysqlserver",
+  "name": "mysqlserver098765",
   "location": "westus",
   "resource_group_name": "rg_test",
   "version": "12.0",

@@ -1,5 +1,5 @@
 {
-  "name": "mysqlserver",
+  "name": "mysqlserver098765",
   "location": "westus",
   "resource_group_name": "rg_test",
   "version": "12.0",
@@ -7,6 +7,7 @@
   "administrator_login_password": "P4ssw0rd",
   "tags": {
     "t1": "one",
-    "t2": "two"
+    "t2": "two",
+    "t3": "three"
   }
 }
