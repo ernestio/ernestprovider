@@ -1,0 +1,10 @@
+{
+  "name": "mydb",
+  "location": "westus",
+  "resource_group_name": "rg_test",
+  "server_name": "mysqlserver098765",
+  "tags": {
+    "t1": "one",
+    "t2": "two"
+  }
+}

@@ -16,6 +16,7 @@ import (
 	"github.com/ernestio/ernestprovider/providers/azure/publicip"
 	"github.com/ernestio/ernestprovider/providers/azure/resourcegroup"
 	"github.com/ernestio/ernestprovider/providers/azure/securitygroup"
+	"github.com/ernestio/ernestprovider/providers/azure/sqldatabase"
 	"github.com/ernestio/ernestprovider/providers/azure/sqlserver"
 	"github.com/ernestio/ernestprovider/providers/azure/storageaccount"
 	"github.com/ernestio/ernestprovider/providers/azure/storagecontainer"
@@ -130,6 +131,8 @@ func getAzureEvent(subject string, data []byte, key string) (*event.Event, error
 		ev, err = localnetworkgateway.New(subject, key, data, val)
 	case "azure_network_security_group":
 		ev, err = securitygroup.New(subject, key, data, val)
+	case "azure_sql_database":
+		ev, err = sqldatabase.New(subject, key, data, val)
 	}
 	return &ev, err
 }
