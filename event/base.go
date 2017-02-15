@@ -8,6 +8,9 @@ import (
 
 // Base : common Event method container
 type Base struct {
+	UUID         string `json:"_uuid"`
+	BatchID      string `json:"_batch_id"`
+	ProviderType string `json:"_type"`
 	ErrorMessage string `json:"error,omitempty"`
 	Subject      string `json:"-"`
 	Body         []byte `json:"-"`

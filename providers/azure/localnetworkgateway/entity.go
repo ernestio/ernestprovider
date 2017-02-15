@@ -7,6 +7,7 @@ package localnetworkgateway
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
 
@@ -18,19 +19,20 @@ import (
 // Event : This is the Ernest representation of an azure subnet
 type Event struct {
 	event.Base
-	ID                string   `json:"id"`
-	Name              string   `json:"name" validate:"required"`
-	ResourceGroupName string   `json:"resource_group_name" validate:"required"`
-	Location          string   `json:"location" validate:"required"`
-	GatewayAddress    string   `json:"gateway_address" validate:"required"`
-	AddressSpace      []string `json:"address_space"`
-	ClientID          string   `json:"azure_client_id"`
-	ClientSecret      string   `json:"azure_client_secret"`
-	TenantID          string   `json:"azure_tenant_id"`
-	SubscriptionID    string   `json:"azure_subscription_id"`
-	Environment       string   `json:"environment"`
-	ErrorMessage      string   `json:"error,omitempty"`
-	CryptoKey         string   `json:"-"`
+	ID                string            `json:"id"`
+	Name              string            `json:"name" validate:"required"`
+	ResourceGroupName string            `json:"resource_group_name" validate:"required"`
+	Location          string            `json:"location" validate:"required"`
+	GatewayAddress    string            `json:"gateway_address" validate:"required"`
+	AddressSpace      []string          `json:"address_space"`
+	ClientID          string            `json:"azure_client_id"`
+	ClientSecret      string            `json:"azure_client_secret"`
+	TenantID          string            `json:"azure_tenant_id"`
+	SubscriptionID    string            `json:"azure_subscription_id"`
+	Environment       string            `json:"environment"`
+	ErrorMessage      string            `json:"error,omitempty"`
+	Components        []json.RawMessage `json:"components"`
+	CryptoKey         string            `json:"-"`
 }
 
 // New : Constructor
@@ -43,6 +45,28 @@ func New(subject, cryptoKey string, body []byte, val *event.Validator) (event.Ev
 	}
 
 	return azure.New(subject, "azurerm_local_network_gateway", body, val, ev)
+}
+
+// SetComponents : ....
+func (ev *Event) SetComponents(components []event.Event) {
+	for _, v := range components {
+		ev.Components = append(ev.Components, v.GetBody())
+	}
+}
+
+// ValidateID : determines if the given id is valid for this resource type
+func (ev *Event) ValidateID(id string) bool {
+	parts := strings.Split(strings.ToLower(id), "/")
+	if len(parts) != 9 {
+		return false
+	}
+	if parts[6] != "microsoft.network" {
+		return false
+	}
+	if parts[7] != "localnetworkgateways" {
+		return false
+	}
+	return true
 }
 
 // SetID : id setter

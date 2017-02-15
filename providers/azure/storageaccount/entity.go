@@ -7,6 +7,7 @@ package storageaccount
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
 
@@ -42,6 +43,7 @@ type Event struct {
 	SubscriptionID         string            `json:"azure_subscription_id"`
 	Environment            string            `json:"environment"`
 	ErrorMessage           string            `json:"error,omitempty"`
+	Components             []event.Event     `json:"components"`
 	CryptoKey              string            `json:"-"`
 }
 
@@ -55,6 +57,26 @@ func New(subject, cryptoKey string, body []byte, val *event.Validator) (event.Ev
 	}
 
 	return azure.New(subject, "azurerm_storage_account", body, val, ev)
+}
+
+// SetComponents : ....
+func (ev *Event) SetComponents(components []event.Event) {
+	ev.Components = components
+}
+
+// ValidateID : determines if the given id is valid for this resource type
+func (ev *Event) ValidateID(id string) bool {
+	parts := strings.Split(strings.ToLower(id), "/")
+	if len(parts) != 9 {
+		return false
+	}
+	if parts[6] != "microsoft.storage" {
+		return false
+	}
+	if parts[7] != "storageaccounts" {
+		return false
+	}
+	return true
 }
 
 // SetID : id setter

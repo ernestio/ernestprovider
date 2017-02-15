@@ -17,4 +17,6 @@ type Event interface {
 	GetSubject() string
 	GetBody() []byte
 	Log(string, string)
+	SetID(string)
+	SetComponents([]Event)
 }

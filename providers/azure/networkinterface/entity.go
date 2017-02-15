@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
@@ -41,6 +42,7 @@ type Event struct {
 	SubscriptionID       string            `json:"azure_subscription_id"`
 	Environment          string            `json:"environment"`
 	ErrorMessage         string            `json:"error,omitempty"`
+	Components           []json.RawMessage `json:"components"`
 	CryptoKey            string            `json:"-"`
 }
 
@@ -65,6 +67,28 @@ func New(subject, cryptoKey string, body []byte, val *event.Validator) (event.Ev
 	}
 
 	return azure.New(subject, "azurerm_network_interface", body, val, ev)
+}
+
+// SetComponents : ....
+func (ev *Event) SetComponents(components []event.Event) {
+	for _, v := range components {
+		ev.Components = append(ev.Components, v.GetBody())
+	}
+}
+
+// ValidateID : determines if the given id is valid for this resource type
+func (ev *Event) ValidateID(id string) bool {
+	parts := strings.Split(strings.ToLower(id), "/")
+	if len(parts) != 9 {
+		return false
+	}
+	if parts[6] != "microsoft.network" {
+		return false
+	}
+	if parts[7] != "networkinterfaces" {
+		return false
+	}
+	return true
 }
 
 // SetID : id setter

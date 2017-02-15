@@ -2,7 +2,6 @@ package azure
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"reflect"
@@ -15,10 +14,12 @@ import (
 
 // Resource : ...
 type Resource interface {
+	ValidateID(id string) bool
 	SetID(id string)
 	GetID() string
 	ResourceDataToEvent(d *schema.ResourceData) error
 	EventToResourceData(d *schema.ResourceData) error
+	SetComponents([]event.Event)
 	Error(err error)
 }
 
@@ -31,6 +32,7 @@ type Event struct {
 	Provider     *schema.Provider
 	Component    *schema.Resource
 	ResourceData *schema.ResourceData
+	ResourceType string
 	Schema       map[string]*schema.Schema
 	Validator    *event.Validator
 
@@ -56,6 +58,7 @@ func New(subject, resourceType string, body []byte, val *event.Validator, res Re
 	n.Subject = subject
 	n.Validator = val
 	n.Resource = res
+	n.ResourceType = resourceType
 
 	return &n, nil
 }
@@ -65,9 +68,37 @@ func (ev *Event) Validate() error {
 	return ev.Validator.Validate(ev.Resource)
 }
 
+// SetID ....
+func (ev *Event) SetID(id string) {
+	ev.Resource.SetID(id)
+}
+
+// SetComponents ...
+func (ev *Event) SetComponents(components []event.Event) {
+	ev.Resource.SetComponents(components)
+}
+
 // Find : Find an object on azure
 func (ev *Event) Find() error {
-	return errors.New(ev.Subject + " not supported")
+	cli, _ := ev.client()
+	res := "rg_test"
+	results, _ := cli.ListResourcesByGroup(res, "", "")
+	components := make([]event.Event, 0)
+	for _, ids := range results {
+		for _, id := range ids {
+			if ev.Resource.ValidateID(id) {
+				e, _ := New(ev.Subject, ev.ResourceType, ev.Body, ev.Validator, ev.Resource)
+				e.SetID(id)
+				if err := e.Get(); err != nil {
+					ev.Log("error", err.Error())
+				}
+				components = append(components, e)
+			}
+		}
+	}
+	ev.SetComponents(components)
+
+	return nil
 }
 
 // Create : Creates a Resource Group on Azure using terraform

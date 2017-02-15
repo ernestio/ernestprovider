@@ -82,6 +82,11 @@ func init() {
 		}
 	})
 
+	And(`^I print the last info$`, func() {
+		fmt.Println(lastSubject)
+		fmt.Println(string(lastBody))
+	})
+
 	Then(`^I should get a "(.+?)" response with "(.+?)" containing "(.+?)"$`, func(subject string, k string, v string) {
 		if lastSubject != subject {
 			T.Errorf("Last subject was: \n" + lastSubject)

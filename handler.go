@@ -106,6 +106,8 @@ func getAzureEvent(subject string, data []byte, key string) (*event.Event, error
 	parts := strings.Split(subject, ".")
 	val := event.NewValidator()
 	switch parts[0] {
+	case "azure_public_ip":
+		ev, err = publicip.New(subject, key, data, val)
 	case "azure_virtual_network":
 		ev, err = virtualnetwork.New(subject, key, data, val)
 	case "azure_resource_group":
@@ -120,8 +122,6 @@ func getAzureEvent(subject string, data []byte, key string) (*event.Event, error
 		ev, err = storagecontainer.New(subject, key, data, val)
 	case "azure_virtual_machine":
 		ev, err = virtualmachine.New(subject, key, data, val)
-	case "azure_public_ip":
-		ev, err = publicip.New(subject, key, data, val)
 	case "azure_lb":
 		ev, err = lb.New(subject, key, data, val)
 	case "azure_sql_server":
