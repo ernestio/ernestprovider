@@ -8,8 +8,8 @@ import (
 
 	"github.com/ernestio/ernestprovider/event"
 	"github.com/fatih/color"
-	"github.com/hashicorp/terraform/builtin/providers/azurerm"
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/r3labs/terraform/builtin/providers/azurerm"
+	"github.com/r3labs/terraform/helper/schema"
 )
 
 // Resource : ...
