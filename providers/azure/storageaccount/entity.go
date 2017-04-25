@@ -36,6 +36,7 @@ type Event struct {
 	PrimaryFileEndpoint    string            `json:"primary_file_endpoint"`
 	PrimaryAccessKey       string            `json:"primary_access_key"`
 	SecondaryAccessKey     string            `json:"secondary_access_key"`
+	EnableBlobEncryption   bool              `json:"enable_blob_encryption"`
 	Tags                   map[string]string `json:"tags"`
 	ClientID               string            `json:"azure_client_id"`
 	ClientSecret           string            `json:"azure_client_secret"`
