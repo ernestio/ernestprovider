@@ -44,7 +44,7 @@ type Event struct {
 		CreateOption string `json:"create_option" validate:"required" structs:"create_option"`
 		OSType       string `json:"os_type" structs:"os_type"`
 		ImageURI     string `json:"image_uri" structs:"image_uri"`
-		Caching      string `json:"caching" structs:"caching"`
+		Caching      bool   `json:"caching" structs:"caching"`
 	} `json:"storage_os_disk" validate:"dive"`
 	DeleteOSDiskOnTermination bool `json:"delete_os_disk_on_termination"`
 	StorageDataDisk           struct {
@@ -81,6 +81,7 @@ type Event struct {
 		SSHKeys                       []SSHKey `json:"ssh_keys" structs:"ssh_keys"`
 	} `json:"os_profile_linux_config"`
 	OSProfileSecrets    []secret          `json:"os_profile_secrets"`
+	NetworkInterfaces   []string          `json:"network_interfaces"`
 	NetworkInterfaceIDs []string          `json:"network_interface_ids"`
 	Tags                map[string]string `json:"tags"`
 	ClientID            string            `json:"azure_client_id"`
@@ -191,7 +192,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 		ev.StorageOSDisk.CreateOption = s["create_option"].(string)
 		ev.StorageOSDisk.OSType = s["os_type"].(string)
 		ev.StorageOSDisk.ImageURI = s["image_uri"].(string)
-		ev.StorageOSDisk.Caching = s["caching"].(string)
+		ev.StorageOSDisk.Caching = s["caching"].(bool)
 	}
 	ev.DeleteOSDiskOnTermination = d.Get("delete_os_disk_on_termination").(bool)
 
