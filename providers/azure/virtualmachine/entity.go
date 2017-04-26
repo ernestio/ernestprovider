@@ -78,7 +78,7 @@ type Event struct {
 	} `json:"os_profile_windows_config"`
 	OSProfileLinuxConfig struct {
 		DisablePasswordAuthentication bool     `json:"disable_password_authentication" structs:"disable_password_authentication"`
-		SSHKeys                       []sshKey `json:"ssh_keys" structs:"ssh_keys"`
+		SSHKeys                       []SSHKey `json:"ssh_keys" structs:"ssh_keys"`
 	} `json:"os_profile_linux_config"`
 	OSProfileSecrets    []secret          `json:"os_profile_secrets"`
 	NetworkInterfaceIDs []string          `json:"network_interface_ids"`
@@ -102,7 +102,7 @@ type vaultCertificate struct {
 	CertificateURL   string `json:"certificate_url" structs:"certificate_url"`
 	CertificateStore string `json:"certificate_store" structs:"certificate_store"`
 }
-type sshKey struct {
+type SSHKey struct {
 	Path    string `json:"path" validate:"required" structs:"path"`
 	KeyData string `json:"key_data" structs:"key_data"`
 }
@@ -254,10 +254,10 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	if len(linList) > 0 {
 		lin := linList[0].(map[string]interface{})
 		ev.OSProfileLinuxConfig.DisablePasswordAuthentication = lin["disable_password_authentication"].(bool)
-		ev.OSProfileLinuxConfig.SSHKeys = make([]sshKey, 0)
+		ev.OSProfileLinuxConfig.SSHKeys = make([]SSHKey, 0)
 		for _, key := range lin["ssh_keys"].([]interface{}) {
 			v := key.(map[string]interface{})
-			ev.OSProfileLinuxConfig.SSHKeys = append(ev.OSProfileLinuxConfig.SSHKeys, sshKey{
+			ev.OSProfileLinuxConfig.SSHKeys = append(ev.OSProfileLinuxConfig.SSHKeys, SSHKey{
 				Path:    v["path"].(string),
 				KeyData: v["key_data"].(string),
 			})
