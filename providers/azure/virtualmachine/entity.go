@@ -55,7 +55,7 @@ type Event struct {
 		Lun          int32  `json:"lun" structs:"lun"`
 	} `json:"storage_data_disk"`
 	DeleteDataDisksOnTermination bool             `json:"delete_data_disks_on_termination"`
-	BootDiagnostics              []bootDiagnostic `json:"boot_diagnostics"`
+	BootDiagnostics              []BootDiagnostic `json:"boot_diagnostics"`
 	OSProfile                    struct {
 		ComputerName  string `json:"computer_name" structs:"computer_name"`
 		AdminUsername string `json:"admin_username" structs:"admin_username"`
@@ -107,7 +107,7 @@ type SSHKey struct {
 	KeyData string `json:"key_data" structs:"key_data"`
 }
 
-type bootDiagnostic struct {
+type BootDiagnostic struct {
 	Enabled bool   `json:"enabled"`
 	URI     string `json:"storage_uri"`
 }
@@ -212,10 +212,10 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 
 	// TODO diagnostics_profile -> TypeSet
 
-	bootDiagnostics := make([]bootDiagnostic, 0)
+	bootDiagnostics := make([]BootDiagnostic, 0)
 	for _, v := range d.Get("boot_diagnostics").([]interface{}) {
 		x := v.(map[string]interface{})
-		bootDiagnostics = append(bootDiagnostics, bootDiagnostic{
+		bootDiagnostics = append(bootDiagnostics, BootDiagnostic{
 			Enabled: x["enabled"].(bool),
 			URI:     x["storage_uri"].(string),
 		})
