@@ -107,31 +107,31 @@ func getAzureEvent(subject string, data []byte, key string) (*event.Event, error
 	parts := strings.Split(subject, ".")
 	val := event.NewValidator()
 	switch parts[0] {
-	case "azure_public_ip":
+	case "public_ip":
 		ev, err = publicip.New(subject, key, data, val)
-	case "azure_virtual_network":
+	case "virtual_network":
 		ev, err = virtualnetwork.New(subject, key, data, val)
-	case "azure_resource_group":
+	case "resource_group":
 		ev, err = resourcegroup.New(subject, key, data, val)
-	case "azure_subnet":
+	case "subnet":
 		ev, err = subnet.New(subject, key, data, val)
-	case "azure_network_interface":
+	case "network_interface":
 		ev, err = networkinterface.New(subject, key, data, val)
-	case "azure_storage_account":
+	case "storage_account":
 		ev, err = storageaccount.New(subject, key, data, val)
-	case "azure_storage_container":
+	case "storage_container":
 		ev, err = storagecontainer.New(subject, key, data, val)
-	case "azure_virtual_machine":
+	case "virtual_machine":
 		ev, err = virtualmachine.New(subject, key, data, val)
-	case "azure_lb":
+	case "lb":
 		ev, err = lb.New(subject, key, data, val)
-	case "azure_sql_server":
+	case "sql_server":
 		ev, err = sqlserver.New(subject, key, data, val)
-	case "azure_local_network_gateway":
+	case "local_network_gateway":
 		ev, err = localnetworkgateway.New(subject, key, data, val)
-	case "azure_network_security_group":
+	case "network_security_group":
 		ev, err = securitygroup.New(subject, key, data, val)
-	case "azure_sql_database":
+	case "sql_database":
 		ev, err = sqldatabase.New(subject, key, data, val)
 	}
 	return &ev, err
