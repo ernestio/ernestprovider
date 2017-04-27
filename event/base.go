@@ -11,6 +11,7 @@ type Base struct {
 	UUID         string `json:"_uuid"`
 	BatchID      string `json:"_batch_id"`
 	ProviderType string `json:"_type"`
+	State        string `json:"_state"`
 	ErrorMessage string `json:"error,omitempty"`
 	Subject      string `json:"-"`
 	Body         []byte `json:"-"`

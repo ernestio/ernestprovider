@@ -16,6 +16,8 @@ type Event interface {
 	Get() error
 	GetSubject() string
 	GetBody() []byte
+	GetErroredBody() []byte
+	GetCompletedBody() []byte
 	Log(string, string)
 	SetID(string)
 	SetComponents([]Event)

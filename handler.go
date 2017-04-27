@@ -32,7 +32,7 @@ func Handle(ev *event.Event) (string, []byte) {
 	n := *ev
 	if err := n.Process(); err != nil {
 		n.Log("error", err.Error())
-		return n.GetSubject() + ".error", n.GetBody()
+		return n.GetSubject() + ".error", n.GetErroredBody()
 	}
 
 	parts := strings.Split(n.GetSubject(), ".")
@@ -40,19 +40,19 @@ func Handle(ev *event.Event) (string, []byte) {
 	case "create":
 		if err := n.Validate(); err != nil {
 			n.Log("error", err.Error())
-			return n.GetSubject() + ".error", n.GetBody()
+			return n.GetSubject() + ".error", n.GetErroredBody()
 		}
 		err = n.Create()
 	case "update":
 		if err := n.Validate(); err != nil {
 			n.Log("error", err.Error())
-			return n.GetSubject() + ".error", n.GetBody()
+			return n.GetSubject() + ".error", n.GetErroredBody()
 		}
 		err = n.Update()
 	case "delete":
 		if err := n.Validate(); err != nil {
 			n.Log("error", err.Error())
-			return n.GetSubject() + ".error", n.GetBody()
+			return n.GetSubject() + ".error", n.GetErroredBody()
 		}
 		err = n.Delete()
 	case "get":
@@ -62,16 +62,16 @@ func Handle(ev *event.Event) (string, []byte) {
 	case "validate":
 		if err := n.Validate(); err != nil {
 			n.Log("error", err.Error())
-			return n.GetSubject() + ".error", n.GetBody()
+			return n.GetSubject() + ".error", n.GetErroredBody()
 		}
 	}
 
 	if err != nil {
 		n.Error(err)
-		return n.GetSubject() + ".error", n.GetBody()
+		return n.GetSubject() + ".error", n.GetErroredBody()
 	}
 
-	return n.GetSubject() + ".done", n.GetBody()
+	return n.GetSubject() + ".done", n.GetCompletedBody()
 }
 
 // GetAndHandle : Gets an event and Handles its results
