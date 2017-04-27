@@ -63,18 +63,10 @@ type Event struct {
 		CustomData    string `json:"custom_data" structs:"custom_data"`
 	} `json:"os_profile"`
 	OSProfileWindowsConfig struct {
-		ProvisionVMAgent        bool `json:"provision_vm_agent" structs:"provision_vm_agent"`
-		EnableAutomaticUpgrades bool `json:"enable_automatic_upgrades" structs:"enable_automatic_upgrades"`
-		WinRm                   []struct {
-			Protocol       string `json:"protocol" structs:"protocol"`
-			CertificateURL string `json:"certificate_url" structs:"certification_url"`
-		} `json:"winrm" structs:"winrm"`
-		AdditionalUnattendConfig []struct {
-			Pass        string `json:"pass" structs:"pass"`
-			Component   string `json:"component" structs:"component"`
-			SettingName string `json:"setting_name" structs:"setting_name"`
-			Content     string `json:"content" structs:"content"`
-		} `json:"additional_unattend_config" structs:"additional_unattend_config"`
+		ProvisionVMAgent         bool               `json:"provision_vm_agent" structs:"provision_vm_agent"`
+		EnableAutomaticUpgrades  bool               `json:"enable_automatic_upgrades" structs:"enable_automatic_upgrades"`
+		WinRm                    []WinRM            `json:"winrm" structs:"winrm"`
+		AdditionalUnattendConfig []UnattendedConfig `json:"additional_unattend_config" structs:"additional_unattend_config"`
 	} `json:"os_profile_windows_config"`
 	OSProfileLinuxConfig struct {
 		DisablePasswordAuthentication bool     `json:"disable_password_authentication" structs:"disable_password_authentication"`
@@ -103,14 +95,31 @@ type vaultCertificate struct {
 	CertificateURL   string `json:"certificate_url" structs:"certificate_url"`
 	CertificateStore string `json:"certificate_store" structs:"certificate_store"`
 }
+
+// WinRM ...
+type WinRM struct {
+	Protocol       string `json:"protocol" structs:"protocol"`
+	CertificateURL string `json:"certificate_url" structs:"certification_url"`
+}
+
+// SSHKey ...
 type SSHKey struct {
 	Path    string `json:"path" validate:"required" structs:"path"`
 	KeyData string `json:"key_data" structs:"key_data"`
 }
 
+// BootDiagnostic ...
 type BootDiagnostic struct {
 	Enabled bool   `json:"enabled"`
 	URI     string `json:"storage_uri"`
+}
+
+// UnattendedConfig ...
+type UnattendedConfig struct {
+	Pass        string `json:"pass" structs:"pass"`
+	Component   string `json:"component" structs:"component"`
+	SettingName string `json:"setting_name" structs:"setting_name"`
+	Content     string `json:"content" structs:"content"`
 }
 
 // New : Constructor
