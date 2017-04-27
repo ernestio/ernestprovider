@@ -24,7 +24,7 @@ type Event struct {
 	Name              string            `json:"name" validate:"required"`
 	AddressSpace      []string          `json:"address_space" validate:"min=1"`
 	DNSServerNames    []string          `json:"dns_server_names" validate:"dive,ip"`
-	Subnets           []subnet          `json:"subnets" validate:"min=1"`
+	Subnets           []Subnet          `json:"subnets" validate:"min=1"`
 	Location          string            `json:"location"`
 	ResourceGroupName string            `json:"resource_group_name"`
 	Tags              map[string]string `json:"tags"`
@@ -38,7 +38,8 @@ type Event struct {
 	CryptoKey         string            `json:"-"`
 }
 
-type subnet struct {
+// Subnet ..
+type Subnet struct {
 	Name          string `json:"name"`
 	AddressPrefix string `json:"address_prefix"`
 	SecurityGroup string `json:"security_group"`
@@ -105,10 +106,10 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.DNSServerNames = dnses
 	ev.Location = d.Get("location").(string)
 
-	subnets := []subnet{}
+	subnets := []Subnet{}
 	for _, sub := range d.Get("subnet").(*schema.Set).List() {
 		m := sub.(map[string]interface{})
-		s := subnet{
+		s := Subnet{
 			Name:          m["name"].(string),
 			AddressPrefix: m["address_prefix"].(string),
 			SecurityGroup: m["security_group"].(string),
