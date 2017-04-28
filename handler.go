@@ -71,7 +71,10 @@ func Handle(ev *event.Event) (string, []byte) {
 		return n.GetSubject() + ".error", n.GetErroredBody()
 	}
 
-	return n.GetSubject() + ".done", n.GetCompletedBody()
+	n.Log("debug", "Component successfully processed")
+	body := n.GetCompletedBody()
+	n.Log("debug", string(body))
+	return n.GetSubject() + ".done", body
 }
 
 // GetAndHandle : Gets an event and Handles its results

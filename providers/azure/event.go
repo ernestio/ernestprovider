@@ -195,22 +195,35 @@ func (ev *Event) GetBody() []byte {
 	return ev.Body
 }
 
+func (ev *Event) getStatedBody(state string) []byte {
+	var err error
+	ev.Log("debug", "Building "+state+" response body")
+
+	if ev.Body, err = json.Marshal(ev.Resource); err != nil {
+		ev.Log("error", err.Error())
+		panic(err)
+	}
+
+	values := make(map[string]interface{})
+	if err = json.Unmarshal(ev.Body, &values); err != nil {
+		ev.Log("error", err.Error())
+		panic(err)
+	}
+
+	values["_state"] = state
+	ev.Body, _ = json.Marshal(values)
+	ev.Log("debug", "Response body : "+string(ev.Body))
+	return ev.GetBody()
+}
+
 // GetErroredBody : Gets the body overloaded with errored state
 func (ev *Event) GetErroredBody() []byte {
-	ev.State = "errored"
-	ev.Log("debug", "Building errored response body")
-	body := ev.GetBody()
-	ev.Log("debug", "Response body")
-	return body
+	return ev.getStatedBody("errored")
 }
 
 // GetCompletedBody : Gets the body overloaded with errored state
 func (ev *Event) GetCompletedBody() []byte {
-	ev.State = "completed"
-	ev.Log("debug", "Building completed response body")
-	body := ev.GetBody()
-	ev.Log("debug", "Response body")
-	return body
+	return ev.getStatedBody("completed")
 }
 
 // GetSubject : Gets the subject for this event
