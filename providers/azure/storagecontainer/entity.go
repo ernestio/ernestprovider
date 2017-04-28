@@ -64,6 +64,11 @@ func (ev *Event) GetID() string {
 	return ev.ID
 }
 
+// SetState : state setter
+func (ev *Event) SetState(state string) {
+	ev.State = state
+}
+
 // ValidateID : determines if the given id is valid for this resource type
 func (ev *Event) ValidateID(id string) bool {
 	parts := strings.Split(strings.ToLower(id), "/")

@@ -9,11 +9,11 @@ import (
 )
 
 func validEvent() Event {
-	var subnets []subnet
+	var subnets []Subnet
 	var dns []string
 	var address []string
 
-	subnets = append(subnets, subnet{
+	subnets = append(subnets, Subnet{
 		Name:          "subnet",
 		AddressPrefix: "10.2.0.1/24",
 	})
@@ -62,7 +62,7 @@ func TestEmptyAddressSpace(t *testing.T) {
 
 func TestEmptySubnets(t *testing.T) {
 	ev := validEvent()
-	ev.Subnets = []subnet{}
+	ev.Subnets = []Subnet{}
 	val := event.NewValidator()
 	err := val.Validate(ev)
 

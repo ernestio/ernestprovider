@@ -17,6 +17,7 @@ type Resource interface {
 	ValidateID(id string) bool
 	SetID(id string)
 	GetID() string
+	SetState(state string)
 	ResourceDataToEvent(d *schema.ResourceData) error
 	EventToResourceData(d *schema.ResourceData) error
 	SetComponents([]event.Event)
@@ -54,6 +55,7 @@ func New(subject, resourceType string, body []byte, val *event.Validator, res Re
 	if err := res.EventToResourceData(n.ResourceData); err != nil {
 		return nil, err
 	}
+
 	n.Body = body
 	n.Subject = subject
 	n.Validator = val
@@ -71,6 +73,11 @@ func (ev *Event) Validate() error {
 // SetID ....
 func (ev *Event) SetID(id string) {
 	ev.Resource.SetID(id)
+}
+
+// SetState ...
+func (ev *Event) SetState(state string) {
+	ev.Resource.SetState(state)
 }
 
 // SetComponents ...
@@ -196,23 +203,7 @@ func (ev *Event) GetBody() []byte {
 }
 
 func (ev *Event) getStatedBody(state string) []byte {
-	var err error
-	ev.Log("debug", "Building "+state+" response body")
-
-	if ev.Body, err = json.Marshal(ev.Resource); err != nil {
-		ev.Log("error", err.Error())
-		panic(err)
-	}
-
-	values := make(map[string]interface{})
-	if err = json.Unmarshal(ev.Body, &values); err != nil {
-		ev.Log("error", err.Error())
-		panic(err)
-	}
-
-	values["_state"] = state
-	ev.Body, _ = json.Marshal(values)
-	ev.Log("debug", "Response body : "+string(ev.Body))
+	ev.Resource.SetState(state)
 	return ev.GetBody()
 }
 
