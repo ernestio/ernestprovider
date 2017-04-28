@@ -198,13 +198,19 @@ func (ev *Event) GetBody() []byte {
 // GetErroredBody : Gets the body overloaded with errored state
 func (ev *Event) GetErroredBody() []byte {
 	ev.State = "errored"
-	return ev.GetBody()
+	ev.Log("debug", "Building errored response body")
+	body := ev.GetBody()
+	ev.Log("debug", "Response body")
+	return body
 }
 
 // GetCompletedBody : Gets the body overloaded with errored state
 func (ev *Event) GetCompletedBody() []byte {
 	ev.State = "completed"
-	return ev.GetBody()
+	ev.Log("debug", "Building completed response body")
+	body := ev.GetBody()
+	ev.Log("debug", "Response body")
+	return body
 }
 
 // GetSubject : Gets the subject for this event
