@@ -346,7 +346,7 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	fields["delete_os_disk_on_termination"] = ev.DeleteOSDiskOnTermination
 	fields["storage_data_disk"] = []interface{}{structs.Map(ev.StorageDataDisk)}
 	fields["delete_data_disks_on_termination"] = ev.DeleteDataDisksOnTermination
-	fields["boot_diagnostics"] = ev.BootDiagnostics
+	fields["boot_diagnostics"] = []interface{}{structs.Map(ev.BootDiagnostics)}
 	fields["os_profile"] = []interface{}{structs.Map(ev.OSProfile)}
 
 	if len(ev.OSProfileWindowsConfig.WinRm) > 0 {
