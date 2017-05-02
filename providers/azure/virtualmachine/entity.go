@@ -33,25 +33,25 @@ type Event struct {
 	LicenseType           string `json:"license_type"`
 	VMSize                string `json:"vm_size"`
 	StorageImageReference struct {
-		Publisher string `json:"publisher" validate:"required" structs:"publisher"`
-		Offer     string `json:"offer" validate:"required" structs:"offer"`
-		Sku       string `json:"sku" validate:"required" structs:"sku"`
+		Publisher string `json:"publisher" structs:"publisher"`
+		Offer     string `json:"offer" structs:"offer"`
+		Sku       string `json:"sku" structs:"sku"`
 		Version   string `json:"version" structs:"version"`
 	} `json:"storage_image_reference" validate:"dive"`
 	StorageOSDisk struct {
-		Name         string `json:"name" validate:"required" structs:"name"`
-		VhdURI       string `json:"vhd_uri" validate:"required" structs:"vhd_uri"`
-		CreateOption string `json:"create_option" validate:"required" structs:"create_option"`
+		Name         string `json:"name" structs:"name"`
+		VhdURI       string `json:"vhd_uri" structs:"vhd_uri"`
+		CreateOption string `json:"create_option" structs:"create_option"`
 		OSType       string `json:"os_type" structs:"os_type"`
 		ImageURI     string `json:"image_uri" structs:"image_uri"`
 		Caching      bool   `json:"caching" structs:"caching"`
 	} `json:"storage_os_disk" validate:"dive"`
 	DeleteOSDiskOnTermination bool `json:"delete_os_disk_on_termination"`
 	StorageDataDisk           struct {
-		Name         string `json:"name" validate:"required" structs:"name"`
-		VhdURI       string `json:"vhd_uri" validate:"required" structs:"vhd_uri"`
-		CreateOption string `json:"create_option" validate:"required" structs:"create_option"`
-		Size         int32  `json:"disk_size_gb" validate:"required" structs:"disk_size_gb"`
+		Name         string `json:"name" structs:"name"`
+		VhdURI       string `json:"vhd_uri" structs:"vhd_uri"`
+		CreateOption string `json:"create_option" structs:"create_option"`
+		Size         int32  `json:"disk_size_gb" structs:"disk_size_gb"`
 		Lun          int32  `json:"lun" structs:"lun"`
 	} `json:"storage_data_disk"`
 	DeleteDataDisksOnTermination bool             `json:"delete_data_disks_on_termination"`
@@ -104,7 +104,7 @@ type WinRM struct {
 
 // SSHKey ...
 type SSHKey struct {
-	Path    string `json:"path" validate:"required" structs:"path"`
+	Path    string `json:"path" structs:"path"`
 	KeyData string `json:"key_data" structs:"key_data"`
 }
 
