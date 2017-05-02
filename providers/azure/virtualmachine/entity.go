@@ -346,8 +346,14 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	fields["delete_os_disk_on_termination"] = ev.DeleteOSDiskOnTermination
 	fields["storage_data_disk"] = []interface{}{structs.Map(ev.StorageDataDisk)}
 	fields["delete_data_disks_on_termination"] = ev.DeleteDataDisksOnTermination
-	fields["boot_diagnostics"] = []interface{}{structs.Map(ev.BootDiagnostics)}
 	fields["os_profile"] = []interface{}{structs.Map(ev.OSProfile)}
+
+	var diagnostics []interface{}
+	for _, bd := range ev.BootDiagnostics {
+		diagnostics = append(diagnostics, structs.Map(bd))
+	}
+
+	fields["boot_diagnostics"] = diagnostics
 
 	if len(ev.OSProfileWindowsConfig.WinRm) > 0 {
 		fields["os_profile_windows_config"] = []interface{}{structs.Map(ev.OSProfileWindowsConfig)}
