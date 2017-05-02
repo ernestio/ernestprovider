@@ -44,7 +44,7 @@ type Event struct {
 		CreateOption string `json:"create_option" structs:"create_option"`
 		OSType       string `json:"os_type" structs:"os_type"`
 		ImageURI     string `json:"image_uri" structs:"image_uri"`
-		Caching      bool   `json:"caching" structs:"caching"`
+		Caching      string `json:"caching" structs:"caching"`
 	} `json:"storage_os_disk" validate:"dive"`
 	DeleteOSDiskOnTermination bool `json:"delete_os_disk_on_termination"`
 	StorageDataDisk           struct {
@@ -206,7 +206,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 		ev.StorageOSDisk.CreateOption = s["create_option"].(string)
 		ev.StorageOSDisk.OSType = s["os_type"].(string)
 		ev.StorageOSDisk.ImageURI = s["image_uri"].(string)
-		ev.StorageOSDisk.Caching = s["caching"].(bool)
+		ev.StorageOSDisk.Caching = s["caching"].(string)
 	}
 	ev.DeleteOSDiskOnTermination = d.Get("delete_os_disk_on_termination").(bool)
 
