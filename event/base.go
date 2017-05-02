@@ -8,14 +8,16 @@ import (
 
 // Base : common Event method container
 type Base struct {
-	UUID         string `json:"_uuid"`
-	BatchID      string `json:"_batch_id"`
-	ProviderType string `json:"_type"`
-	State        string `json:"_state"`
-	ErrorMessage string `json:"error,omitempty"`
-	Subject      string `json:"-"`
-	Body         []byte `json:"-"`
-	CryptoKey    string `json:"-"`
+	ProviderType  string `json:"_provider"`
+	ComponentType string `json:"_component"`
+	ComponentID   string `json:"_component_id"`
+	State         string `json:"_state"`
+	Action        string `json:"_action"`
+	Service       string `json:"service"`
+	ErrorMessage  string `json:"error,omitempty"`
+	Subject       string `json:"-"`
+	Body          []byte `json:"-"`
+	CryptoKey     string `json:"-"`
 }
 
 // Log : ...

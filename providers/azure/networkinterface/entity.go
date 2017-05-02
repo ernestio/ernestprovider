@@ -101,6 +101,11 @@ func (ev *Event) GetID() string {
 	return ev.ID
 }
 
+// SetState : state setter
+func (ev *Event) SetState(state string) {
+	ev.State = state
+}
+
 // ResourceDataToEvent : Translates a ResourceData on a valid Ernest Event
 func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.ID = d.Id()

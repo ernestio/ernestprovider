@@ -26,55 +26,54 @@ import (
 )
 
 // Handle : Handles the given event
-func Handle(ev *event.Event) (string, []byte) {
+func Handle(ev event.Event) (string, []byte) {
 	var err error
 
-	n := *ev
-	if err := n.Process(); err != nil {
-		n.Log("error", err.Error())
-		return n.GetSubject() + ".error", n.GetErroredBody()
+	if err := ev.Process(); err != nil {
+		ev.Log("error", err.Error())
+		return ev.GetSubject() + ".error", ev.GetErroredBody()
 	}
 
-	parts := strings.Split(n.GetSubject(), ".")
+	parts := strings.Split(ev.GetSubject(), ".")
 	switch parts[1] {
 	case "create":
-		if err := n.Validate(); err != nil {
-			n.Log("error", err.Error())
-			return n.GetSubject() + ".error", n.GetErroredBody()
+		if err := ev.Validate(); err != nil {
+			ev.Log("error", err.Error())
+			return ev.GetSubject() + ".error", ev.GetErroredBody()
 		}
-		err = n.Create()
+		err = ev.Create()
 	case "update":
-		if err := n.Validate(); err != nil {
-			n.Log("error", err.Error())
-			return n.GetSubject() + ".error", n.GetErroredBody()
+		if err := ev.Validate(); err != nil {
+			ev.Log("error", err.Error())
+			return ev.GetSubject() + ".error", ev.GetErroredBody()
 		}
-		err = n.Update()
+		err = ev.Update()
 	case "delete":
-		if err := n.Validate(); err != nil {
-			n.Log("error", err.Error())
-			return n.GetSubject() + ".error", n.GetErroredBody()
+		if err := ev.Validate(); err != nil {
+			ev.Log("error", err.Error())
+			return ev.GetSubject() + ".error", ev.GetErroredBody()
 		}
-		err = n.Delete()
+		err = ev.Delete()
 	case "get":
-		err = n.Get()
+		err = ev.Get()
 	case "find":
-		err = n.Find()
+		err = ev.Find()
 	case "validate":
-		if err := n.Validate(); err != nil {
-			n.Log("error", err.Error())
-			return n.GetSubject() + ".error", n.GetErroredBody()
+		if err := ev.Validate(); err != nil {
+			ev.Log("error", err.Error())
+			return ev.GetSubject() + ".error", ev.GetErroredBody()
 		}
 	}
 
 	if err != nil {
-		n.Error(err)
-		return n.GetSubject() + ".error", n.GetErroredBody()
+		ev.Error(err)
+		return ev.GetSubject() + ".error", ev.GetErroredBody()
 	}
 
-	n.Log("debug", "Component successfully processed")
-	body := n.GetCompletedBody()
-	n.Log("debug", string(body))
-	return n.GetSubject() + ".done", body
+	ev.Log("debug", "Component successfully processed")
+	body := ev.GetCompletedBody()
+	ev.Log("debug", string(body))
+	return ev.GetSubject() + ".done", body
 }
 
 // GetAndHandle : Gets an event and Handles its results
@@ -84,7 +83,7 @@ func GetAndHandle(subject string, data []byte, key string) (string, []byte) {
 		log.Println("[ERROR] : Event not found (A) - " + err.Error())
 		return subject + ".error", data
 	}
-	if *ev == nil {
+	if ev == nil {
 		log.Println("[ERROR] : Event not found (B) ")
 		return subject + ".error", data
 	}
@@ -93,7 +92,7 @@ func GetAndHandle(subject string, data []byte, key string) (string, []byte) {
 }
 
 // GetEvent : Gets a valid event based on a subject
-func GetEvent(subject string, data []byte, key string) (*event.Event, error) {
+func GetEvent(subject string, data []byte, key string) (event.Event, error) {
 	parts := strings.Split(subject, ".")
 	switch parts[2] {
 	case "aws":
@@ -104,7 +103,7 @@ func GetEvent(subject string, data []byte, key string) (*event.Event, error) {
 	return nil, errors.New("Unkown provider")
 }
 
-func getAzureEvent(subject string, data []byte, key string) (*event.Event, error) {
+func getAzureEvent(subject string, data []byte, key string) (event.Event, error) {
 	var ev event.Event
 	var err error
 	parts := strings.Split(subject, ".")
@@ -137,9 +136,9 @@ func getAzureEvent(subject string, data []byte, key string) (*event.Event, error
 	case "sql_database":
 		ev, err = sqldatabase.New(subject, key, data, val)
 	}
-	return &ev, err
+	return ev, err
 }
 
-func getAWSEvent(subject string, data []byte, key string) (*event.Event, error) {
+func getAWSEvent(subject string, data []byte, key string) (event.Event, error) {
 	return nil, errors.New("Unconfigured provider")
 }
