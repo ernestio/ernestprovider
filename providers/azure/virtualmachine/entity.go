@@ -55,7 +55,7 @@ type Event struct {
 		Lun          int32  `json:"lun" structs:"lun"`
 	} `json:"storage_data_disk"`
 	DeleteDataDisksOnTermination bool             `json:"delete_data_disks_on_termination"`
-	BootDiagnostics              []BootDiagnostic `json:"boot_diagnostics"`
+	BootDiagnostics              []BootDiagnostic `json:"boot_diagnostics,omitempty"`
 	OSProfile                    struct {
 		ComputerName  string `json:"computer_name" structs:"computer_name"`
 		AdminUsername string `json:"admin_username" structs:"admin_username"`
