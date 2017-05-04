@@ -134,7 +134,7 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	fields["resource_group_name"] = ev.ResourceGroupName
 	fields["virtual_network_name"] = ev.VirtualNetworkName
 	fields["address_prefix"] = ev.AddressPrefix
-	fields["network_security_group_id"] = ev.NetworkSecurityGroup
+	fields["network_security_group_id"] = ev.NetworkSecurityGroupID
 	fields["route_table_id"] = ev.RouteTable
 	fields["ip_configurations"] = ev.IPConfigurations
 	for k, v := range fields {
