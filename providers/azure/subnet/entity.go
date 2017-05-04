@@ -93,7 +93,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)
 	ev.VirtualNetworkName = d.Get("virtual_network_name").(string)
 	ev.AddressPrefix = d.Get("address_prefix").(string)
-	ev.NetworkSecurityGroup = d.Get("network_security_group_id").(string)
+	ev.NetworkSecurityGroupID = d.Get("network_security_group_id").(string)
 	ev.RouteTable = d.Get("route_table_id").(string)
 
 	configs := []string{}
