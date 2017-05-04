@@ -131,7 +131,7 @@ func getAzureEvent(subject string, data []byte, key string) (event.Event, error)
 		ev, err = sqlserver.New(subject, key, data, val)
 	case "local_network_gateway":
 		ev, err = localnetworkgateway.New(subject, key, data, val)
-	case "network_security_group":
+	case "security_group":
 		ev, err = securitygroup.New(subject, key, data, val)
 	case "sql_database":
 		ev, err = sqldatabase.New(subject, key, data, val)

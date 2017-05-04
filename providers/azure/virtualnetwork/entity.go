@@ -40,9 +40,10 @@ type Event struct {
 
 // Subnet ..
 type Subnet struct {
-	Name          string `json:"name"`
-	AddressPrefix string `json:"address_prefix"`
-	SecurityGroup string `json:"security_group"`
+	Name              string `json:"name"`
+	AddressPrefix     string `json:"address_prefix"`
+	SecurityGroupName string `json:"security_group_name"`
+	SecurityGroup     string `json:"security_group"`
 }
 
 // New : Constructor
