@@ -19,22 +19,23 @@ import (
 // Event : This is the Ernest representation of an azure subnet
 type Event struct {
 	event.Base
-	ID                   string            `json:"id"`
-	Name                 string            `json:"name" validate:"required"`
-	ResourceGroupName    string            `json:"resource_group_name" validate:"required"`
-	VirtualNetworkName   string            `json:"virtual_network_name" validate:"required"`
-	AddressPrefix        string            `json:"address_prefix"  validate:"required"`
-	NetworkSecurityGroup string            `json:"network_security_group_id"`
-	RouteTable           string            `json:"route_table_id"`
-	IPConfigurations     []string          `json:"ip_configurations"`
-	ClientID             string            `json:"azure_client_id"`
-	ClientSecret         string            `json:"azure_client_secret"`
-	TenantID             string            `json:"azure_tenant_id"`
-	SubscriptionID       string            `json:"azure_subscription_id"`
-	Environment          string            `json:"environment"`
-	ErrorMessage         string            `json:"error,omitempty"`
-	Components           []json.RawMessage `json:"components"`
-	CryptoKey            string            `json:"-"`
+	ID                     string            `json:"id"`
+	Name                   string            `json:"name" validate:"required"`
+	ResourceGroupName      string            `json:"resource_group_name" validate:"required"`
+	VirtualNetworkName     string            `json:"virtual_network_name" validate:"required"`
+	AddressPrefix          string            `json:"address_prefix"  validate:"required"`
+	NetworkSecurityGroup   string            `json:"network_security_group"`
+	NetworkSecurityGroupID string            `json:"network_security_group_id"`
+	RouteTable             string            `json:"route_table_id"`
+	IPConfigurations       []string          `json:"ip_configurations"`
+	ClientID               string            `json:"azure_client_id"`
+	ClientSecret           string            `json:"azure_client_secret"`
+	TenantID               string            `json:"azure_tenant_id"`
+	SubscriptionID         string            `json:"azure_subscription_id"`
+	Environment            string            `json:"environment"`
+	ErrorMessage           string            `json:"error,omitempty"`
+	Components             []json.RawMessage `json:"components"`
+	CryptoKey              string            `json:"-"`
 }
 
 // New : Constructor
