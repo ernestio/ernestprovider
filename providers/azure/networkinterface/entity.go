@@ -49,7 +49,8 @@ type Event struct {
 // IPConfiguration : ...
 type IPConfiguration struct {
 	Name                            string   `json:"name" validate:"required"`
-	Subnet                          string   `json:"subnet_id" validate:"required"`
+	Subnet                          string   `json:"subnet" validate:"required"`
+	SubnetID                        string   `json:"subnet_id" validate:"required"`
 	PrivateIPAddress                string   `json:"private_ip_address"`
 	PrivateIPAddressAllocation      string   `json:"private_ip_address_allocation" validate:"required"`
 	PublicIPAddress                 string   `json:"public_ip_address_id"`
@@ -122,7 +123,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 		m := cfg.(map[string]interface{})
 		s := IPConfiguration{
 			Name:                       m["name"].(string),
-			Subnet:                     m["subnet_id"].(string),
+			SubnetID:                   m["subnet_id"].(string),
 			PrivateIPAddress:           m["private_ip_address"].(string),
 			PrivateIPAddressAllocation: m["private_ip_address_allocation"].(string),
 			PublicIPAddress:            m["public_ip_address_id"].(string),
@@ -218,7 +219,7 @@ func (ev *Event) mapIPConfigurations() *schema.Set {
 	for _, c := range ev.IPConfigurations {
 		conf := map[string]interface{}{}
 		conf["name"] = c.Name
-		conf["subnet_id"] = c.Subnet
+		conf["subnet_id"] = c.SubnetID
 		conf["private_ip_address"] = c.PrivateIPAddress
 		conf["private_ip_address_allocation"] = c.PrivateIPAddressAllocation
 		l1 := schema.Set{}

@@ -19,7 +19,7 @@ func validEvent() Event {
 
 	ips = append(ips, IPConfiguration{
 		Name:                       "ip",
-		Subnet:                     "10.0.2.0/14",
+		SubnetID:                   "10.0.2.0/14",
 		PrivateIPAddress:           "10.0.2.1",
 		PrivateIPAddressAllocation: "10.0.2.1",
 	})
@@ -118,7 +118,7 @@ func TestRequiredIPConfigurationsName(t *testing.T) {
 func TestRequiredIPConfigurationsSubnet(t *testing.T) {
 	var str string
 	ev := validEvent()
-	ev.IPConfigurations[0].Subnet = str
+	ev.IPConfigurations[0].SubnetID = str
 
 	val := event.NewValidator()
 	err := val.Validate(ev)
