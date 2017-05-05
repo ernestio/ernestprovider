@@ -39,20 +39,24 @@ type Event struct {
 		Version   string `json:"version" structs:"version"`
 	} `json:"storage_image_reference" validate:"dive"`
 	StorageOSDisk struct {
-		Name         string `json:"name" structs:"name"`
-		VhdURI       string `json:"vhd_uri" structs:"vhd_uri"`
-		CreateOption string `json:"create_option" structs:"create_option"`
-		OSType       string `json:"os_type" structs:"os_type"`
-		ImageURI     string `json:"image_uri" structs:"image_uri"`
-		Caching      string `json:"caching" structs:"caching"`
+		Name             string `json:"name" structs:"name"`
+		VhdURI           string `json:"vhd_uri" structs:"vhd_uri"`
+		StorageAccount   string `json:"storage_account"`
+		StorageContainer string `json:"storage_container"`
+		CreateOption     string `json:"create_option" structs:"create_option"`
+		OSType           string `json:"os_type" structs:"os_type"`
+		ImageURI         string `json:"image_uri" structs:"image_uri"`
+		Caching          string `json:"caching" structs:"caching"`
 	} `json:"storage_os_disk" validate:"dive"`
 	DeleteOSDiskOnTermination bool `json:"delete_os_disk_on_termination"`
 	StorageDataDisk           struct {
-		Name         string `json:"name" structs:"name"`
-		VhdURI       string `json:"vhd_uri" structs:"vhd_uri"`
-		CreateOption string `json:"create_option" structs:"create_option"`
-		Size         int32  `json:"disk_size_gb" structs:"disk_size_gb"`
-		Lun          int32  `json:"lun" structs:"lun"`
+		Name             string `json:"name" structs:"name"`
+		VhdURI           string `json:"vhd_uri" structs:"vhd_uri"`
+		StorageAccount   string `json:"storage_account"`
+		StorageContainer string `json:"storage_container"`
+		CreateOption     string `json:"create_option" structs:"create_option"`
+		Size             int32  `json:"disk_size_gb" structs:"disk_size_gb"`
+		Lun              int32  `json:"lun" structs:"lun"`
 	} `json:"storage_data_disk"`
 	DeleteDataDisksOnTermination bool             `json:"delete_data_disks_on_termination"`
 	BootDiagnostics              []BootDiagnostic `json:"boot_diagnostics,omitempty"`
