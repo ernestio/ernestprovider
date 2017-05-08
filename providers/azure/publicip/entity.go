@@ -23,6 +23,7 @@ type Event struct {
 	Name                      string            `json:"name" validate:"required"`
 	Location                  string            `json:"location" validate:"required"`
 	ResourceGroupName         string            `json:"resource_group_name" validate:"required"`
+	LoadBalancer              string            `json:"lb"`
 	PublicIPAddressAllocation string            `json:"public_ip_address_allocation" validate:"required"`
 	IdleTimeoutInMinutes      int               `json:"idle_timeout_in_minutes"`
 	DomainNameLabel           string            `json:"domain_name_label"`
@@ -91,6 +92,7 @@ func (ev *Event) SetState(state string) {
 
 // ResourceDataToEvent : Translates a ResourceData on a valid Ernest Event
 func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
+	ev.ID = d.Id()
 	ev.Name = d.Get("name").(string)
 	ev.Location = d.Get("location").(string)
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)

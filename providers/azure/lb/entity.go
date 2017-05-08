@@ -17,29 +17,33 @@ import (
 	"github.com/fatih/structs"
 )
 
-// Event : This is the Ernest representation of an azure publicip
+// Event : This is the Ernest representation of an azure lb
 type Event struct {
 	event.Base
-	ID                      string `json:"id"`
-	Name                    string `json:"name" validate:"required"`
-	ResourceGroupName       string `json:"resource_group_name" validate:"required"`
-	Location                string `json:"location" validate:"required"`
-	FrontendIPConfiguration struct {
-		Name                       string `json:"name" validate:"required" structs:"name"`
-		SubnetID                   string `json:"subnet_id" structs:"subnet_id"`
-		PrivateIPAddress           string `json:"private_ip_address" structs:"private_ip_address"`
-		PrivateIPAddressAllocation string `json:"private_ip_address_allocation" structs:"private_ip_address_allocation"`
-		PublicIPAddressID          string `json:"public_ip_address_id" structs:"public_ip_address_id"`
-	} `json:"frontend_ip_configuration" validate:"required"`
-	Tags           map[string]string `json:"tags"`
-	ClientID       string            `json:"azure_client_id"`
-	ClientSecret   string            `json:"azure_client_secret"`
-	TenantID       string            `json:"azure_tenant_id"`
-	SubscriptionID string            `json:"azure_subscription_id"`
-	Environment    string            `json:"environment"`
-	ErrorMessage   string            `json:"error,omitempty"`
-	Components     []json.RawMessage `json:"components"`
-	CryptoKey      string            `json:"-"`
+	ID                       string                    `json:"id"`
+	Name                     string                    `json:"name" validate:"required"`
+	ResourceGroupName        string                    `json:"resource_group_name" validate:"required"`
+	Location                 string                    `json:"location" validate:"required"`
+	FrontendIPConfigurations []FrontendIPConfiguration `json:"frontend_ip_configurations" validate:"required"`
+	Tags                     map[string]string         `json:"tags"`
+	ClientID                 string                    `json:"azure_client_id"`
+	ClientSecret             string                    `json:"azure_client_secret"`
+	TenantID                 string                    `json:"azure_tenant_id"`
+	SubscriptionID           string                    `json:"azure_subscription_id"`
+	Environment              string                    `json:"environment"`
+	ErrorMessage             string                    `json:"error,omitempty"`
+	Components               []json.RawMessage         `json:"components"`
+	CryptoKey                string                    `json:"-"`
+}
+
+// FrontendIPConfiguration ...
+type FrontendIPConfiguration struct {
+	Name                       string `json:"name" validate:"required" structs:"name"`
+	SubnetID                   string `json:"subnet_id" structs:"subnet_id"`
+	PrivateIPAddress           string `json:"private_ip_address" structs:"private_ip_address"`
+	PrivateIPAddressAllocation string `json:"private_ip_address_allocation" structs:"private_ip_address_allocation"`
+	PublicIPAddress            string `json:"public_ip_address" structs:"-"`
+	PublicIPAddressID          string `json:"public_ip_address_id" structs:"public_ip_address_id"`
 }
 
 // New : Constructor
@@ -93,17 +97,20 @@ func (ev *Event) SetState(state string) {
 
 // ResourceDataToEvent : Translates a ResourceData on a valid Ernest Event
 func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
+	ev.ID = d.Id()
 	ev.Name = d.Get("name").(string)
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)
 	ev.Location = d.Get("location").(string)
-	configs := d.Get("frontend_ip_configuration").([]interface{})
-	if len(configs) > 0 {
-		cfg := configs[0].(map[string]interface{})
-		ev.FrontendIPConfiguration.Name = cfg["name"].(string)
-		ev.FrontendIPConfiguration.SubnetID = cfg["subnet_id"].(string)
-		ev.FrontendIPConfiguration.PrivateIPAddress = cfg["private_ip_address"].(string)
-		ev.FrontendIPConfiguration.PrivateIPAddressAllocation = cfg["private_ip_address_allocation"].(string)
-		ev.FrontendIPConfiguration.PublicIPAddressID = cfg["public_ip_address_id"].(string)
+	configs := d.Get("frontend_ip_configurations").([]interface{})
+	for _, c := range configs {
+		cfg := c.(map[string]interface{})
+		ev.FrontendIPConfigurations = append(ev.FrontendIPConfigurations, FrontendIPConfiguration{
+			Name:                       cfg["name"].(string),
+			SubnetID:                   cfg["subnet_id"].(string),
+			PrivateIPAddress:           cfg["private_ip_address"].(string),
+			PrivateIPAddressAllocation: cfg["public_ip_address_allocation"].(string),
+			PublicIPAddressID:          cfg["public_ip_address_id"].(string),
+		})
 	}
 
 	tags := make(map[string]string, 0)
@@ -143,7 +150,11 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	fields["name"] = ev.Name
 	fields["location"] = ev.Location
 	fields["resource_group_name"] = ev.ResourceGroupName
-	fields["frontend_ip_configuration"] = []interface{}{structs.Map(ev.FrontendIPConfiguration)}
+	var configs []interface{}
+	for _, c := range ev.FrontendIPConfigurations {
+		configs = append(configs, structs.Map(c))
+	}
+	fields["frontend_ip_configuration"] = configs
 	fields["tags"] = ev.Tags
 	for k, v := range fields {
 		if err := d.Set(k, v); err != nil {
