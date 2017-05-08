@@ -41,8 +41,8 @@ type Event struct {
 	StorageOSDisk struct {
 		Name             string `json:"name" structs:"name"`
 		VhdURI           string `json:"vhd_uri" structs:"vhd_uri"`
-		StorageAccount   string `json:"storage_account"`
-		StorageContainer string `json:"storage_container"`
+		StorageAccount   string `json:"storage_account" structs:"storage_account"`
+		StorageContainer string `json:"storage_container" structs:"storage_container"`
 		CreateOption     string `json:"create_option" structs:"create_option"`
 		OSType           string `json:"os_type" structs:"os_type"`
 		ImageURI         string `json:"image_uri" structs:"image_uri"`
@@ -52,8 +52,8 @@ type Event struct {
 	StorageDataDisk           struct {
 		Name             string `json:"name" structs:"name"`
 		VhdURI           string `json:"vhd_uri" structs:"vhd_uri"`
-		StorageAccount   string `json:"storage_account"`
-		StorageContainer string `json:"storage_container"`
+		StorageAccount   string `json:"storage_account" structs:"storage_account"`
+		StorageContainer string `json:"storage_container" structs:"storage_container"`
 		CreateOption     string `json:"create_option" structs:"create_option"`
 		Size             int32  `json:"disk_size_gb" structs:"disk_size_gb"`
 		Lun              int32  `json:"lun" structs:"lun"`
