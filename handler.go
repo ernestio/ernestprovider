@@ -84,7 +84,7 @@ func GetAndHandle(subject string, data []byte, key string) (string, []byte) {
 		return subject + ".error", data
 	}
 	if ev == nil {
-		log.Println("[ERROR] : Event not found (B) ")
+		log.Println("[ERROR] : Event not found (" + subject + ") ")
 		return subject + ".error", data
 	}
 
@@ -109,31 +109,31 @@ func getAzureEvent(subject string, data []byte, key string) (event.Event, error)
 	parts := strings.Split(subject, ".")
 	val := event.NewValidator()
 	switch parts[0] {
-	case "public_ip":
+	case "public_ip", "public_ips":
 		ev, err = publicip.New(subject, key, data, val)
-	case "virtual_network":
+	case "virtual_network", "virtual_networks":
 		ev, err = virtualnetwork.New(subject, key, data, val)
-	case "resource_group":
+	case "resource_group", "resource_groups":
 		ev, err = resourcegroup.New(subject, key, data, val)
-	case "subnet":
+	case "subnet", "subnets":
 		ev, err = subnet.New(subject, key, data, val)
-	case "network_interface":
+	case "network_interface", "network_interfaces":
 		ev, err = networkinterface.New(subject, key, data, val)
-	case "storage_account":
+	case "storage_account", "storage_accounts":
 		ev, err = storageaccount.New(subject, key, data, val)
-	case "storage_container":
+	case "storage_container", "storage_containers":
 		ev, err = storagecontainer.New(subject, key, data, val)
-	case "virtual_machine":
+	case "virtual_machine", "virtual_machines":
 		ev, err = virtualmachine.New(subject, key, data, val)
-	case "lb":
+	case "lb", "lbs":
 		ev, err = lb.New(subject, key, data, val)
-	case "sql_server":
+	case "sql_server", "sql_servers":
 		ev, err = sqlserver.New(subject, key, data, val)
-	case "local_network_gateway":
+	case "local_network_gateway", "local_network_gateways":
 		ev, err = localnetworkgateway.New(subject, key, data, val)
-	case "security_group":
+	case "security_group", "security_groups":
 		ev, err = securitygroup.New(subject, key, data, val)
-	case "sql_database":
+	case "sql_database", "sql_databases":
 		ev, err = sqldatabase.New(subject, key, data, val)
 	}
 	return ev, err
