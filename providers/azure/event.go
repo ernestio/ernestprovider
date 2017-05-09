@@ -43,7 +43,8 @@ type Event struct {
 
 // New : Constructor
 func New(subject, resourceType string, body []byte, val *event.Validator, res Resource) (event.Event, error) {
-	n := Event{Subject: subject, Body: body, Validator: val}
+	var n Event
+	n = Event{Subject: subject, Body: body, Validator: val}
 	n.Provider = azurerm.Provider().(*schema.Provider)
 	n.Component = n.Provider.ResourcesMap[resourceType]
 	n.Schema = n.schema()
@@ -85,24 +86,53 @@ func (ev *Event) SetComponents(components []event.Event) {
 	ev.Resource.SetComponents(components)
 }
 
+func (ev *Event) getResourceGroup() (string, error) {
+	var rg struct {
+		ResourceGroup string `json:"resource_group_name"`
+	}
+	body := ev.GetBody()
+	println(string(body))
+	if err := json.Unmarshal(body, &rg); err != nil {
+		ev.Log("error", err.Error())
+		return "", err
+	}
+	return rg.ResourceGroup, nil
+}
+
 // Find : Find an object on azure
 func (ev *Event) Find() error {
 	cli, _ := ev.client()
-	res := "rg_test"
-	results, _ := cli.ListResourcesByGroup(res, "", "")
+	res, err := ev.getResourceGroup()
+	if err != nil {
+		return err
+	}
+	results, err := cli.ListResourcesByGroup(res, "", "")
+	if err != nil {
+		ev.Log("error", err.Error())
+	}
 	components := make([]event.Event, 0)
 	for _, ids := range results {
 		for _, id := range ids {
 			if ev.Resource.ValidateID(id) {
-				e, _ := New(ev.Subject, ev.ResourceType, ev.Body, ev.Validator, ev.Resource)
+				var e event.Event
+				resource := ev.Resource
+				e, _ = New(ev.Subject, ev.ResourceType, ev.Body, ev.Validator, resource)
 				e.SetID(id)
 				if err := e.Get(); err != nil {
 					ev.Log("error", err.Error())
 				}
+
 				components = append(components, e)
 			}
 		}
 	}
+	if len(components) > 0 {
+		println("----")
+		fmt.Println("%s", string(components[0].GetBody()))
+		fmt.Println("%s", string(components[1].GetBody()))
+		println("----")
+	}
+
 	ev.SetComponents(components)
 
 	return nil

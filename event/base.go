@@ -8,6 +8,7 @@ import (
 
 // Base : common Event method container
 type Base struct {
+	Name          string `json:"name" validate:"required"`
 	ProviderType  string `json:"_provider"`
 	ComponentType string `json:"_component"`
 	ComponentID   string `json:"_component_id"`
