@@ -105,14 +105,14 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.ComponentID = "lb::" + ev.Name
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)
 	ev.Location = d.Get("location").(string)
-	configs := d.Get("frontend_ip_configurations").([]interface{})
+	configs := d.Get("frontend_ip_configuration").([]interface{})
 	for _, c := range configs {
 		cfg := c.(map[string]interface{})
 		ev.FrontendIPConfigurations = append(ev.FrontendIPConfigurations, FrontendIPConfiguration{
 			Name:                       cfg["name"].(string),
 			SubnetID:                   cfg["subnet_id"].(string),
 			PrivateIPAddress:           cfg["private_ip_address"].(string),
-			PrivateIPAddressAllocation: cfg["public_ip_address_allocation"].(string),
+			PrivateIPAddressAllocation: cfg["private_ip_address_allocation"].(string),
 			PublicIPAddressID:          cfg["public_ip_address_id"].(string),
 		})
 	}
