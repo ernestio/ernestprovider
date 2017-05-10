@@ -91,7 +91,9 @@ func (ev *Event) SetState(state string) {
 
 // ResourceDataToEvent : Translates a ResourceData on a valid Ernest Event
 func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
+	ev.ID = d.Id()
 	ev.Name = d.Get("name").(string)
+	ev.ComponentID = "sql_server::" + ev.Name
 	ev.Location = d.Get("location").(string)
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)
 	ev.AdministratorLogin = d.Get("administrator_login").(string)

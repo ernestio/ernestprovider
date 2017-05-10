@@ -180,12 +180,13 @@ func (ev *Event) SetState(state string) {
 // ResourceDataToEvent : Translates a ResourceData on a valid Ernest Event
 func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.ID = d.Id()
-	ev.Name = d.Get("name").(string)
-	if ev.Name == "" {
+	if ev.ID == "" {
+		ev.Name = d.Get("name").(string)
+	} else {
 		parts := strings.Split(ev.ID, "/")
 		ev.Name = parts[8]
 	}
-	ev.ComponentID = ev.ComponentType + "::" + ev.Name
+	ev.ComponentID = "virtual_machine::" + ev.Name
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)
 	ev.Location = d.Get("location").(string)
 

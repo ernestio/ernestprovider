@@ -88,7 +88,9 @@ func (ev *Event) ValidateID(id string) bool {
 
 // ResourceDataToEvent : Translates a ResourceData on a valid Ernest Event
 func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
+	ev.ID = d.Id()
 	ev.Name = d.Get("name").(string)
+	ev.ComponentID = "storage_container::" + ev.Name
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)
 	ev.StorageAccountName = d.Get("storage_account_name").(string)
 	ev.ContainerAccessType = d.Get("container_access_type").(string)

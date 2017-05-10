@@ -96,6 +96,7 @@ func (ev *Event) SetState(state string) {
 func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.ID = d.Id()
 	ev.Name = d.Get("name").(string)
+	ev.ComponentID = "public_ip::" + ev.Name
 	ev.Location = d.Get("location").(string)
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)
 	ev.PublicIPAddressAllocation = d.Get("public_ip_address_allocation").(string)

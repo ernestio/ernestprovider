@@ -102,6 +102,7 @@ func (ev *Event) SetState(state string) {
 func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.ID = d.Id()
 	ev.Name = d.Get("name").(string)
+	ev.ComponentID = "lb::" + ev.Name
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)
 	ev.Location = d.Get("location").(string)
 	configs := d.Get("frontend_ip_configurations").([]interface{})

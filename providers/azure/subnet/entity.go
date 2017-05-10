@@ -91,7 +91,9 @@ func (ev *Event) SetState(state string) {
 
 // ResourceDataToEvent : Translates a ResourceData on a valid Ernest Event
 func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
+	ev.ID = d.Id()
 	ev.Name = d.Get("name").(string)
+	ev.ComponentID = "subnet::" + ev.Name
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)
 	ev.VirtualNetworkName = d.Get("virtual_network_name").(string)
 	ev.AddressPrefix = d.Get("address_prefix").(string)

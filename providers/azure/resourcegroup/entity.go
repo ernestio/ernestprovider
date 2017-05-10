@@ -91,7 +91,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 		parts := strings.Split(ev.ID, "/")
 		ev.Name = parts[8]
 	}
-	ev.ComponentID = ev.ComponentType + "::" + ev.Name
+	ev.ComponentID = "resource_group::" + ev.Name
 	ev.Location = d.Get("location").(string)
 	tags := d.Get("tags").(map[string]interface{})
 	ev.Tags = make(map[string]string, 0)
