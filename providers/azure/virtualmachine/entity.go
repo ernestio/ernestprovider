@@ -131,6 +131,7 @@ type UnattendedConfig struct {
 func New(subject, cryptoKey string, body []byte, val *event.Validator) (event.Event, error) {
 	var ev event.Resource
 	ev = &Event{CryptoKey: cryptoKey, Validator: val}
+	body = []byte(strings.Replace(string(body), `"_component":"virtual_machines"`, `"_component":"virtual_machine"`, 1))
 	if err := json.Unmarshal(body, &ev); err != nil {
 		err := fmt.Errorf("Error on input message : %s", err)
 		return nil, err

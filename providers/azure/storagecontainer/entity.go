@@ -40,6 +40,7 @@ type Event struct {
 func New(subject, cryptoKey string, body []byte, val *event.Validator) (event.Event, error) {
 	var ev event.Resource
 	ev = &Event{CryptoKey: cryptoKey, Validator: val}
+	body = []byte(strings.Replace(string(body), `"_component":"storage_containers"`, `"_component":"storage_container"`, 1))
 	if err := json.Unmarshal(body, &ev); err != nil {
 		err := fmt.Errorf("Error on input message : %s", err)
 		return nil, err

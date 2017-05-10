@@ -22,4 +22,5 @@ type Event interface {
 	Log(string, string)
 	SetID(string)
 	SetComponents([]Event)
+	SetState(state string)
 }

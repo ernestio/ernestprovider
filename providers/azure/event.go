@@ -114,6 +114,7 @@ func (ev *Event) Find() error {
 					log.Println(err)
 				}
 				e.SetID(id)
+				e.SetState("completed")
 				if err := e.Get(); err != nil {
 					ev.Log("error", err.Error())
 				}
@@ -122,6 +123,7 @@ func (ev *Event) Find() error {
 			}
 		}
 	}
+	ev.SetState("completed")
 	ev.SetComponents(components)
 
 	return nil

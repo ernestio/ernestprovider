@@ -20,25 +20,27 @@ import (
 //         group
 type Event struct {
 	event.Base
-	ID             string            `json:"id"`
-	Name           string            `json:"name" validate:"required"`
-	Location       string            `json:"location" validate:"required"`
-	Tags           map[string]string `json:"tags"`
-	ClientID       string            `json:"azure_client_id"`
-	ClientSecret   string            `json:"azure_client_secret"`
-	TenantID       string            `json:"azure_tenant_id"`
-	SubscriptionID string            `json:"azure_subscription_id"`
-	Environment    string            `json:"environment"`
-	ErrorMessage   string            `json:"error,omitempty"`
-	Components     []json.RawMessage `json:"components"`
-	CryptoKey      string            `json:"-"`
-	Validator      *event.Validator  `json:"-"`
+	ID                string            `json:"id"`
+	Name              string            `json:"name" validate:"required"`
+	Location          string            `json:"location" validate:"required"`
+	ResourceGroupName string            `json:"resource_group_name,omitempty"`
+	Tags              map[string]string `json:"tags"`
+	ClientID          string            `json:"azure_client_id"`
+	ClientSecret      string            `json:"azure_client_secret"`
+	TenantID          string            `json:"azure_tenant_id"`
+	SubscriptionID    string            `json:"azure_subscription_id"`
+	Environment       string            `json:"environment"`
+	ErrorMessage      string            `json:"error,omitempty"`
+	Components        []json.RawMessage `json:"components"`
+	CryptoKey         string            `json:"-"`
+	Validator         *event.Validator  `json:"-"`
 }
 
 // New : Constructor
 func New(subject, cryptoKey string, body []byte, val *event.Validator) (event.Event, error) {
 	var ev event.Resource
 	ev = &Event{CryptoKey: cryptoKey, Validator: val}
+	body = []byte(strings.Replace(string(body), `"_component":"resource_groups"`, `"_component":"resource_group"`, 1))
 	if err := json.Unmarshal(body, &ev); err != nil {
 		err := fmt.Errorf("Error on input message : %s", err)
 		return nil, err
@@ -85,6 +87,11 @@ func (ev *Event) SetState(state string) {
 func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.ID = d.Id()
 	ev.Name = d.Get("name").(string)
+	if ev.Name == "" {
+		parts := strings.Split(ev.ID, "/")
+		ev.Name = parts[8]
+	}
+	ev.ComponentID = ev.ComponentType + "::" + ev.Name
 	ev.Location = d.Get("location").(string)
 	tags := d.Get("tags").(map[string]interface{})
 	ev.Tags = make(map[string]string, 0)
