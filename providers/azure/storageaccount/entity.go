@@ -44,14 +44,15 @@ type Event struct {
 	SubscriptionID         string            `json:"azure_subscription_id"`
 	Environment            string            `json:"environment"`
 	ErrorMessage           string            `json:"error,omitempty"`
-	Components             []event.Event     `json:"components"`
+	Components             []json.RawMessage `json:"components"`
 	CryptoKey              string            `json:"-"`
+	Validator              *event.Validator  `json:"-"`
 }
 
 // New : Constructor
 func New(subject, cryptoKey string, body []byte, val *event.Validator) (event.Event, error) {
-	var ev azure.Resource
-	ev = &Event{CryptoKey: cryptoKey}
+	var ev event.Resource
+	ev = &Event{CryptoKey: cryptoKey, Validator: val}
 	if err := json.Unmarshal(body, &ev); err != nil {
 		err := fmt.Errorf("Error on input message : %s", err)
 		return nil, err
@@ -62,7 +63,9 @@ func New(subject, cryptoKey string, body []byte, val *event.Validator) (event.Ev
 
 // SetComponents : ....
 func (ev *Event) SetComponents(components []event.Event) {
-	ev.Components = components
+	for _, v := range components {
+		ev.Components = append(ev.Components, v.GetBody())
+	}
 }
 
 // ValidateID : determines if the given id is valid for this resource type
@@ -174,6 +177,12 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	}
 
 	return nil
+}
+
+// Clone : will mark the event as errored
+func (ev *Event) Clone() (event.Event, error) {
+	body, _ := json.Marshal(ev)
+	return New(ev.Subject, ev.CryptoKey, body, ev.Validator)
 }
 
 // Error : will mark the event as errored

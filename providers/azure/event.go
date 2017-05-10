@@ -2,6 +2,7 @@ package azure
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"reflect"
@@ -12,23 +13,11 @@ import (
 	"github.com/r3labs/terraform/helper/schema"
 )
 
-// Resource : ...
-type Resource interface {
-	ValidateID(id string) bool
-	SetID(id string)
-	GetID() string
-	SetState(state string)
-	ResourceDataToEvent(d *schema.ResourceData) error
-	EventToResourceData(d *schema.ResourceData) error
-	SetComponents([]event.Event)
-	Error(err error)
-}
-
 // Event : ...
 type Event struct {
 	event.Base
 
-	Resource Resource
+	Resource event.Resource
 
 	Provider     *schema.Provider
 	Component    *schema.Resource
@@ -42,7 +31,7 @@ type Event struct {
 }
 
 // New : Constructor
-func New(subject, resourceType string, body []byte, val *event.Validator, res Resource) (event.Event, error) {
+func New(subject, resourceType string, body []byte, val *event.Validator, res event.Resource) (event.Event, error) {
 	var n Event
 	n = Event{Subject: subject, Body: body, Validator: val}
 	n.Provider = azurerm.Provider().(*schema.Provider)
@@ -76,6 +65,11 @@ func (ev *Event) SetID(id string) {
 	ev.Resource.SetID(id)
 }
 
+// GetResource ....
+func (ev *Event) GetResource() event.Resource {
+	return ev.Resource
+}
+
 // SetState ...
 func (ev *Event) SetState(state string) {
 	ev.Resource.SetState(state)
@@ -90,8 +84,9 @@ func (ev *Event) getResourceGroup() (string, error) {
 	var rg struct {
 		ResourceGroup string `json:"resource_group_name"`
 	}
+	ev.Log("debug", "Subject : "+string(ev.GetSubject()))
 	body := ev.GetBody()
-	println(string(body))
+	ev.Log("debug", "Body : "+string(body))
 	if err := json.Unmarshal(body, &rg); err != nil {
 		ev.Log("error", err.Error())
 		return "", err
@@ -114,9 +109,10 @@ func (ev *Event) Find() error {
 	for _, ids := range results {
 		for _, id := range ids {
 			if ev.Resource.ValidateID(id) {
-				var e event.Event
-				resource := ev.Resource
-				e, _ = New(ev.Subject, ev.ResourceType, ev.Body, ev.Validator, resource)
+				e, err := ev.GetResource().Clone()
+				if err != nil {
+					log.Println(err)
+				}
 				e.SetID(id)
 				if err := e.Get(); err != nil {
 					ev.Log("error", err.Error())
@@ -126,13 +122,6 @@ func (ev *Event) Find() error {
 			}
 		}
 	}
-	if len(components) > 0 {
-		println("----")
-		fmt.Println("%s", string(components[0].GetBody()))
-		fmt.Println("%s", string(components[1].GetBody()))
-		println("----")
-	}
-
 	ev.SetComponents(components)
 
 	return nil
@@ -227,7 +216,6 @@ func (ev *Event) GetBody() []byte {
 	var err error
 	if ev.Body, err = json.Marshal(ev.Resource); err != nil {
 		ev.Log("error", err.Error())
-		panic(err)
 	}
 	return ev.Body
 }
@@ -260,6 +248,11 @@ func (ev *Event) Process() (err error) {
 	}
 
 	return nil
+}
+
+// Clone :
+func (ev *Event) Clone() (event.Event, error) {
+	return nil, errors.New("Not supported")
 }
 
 // Error : Will respond the current event with an error

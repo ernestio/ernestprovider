@@ -15,6 +15,7 @@ type Event interface {
 	Find() error
 	Get() error
 	GetSubject() string
+	GetResource() Resource
 	GetBody() []byte
 	GetErroredBody() []byte
 	GetCompletedBody() []byte

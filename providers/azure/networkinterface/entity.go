@@ -44,6 +44,7 @@ type Event struct {
 	ErrorMessage         string            `json:"error,omitempty"`
 	Components           []json.RawMessage `json:"components"`
 	CryptoKey            string            `json:"-"`
+	Validator            *event.Validator  `json:"-"`
 }
 
 // IPConfiguration : ...
@@ -61,8 +62,8 @@ type IPConfiguration struct {
 
 // New : Constructor
 func New(subject, cryptoKey string, body []byte, val *event.Validator) (event.Event, error) {
-	var ev azure.Resource
-	ev = &Event{CryptoKey: cryptoKey}
+	var ev event.Resource
+	ev = &Event{CryptoKey: cryptoKey, Validator: val}
 	if err := json.Unmarshal(body, &ev); err != nil {
 		err := fmt.Errorf("Error on input message : %s", err)
 		return nil, err
@@ -110,10 +111,12 @@ func (ev *Event) SetState(state string) {
 
 // ResourceDataToEvent : Translates a ResourceData on a valid Ernest Event
 func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
-	fmt.Println("%w", d)
 	ev.ID = d.Id()
-	parts := strings.Split(ev.ID, "/")
-	ev.Name = parts[8]
+	ev.Name = d.Get("name").(string)
+	if ev.Name == "" {
+		parts := strings.Split(ev.ID, "/")
+		ev.Name = parts[8]
+	}
 	ev.ComponentID = ev.ComponentType + "::" + ev.Name
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)
 	ev.Location = d.Get("location").(string)
@@ -263,6 +266,12 @@ func resourceArmNetworkInterfaceIPConfigurationHash(v interface{}) int {
 	}
 
 	return hashcode.String(buf.String())
+}
+
+// Clone : will mark the event as errored
+func (ev *Event) Clone() (event.Event, error) {
+	body, _ := json.Marshal(ev)
+	return New(ev.Subject, ev.CryptoKey, body, ev.Validator)
 }
 
 // Error : will mark the event as errored
