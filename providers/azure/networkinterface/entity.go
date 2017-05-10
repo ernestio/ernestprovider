@@ -24,12 +24,12 @@ type Event struct {
 	ID                   string            `json:"id"`
 	Name                 string            `json:"name" validate:"required"`
 	ResourceGroupName    string            `json:"resource_group_name" validate:"required"`
-	Location             string            `json:"location" validate:"required"`
+	Location             string            `json:"location"`
 	NetworkSecurityGroup string            `json:"network_security_group_id"`
 	MacAddress           string            `json:"mac_address"`
 	PrivateIPAddress     string            `json:"private_ip_address"`
 	VirtualMachineID     string            `json:"virtual_machine_id"`
-	IPConfigurations     []IPConfiguration `json:"ip_configuration" validate:"min=1,dive"`
+	IPConfigurations     []IPConfiguration `json:"ip_configuration"` // validate:"min=1,dive"`
 	DNSServers           []string          `json:"dns_servers" validate:"dive,ip"`
 	InternalDNSNameLabel string            `json:"internal_dns_name_label"`
 	AppliedDNSServers    []string          `json:"applied_dns_servers"`

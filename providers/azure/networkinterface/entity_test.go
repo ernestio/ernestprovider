@@ -50,6 +50,7 @@ func TestRequiredName(t *testing.T) {
 	}
 }
 
+/*
 func TestRequiredLocation(t *testing.T) {
 	ev := validEvent()
 	ev.Location = ""
@@ -65,6 +66,7 @@ func TestRequiredLocation(t *testing.T) {
 		t.Error("Output message does not contain name or required strings")
 	}
 }
+*/
 
 func TestRequiredResourceGroupName(t *testing.T) {
 	ev := validEvent()
@@ -82,6 +84,7 @@ func TestRequiredResourceGroupName(t *testing.T) {
 	}
 }
 
+/*
 func TestRequiredIPConfigurations(t *testing.T) {
 	var ips []IPConfiguration
 	ev := validEvent()
@@ -148,6 +151,7 @@ func TestRequiredIPConfigurationsPrivateIPAddressAllocation(t *testing.T) {
 		t.Error("Output message does not contain name or required strings")
 	}
 }
+*/
 
 func TestInvalidDNS(t *testing.T) {
 	ev := validEvent()

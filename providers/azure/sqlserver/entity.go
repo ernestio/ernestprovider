@@ -23,9 +23,9 @@ type Event struct {
 	Name                       string            `json:"name" validate:"required"`
 	Location                   string            `json:"location" validate:"required"`
 	ResourceGroupName          string            `json:"resource_group_name" validate:"required"`
-	Version                    string            `json:"version" validate:"required"`
+	Version                    string            `json:"version"`
 	AdministratorLogin         string            `json:"administrator_login" validate:"required"`
-	AdministratorLoginPassword string            `json:"administrator_login_password" validate:"required"`
+	AdministratorLoginPassword string            `json:"administrator_login_password"`
 	FullyQualifiedDomainName   string            `json:"fully_qualified_domain_name"`
 	Tags                       map[string]string `json:"tags"`
 	ClientID                   string            `json:"azure_client_id"`
