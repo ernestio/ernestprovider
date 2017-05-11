@@ -235,6 +235,7 @@ func (ev *Event) mapIPConfigurations() *schema.Set {
 		conf["subnet_id"] = c.SubnetID
 		conf["private_ip_address"] = c.PrivateIPAddress
 		conf["private_ip_address_allocation"] = c.PrivateIPAddressAllocation
+		conf["public_ip_address_id"] = c.PublicIPAddressID
 		l1 := schema.Set{}
 		for _, v := range c.LoadBalancerBackendAddressPools {
 			l1.Add(v)
