@@ -99,6 +99,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.AdministratorLogin = d.Get("administrator_login").(string)
 	ev.AdministratorLoginPassword = d.Get("administrator_login_password").(string)
 	ev.FullyQualifiedDomainName = d.Get("fully_qualified_domain_name").(string)
+	ev.Version = d.Get("version").(string)
 	tags := make(map[string]string, 0)
 	for k, v := range d.Get("tags").(map[string]interface{}) {
 		tags[k] = v.(string)
