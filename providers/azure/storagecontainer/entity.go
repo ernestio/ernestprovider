@@ -74,13 +74,13 @@ func (ev *Event) SetState(state string) {
 // ValidateID : determines if the given id is valid for this resource type
 func (ev *Event) ValidateID(id string) bool {
 	parts := strings.Split(strings.ToLower(id), "/")
-	if len(parts) != 9 {
+	if len(parts) != 4 {
 		return false
 	}
-	if parts[6] != "microsoft.storag" {
+	if parts[1] != "microsoft.storage" {
 		return false
 	}
-	if parts[7] != "container" {
+	if parts[2] != "storagecontainers" {
 		return false
 	}
 	return true
@@ -88,12 +88,15 @@ func (ev *Event) ValidateID(id string) bool {
 
 // ResourceDataToEvent : Translates a ResourceData on a valid Ernest Event
 func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
+	parts := strings.Split(ev.ID, "/")
+	parts = strings.Split(parts[len(parts)-1], "::")
+
 	ev.ID = d.Id()
-	ev.Name = d.Get("name").(string)
+	ev.Name = parts[2]
 	ev.ComponentID = "storage_container::" + ev.Name
-	ev.ResourceGroupName = d.Get("resource_group_name").(string)
-	ev.StorageAccountName = d.Get("storage_account_name").(string)
-	ev.ContainerAccessType = d.Get("container_access_type").(string)
+	ev.ResourceGroupName = parts[0]
+	ev.StorageAccountName = parts[1]
+	ev.ContainerAccessType = parts[3]
 
 	properties := make(map[string]string, 0)
 	for k, v := range d.Get("properties").(map[string]interface{}) {

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"strings"
 
 	"github.com/ernestio/ernestprovider/event"
 	"github.com/fatih/color"
@@ -176,17 +177,21 @@ func (ev *Event) Get() error {
 	if err != nil {
 		return err
 	}
-	ev.ResourceData.SetId(ev.Resource.GetID())
-	if err := ev.Component.Read(ev.ResourceData, c); err != nil {
-		err := fmt.Errorf("Resource not found : %s", err)
-		ev.Log("error", err.Error())
-		ev.Log("debug", "Original message: "+string(ev.Body))
-		return err
-	}
-	if ev.ResourceData.Id() == "" {
-		err := fmt.Errorf("Resource not found")
-		ev.Log("warn", err.Error())
-		return err
+	id := ev.Resource.GetID()
+	ev.ResourceData.SetId(id)
+	parts := strings.Split(id, "/")
+	if parts[1] == "subscriptions" {
+		if err := ev.Component.Read(ev.ResourceData, c); err != nil {
+			err := fmt.Errorf("Resource not found : %s", err)
+			ev.Log("error", err.Error())
+			ev.Log("debug", "Original message: "+string(ev.Body))
+			return err
+		}
+		if ev.ResourceData.Id() == "" {
+			err := fmt.Errorf("Resource not found")
+			ev.Log("warn", err.Error())
+			return err
+		}
 	}
 
 	if err = ev.Resource.ResourceDataToEvent(ev.ResourceData); err != nil {
