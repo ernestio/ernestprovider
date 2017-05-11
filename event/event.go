@@ -4,6 +4,10 @@
 
 package event
 
+import (
+	"github.com/r3labs/terraform/builtin/providers/azurerm"
+)
+
 // Event : Generic event interface
 type Event interface {
 	Validate() error
@@ -23,4 +27,5 @@ type Event interface {
 	SetID(string)
 	SetComponents([]Event)
 	SetState(state string)
+	Client() (*azurerm.ArmClient, error)
 }

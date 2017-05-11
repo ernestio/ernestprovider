@@ -1,9 +1,11 @@
 package event
 
 import (
+	"errors"
 	"log"
 
 	"github.com/fatih/color"
+	"github.com/r3labs/terraform/builtin/providers/azurerm"
 )
 
 // Base : common Event method container
@@ -40,4 +42,9 @@ func (ev *Base) Log(level, message string) {
 
 	log.Println(level, message)
 
+}
+
+// Client : not implemented
+func (ev *Base) Client() (*azurerm.ArmClient, error) {
+	return nil, errors.New("Not implemented")
 }

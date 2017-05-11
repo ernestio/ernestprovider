@@ -7,6 +7,7 @@ package networkinterface
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -16,6 +17,7 @@ import (
 	aes "github.com/ernestio/crypto/aes"
 	"github.com/ernestio/ernestprovider/event"
 	"github.com/ernestio/ernestprovider/providers/azure"
+	"github.com/r3labs/terraform/builtin/providers/azurerm"
 )
 
 // Event : This is the Ernest representation of an azure networkinterface
@@ -45,6 +47,7 @@ type Event struct {
 	Components           []json.RawMessage `json:"components"`
 	CryptoKey            string            `json:"-"`
 	Validator            *event.Validator  `json:"-"`
+	GenericEvent         event.Event       `json:"-"`
 }
 
 // IPConfiguration : ...
@@ -62,15 +65,16 @@ type IPConfiguration struct {
 
 // New : Constructor
 func New(subject, cryptoKey string, body []byte, val *event.Validator) (event.Event, error) {
-	var ev event.Resource
-	ev = &Event{CryptoKey: cryptoKey, Validator: val}
+	// var ev event.Resource
+	ev := &Event{CryptoKey: cryptoKey, Validator: val}
 	body = []byte(strings.Replace(string(body), `"_component":"network_interfaces"`, `"_component":"network_interface"`, 1))
 	if err := json.Unmarshal(body, &ev); err != nil {
 		err := fmt.Errorf("Error on input message : %s", err)
 		return nil, err
 	}
 
-	return azure.New(subject, "azurerm_network_interface", body, val, ev)
+	ev.GenericEvent, _ = azure.New(subject, "azurerm_network_interface", body, val, ev)
+	return ev.GenericEvent, nil
 }
 
 // SetComponents : ....
@@ -112,6 +116,7 @@ func (ev *Event) SetState(state string) {
 
 // ResourceDataToEvent : Translates a ResourceData on a valid Ernest Event
 func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
+
 	ev.ID = d.Id()
 	if ev.ID == "" {
 		ev.Name = d.Get("name").(string)
@@ -128,24 +133,23 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.VirtualMachineID = d.Get("virtual_machine_id").(string)
 
 	configs := []IPConfiguration{}
-	for _, cfg := range d.Get("ip_configuration").(*schema.Set).List() {
-		m := cfg.(map[string]interface{})
-		s := IPConfiguration{
-			Name:                       m["name"].(string),
-			SubnetID:                   m["subnet_id"].(string),
-			PrivateIPAddress:           m["private_ip_address"].(string),
-			PrivateIPAddressAllocation: m["private_ip_address_allocation"].(string),
-			PublicIPAddressID:          m["public_ip_address_id"].(string),
-		}
-		s.LoadBalancerBackendAddressPools = make([]string, 0)
-		for _, v := range m["load_balancer_backend_address_pools_ids"].(*schema.Set).List() {
-			s.LoadBalancerBackendAddressPools = append(s.LoadBalancerBackendAddressPools, v.(string))
-		}
-		s.LoadBalancerInboundNatRules = make([]string, 0)
-		for _, v := range m["load_balancer_inbound_nat_rules_ids"].(*schema.Set).List() {
-			s.LoadBalancerInboundNatRules = append(s.LoadBalancerInboundNatRules, v.(string))
-		}
-		configs = append(configs, s)
+
+	x := d.Get("ip_configuration").(*schema.Set)
+	fmt.Println("%w", x)
+
+	cli, _ := ev.GenericEvent.Client()
+	list := cli.ListNetworkInterfaceConfigurations(ev.ResourceGroupName, ev.Name)
+
+	for _, mo := range list {
+		configs = append(configs, IPConfiguration{
+			Name:                            mo["name"],
+			SubnetID:                        mo["subnet_id"],
+			PrivateIPAddress:                mo["private_ip_address"],
+			PrivateIPAddressAllocation:      mo["private_ip_address_allocation"],
+			PublicIPAddressID:               mo["public_ip_address_id"],
+			LoadBalancerBackendAddressPools: strings.Split(mo["load_balancer_backend_address_pools_ids"], ","),
+			LoadBalancerInboundNatRules:     strings.Split(mo["load_balancer_inbound_nat_rules_ids"], ","),
+		})
 	}
 	ev.IPConfigurations = configs
 	ev.DNSServers = make([]string, 0)
@@ -280,4 +284,9 @@ func (ev *Event) Clone() (event.Event, error) {
 func (ev *Event) Error(err error) {
 	ev.ErrorMessage = err.Error()
 	ev.Body, err = json.Marshal(ev)
+}
+
+// Client : not implemented
+func (ev *Event) Client() (*azurerm.ArmClient, error) {
+	return nil, errors.New("Not implemented")
 }

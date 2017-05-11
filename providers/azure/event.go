@@ -97,7 +97,7 @@ func (ev *Event) getResourceGroup() (string, error) {
 
 // Find : Find an object on azure
 func (ev *Event) Find() error {
-	cli, _ := ev.client()
+	cli, _ := ev.Client()
 	res, err := ev.getResourceGroup()
 	if err != nil {
 		return err
@@ -133,7 +133,7 @@ func (ev *Event) Find() error {
 // Create : Creates a Resource Group on Azure using terraform
 // providers
 func (ev *Event) Create() error {
-	c, err := ev.client()
+	c, err := ev.Client()
 	if err != nil {
 		return err
 	}
@@ -151,7 +151,7 @@ func (ev *Event) Create() error {
 // Update : Updates an existing Resource Group on Azure
 // by using azurerm terraform provider resource
 func (ev *Event) Update() error {
-	c, err := ev.client()
+	c, err := ev.Client()
 	if err != nil {
 		return err
 	}
@@ -173,7 +173,7 @@ func (ev *Event) Update() error {
 // Get : Requests and loads the resource to Azure through azurerm
 // terraform provider
 func (ev *Event) Get() error {
-	c, err := ev.client()
+	c, err := ev.Client()
 	if err != nil {
 		return err
 	}
@@ -204,7 +204,7 @@ func (ev *Event) Get() error {
 // Delete : Deletes the received resource from azure through
 // azurerm terraform provider
 func (ev *Event) Delete() error {
-	c, err := ev.client()
+	c, err := ev.Client()
 	if err != nil {
 		return err
 	}
@@ -268,8 +268,8 @@ func (ev *Event) Error(err error) {
 	ev.Resource.Error(err)
 }
 
-// Azure virtual network client
-func (ev *Event) client() (*azurerm.ArmClient, error) {
+// Client : Azure virtual network client
+func (ev *Event) Client() (*azurerm.ArmClient, error) {
 	client, err := ev.Provider.ConfigureFunc(ev.ResourceData)
 	if err != nil {
 		err := fmt.Errorf("Can't connect to provider : %s", err)

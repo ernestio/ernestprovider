@@ -5,6 +5,7 @@
 package event
 
 import (
+	"github.com/r3labs/terraform/builtin/providers/azurerm"
 	"github.com/r3labs/terraform/helper/schema"
 )
 
@@ -18,5 +19,6 @@ type Resource interface {
 	EventToResourceData(d *schema.ResourceData) error
 	SetComponents([]Event)
 	Clone() (Event, error)
+	Client() (*azurerm.ArmClient, error)
 	Error(err error)
 }
