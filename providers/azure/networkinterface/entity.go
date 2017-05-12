@@ -47,7 +47,7 @@ type Event struct {
 	Components           []json.RawMessage `json:"components"`
 	CryptoKey            string            `json:"-"`
 	Validator            *event.Validator  `json:"-"`
-	GenericEvent         event.Event       `json:"-"`
+	GenericEvent         event.Event       `json:"-" validate:"-"`
 }
 
 // IPConfiguration : ...
