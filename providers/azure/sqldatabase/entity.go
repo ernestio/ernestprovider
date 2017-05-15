@@ -21,7 +21,7 @@ type Event struct {
 	event.Base
 	ID                            string            `json:"id"`
 	Name                          string            `json:"name" validate:"required"`
-	Location                      string            `json:"location" validate:"required"`
+	Location                      string            `json:"location"`
 	ResourceGroupName             string            `json:"resource_group_name" validate:"required"`
 	ServerName                    string            `json:"server_name" validate:"required"`
 	CreateMode                    string            `json:"create_mode"`
