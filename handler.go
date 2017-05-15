@@ -17,6 +17,7 @@ import (
 	"github.com/ernestio/ernestprovider/providers/azure/resourcegroup"
 	"github.com/ernestio/ernestprovider/providers/azure/securitygroup"
 	"github.com/ernestio/ernestprovider/providers/azure/sqldatabase"
+	"github.com/ernestio/ernestprovider/providers/azure/sqlfirewallrule"
 	"github.com/ernestio/ernestprovider/providers/azure/sqlserver"
 	"github.com/ernestio/ernestprovider/providers/azure/storageaccount"
 	"github.com/ernestio/ernestprovider/providers/azure/storagecontainer"
@@ -135,6 +136,8 @@ func getAzureEvent(subject string, data []byte, key string) (event.Event, error)
 		ev, err = securitygroup.New(subject, key, data, val)
 	case "sql_database", "sql_databases":
 		ev, err = sqldatabase.New(subject, key, data, val)
+	case "sql_firewall_rule", "sql_firewall_rules":
+		ev, err = sqlfirewallrule.New(subject, key, data, val)
 	}
 	return ev, err
 }
