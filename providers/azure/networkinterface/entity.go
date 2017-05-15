@@ -23,31 +23,32 @@ import (
 // Event : This is the Ernest representation of an azure networkinterface
 type Event struct {
 	event.Base
-	ID                   string            `json:"id"`
-	Name                 string            `json:"name" validate:"required"`
-	ResourceGroupName    string            `json:"resource_group_name" validate:"required"`
-	Location             string            `json:"location"`
-	NetworkSecurityGroup string            `json:"network_security_group_id"`
-	MacAddress           string            `json:"mac_address"`
-	PrivateIPAddress     string            `json:"private_ip_address"`
-	VirtualMachineID     string            `json:"virtual_machine_id"`
-	IPConfigurations     []IPConfiguration `json:"ip_configuration"` // validate:"min=1,dive"`
-	DNSServers           []string          `json:"dns_servers" validate:"dive,ip"`
-	InternalDNSNameLabel string            `json:"internal_dns_name_label"`
-	AppliedDNSServers    []string          `json:"applied_dns_servers"`
-	InternalFQDN         string            `json:"internal_fqdn"`
-	EnableIPForwarding   bool              `json:"enable_ip_forwarding"`
-	Tags                 map[string]string `json:"tags"`
-	ClientID             string            `json:"azure_client_id"`
-	ClientSecret         string            `json:"azure_client_secret"`
-	TenantID             string            `json:"azure_tenant_id"`
-	SubscriptionID       string            `json:"azure_subscription_id"`
-	Environment          string            `json:"environment"`
-	ErrorMessage         string            `json:"error,omitempty"`
-	Components           []json.RawMessage `json:"components"`
-	CryptoKey            string            `json:"-"`
-	Validator            *event.Validator  `json:"-"`
-	GenericEvent         event.Event       `json:"-" validate:"-"`
+	ID                     string            `json:"id"`
+	Name                   string            `json:"name" validate:"required"`
+	ResourceGroupName      string            `json:"resource_group_name" validate:"required"`
+	Location               string            `json:"location"`
+	NetworkSecurityGroup   string            `json:"network_security_group"`
+	NetworkSecurityGroupID string            `json:"network_security_group_id"`
+	MacAddress             string            `json:"mac_address"`
+	PrivateIPAddress       string            `json:"private_ip_address"`
+	VirtualMachineID       string            `json:"virtual_machine_id"`
+	IPConfigurations       []IPConfiguration `json:"ip_configuration"` // validate:"min=1,dive"`
+	DNSServers             []string          `json:"dns_servers" validate:"dive,ip"`
+	InternalDNSNameLabel   string            `json:"internal_dns_name_label"`
+	AppliedDNSServers      []string          `json:"applied_dns_servers"`
+	InternalFQDN           string            `json:"internal_fqdn"`
+	EnableIPForwarding     bool              `json:"enable_ip_forwarding"`
+	Tags                   map[string]string `json:"tags"`
+	ClientID               string            `json:"azure_client_id"`
+	ClientSecret           string            `json:"azure_client_secret"`
+	TenantID               string            `json:"azure_tenant_id"`
+	SubscriptionID         string            `json:"azure_subscription_id"`
+	Environment            string            `json:"environment"`
+	ErrorMessage           string            `json:"error,omitempty"`
+	Components             []json.RawMessage `json:"components"`
+	CryptoKey              string            `json:"-"`
+	Validator              *event.Validator  `json:"-"`
+	GenericEvent           event.Event       `json:"-" validate:"-"`
 }
 
 // IPConfiguration : ...
@@ -127,7 +128,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.ComponentID = "network_interface::" + ev.Name
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)
 	ev.Location = d.Get("location").(string)
-	ev.NetworkSecurityGroup = d.Get("network_security_group_id").(string)
+	ev.NetworkSecurityGroupID = d.Get("network_security_group_id").(string)
 	ev.MacAddress = d.Get("mac_address").(string)
 	ev.PrivateIPAddress = d.Get("private_ip_address").(string)
 	ev.VirtualMachineID = d.Get("virtual_machine_id").(string)
@@ -203,7 +204,7 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	fields["name"] = ev.Name
 	fields["resource_group_name"] = ev.ResourceGroupName
 	fields["location"] = ev.Location
-	fields["network_security_group_id"] = ev.NetworkSecurityGroup
+	fields["network_security_group_id"] = ev.NetworkSecurityGroupID
 	fields["mac_address"] = ev.MacAddress
 	fields["private_ip_address"] = ev.PrivateIPAddress
 	fields["virtual_machine_id"] = ev.VirtualMachineID
