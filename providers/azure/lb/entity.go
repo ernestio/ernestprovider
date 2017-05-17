@@ -23,7 +23,7 @@ type Event struct {
 	ID                       string                    `json:"id"`
 	Name                     string                    `json:"name" validate:"required"`
 	ResourceGroupName        string                    `json:"resource_group_name" validate:"required"`
-	Location                 string                    `json:"location" validate:"required"`
+	Location                 string                    `json:"location"`
 	FrontendIPConfigurations []FrontendIPConfiguration `json:"frontend_ip_configurations" validate:"required"`
 	Tags                     map[string]string         `json:"tags"`
 	ClientID                 string                    `json:"azure_client_id"`
@@ -100,8 +100,9 @@ func (ev *Event) SetState(state string) {
 
 // ResourceDataToEvent : Translates a ResourceData on a valid Ernest Event
 func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
+	idParts := strings.Split(d.Id(), "/")
 	ev.ID = d.Id()
-	ev.Name = d.Get("name").(string)
+	ev.Name = idParts[len(idParts)-1]
 	ev.ComponentID = "lb::" + ev.Name
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)
 	ev.Location = d.Get("location").(string)
