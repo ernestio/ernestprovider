@@ -11,6 +11,7 @@ import (
 
 	"github.com/ernestio/ernestprovider/event"
 	"github.com/ernestio/ernestprovider/providers/azure/lb"
+	"github.com/ernestio/ernestprovider/providers/azure/lbrule"
 	"github.com/ernestio/ernestprovider/providers/azure/localnetworkgateway"
 	"github.com/ernestio/ernestprovider/providers/azure/networkinterface"
 	"github.com/ernestio/ernestprovider/providers/azure/publicip"
@@ -128,6 +129,8 @@ func getAzureEvent(subject string, data []byte, key string) (event.Event, error)
 		ev, err = virtualmachine.New(subject, key, data, val)
 	case "lb", "lbs":
 		ev, err = lb.New(subject, key, data, val)
+	case "lb_rule", "lb_rules":
+		ev, err = lbrule.New(subject, key, data, val)
 	case "sql_server", "sql_servers":
 		ev, err = sqlserver.New(subject, key, data, val)
 	case "local_network_gateway", "local_network_gateways":
