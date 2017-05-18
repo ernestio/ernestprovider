@@ -53,15 +53,16 @@ type Event struct {
 
 // IPConfiguration : ...
 type IPConfiguration struct {
-	Name                            string   `json:"name" validate:"required"`
-	Subnet                          string   `json:"subnet" validate:"required"`
-	SubnetID                        string   `json:"subnet_id" validate:"required"`
-	PublicIPAddress                 string   `json:"public_ip_address"`
-	PrivateIPAddress                string   `json:"private_ip_address"`
-	PrivateIPAddressAllocation      string   `json:"private_ip_address_allocation" validate:"required"`
-	PublicIPAddressID               string   `json:"public_ip_address_id"`
-	LoadBalancerBackendAddressPools []string `json:"load_balancer_backend_address_pools_ids"`
-	LoadBalancerInboundNatRules     []string `json:"load_balancer_inbound_nat_rules_ids"`
+	Name                              string   `json:"name" validate:"required"`
+	Subnet                            string   `json:"subnet" validate:"required"`
+	SubnetID                          string   `json:"subnet_id" validate:"required"`
+	PublicIPAddress                   string   `json:"public_ip_address"`
+	PrivateIPAddress                  string   `json:"private_ip_address"`
+	PrivateIPAddressAllocation        string   `json:"private_ip_address_allocation" validate:"required"`
+	PublicIPAddressID                 string   `json:"public_ip_address_id"`
+	LoadbalancerBackendAddressPools   []string `json:"load_balancer_backend_address_pools"`
+	LoadBalancerBackendAddressPoolIDs []string `json:"load_balancer_backend_address_pools_ids"`
+	LoadBalancerInboundNatRules       []string `json:"load_balancer_inbound_nat_rules_ids"`
 }
 
 // New : Constructor
@@ -143,13 +144,13 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 
 	for _, mo := range list {
 		configs = append(configs, IPConfiguration{
-			Name:                            mo["name"],
-			SubnetID:                        mo["subnet_id"],
-			PrivateIPAddress:                mo["private_ip_address"],
-			PrivateIPAddressAllocation:      mo["private_ip_address_allocation"],
-			PublicIPAddressID:               mo["public_ip_address_id"],
-			LoadBalancerBackendAddressPools: strings.Split(mo["load_balancer_backend_address_pools_ids"], ","),
-			LoadBalancerInboundNatRules:     strings.Split(mo["load_balancer_inbound_nat_rules_ids"], ","),
+			Name:                              mo["name"],
+			SubnetID:                          mo["subnet_id"],
+			PrivateIPAddress:                  mo["private_ip_address"],
+			PrivateIPAddressAllocation:        mo["private_ip_address_allocation"],
+			PublicIPAddressID:                 mo["public_ip_address_id"],
+			LoadBalancerBackendAddressPoolIDs: strings.Split(mo["load_balancer_backend_address_pools_ids"], ","),
+			LoadBalancerInboundNatRules:       strings.Split(mo["load_balancer_inbound_nat_rules_ids"], ","),
 		})
 	}
 	ev.IPConfigurations = configs
@@ -238,7 +239,7 @@ func (ev *Event) mapIPConfigurations() *schema.Set {
 		conf["private_ip_address_allocation"] = c.PrivateIPAddressAllocation
 		conf["public_ip_address_id"] = c.PublicIPAddressID
 		l1 := schema.Set{}
-		for _, v := range c.LoadBalancerBackendAddressPools {
+		for _, v := range c.LoadBalancerBackendAddressPoolIDs {
 			l1.Add(v)
 		}
 		conf["load_balancer_backend_address_pools_ids"] = &l1
