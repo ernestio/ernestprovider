@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-package lbprobe
+package lbbackendaddresspool
 
 import (
 	"encoding/json"
@@ -23,11 +23,6 @@ type Event struct {
 	Name              string            `json:"name" validate:"required"`
 	ResourceGroupName string            `json:"resource_group_name" validate:"required"`
 	LoadbalancerID    string            `json:"loadbalancer_id"`
-	Protocol          string            `json:"protocol"`
-	Port              int               `json:"port"`
-	RequestPath       string            `json:"request_path"`
-	IntervalInSeconds int               `json:"interval_in_seconds"`
-	NumberOfProbes    int               `json:"number_of_probes"`
 	ClientID          string            `json:"azure_client_id"`
 	ClientSecret      string            `json:"azure_client_secret"`
 	TenantID          string            `json:"azure_tenant_id"`
@@ -97,11 +92,6 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.ComponentID = "lb::" + ev.Name
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)
 	ev.LoadbalancerID = d.Get("loadbalancer_id").(string)
-	ev.Protocol = d.Get("protocol").(string)
-	ev.Port = d.Get("port").(int)
-	ev.RequestPath = d.Get("request_path").(string)
-	ev.IntervalInSeconds = d.Get("interval_in_seconds").(int)
-	ev.NumberOfProbes = d.Get("number_of_probes").(int)
 
 	return nil
 }
@@ -134,12 +124,6 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	fields["name"] = ev.Name
 	fields["resource_group_name"] = ev.ResourceGroupName
 	fields["loadbalancer_id"] = ev.LoadbalancerID
-	fields["protocol"] = ev.Protocol
-	fields["port"] = ev.Port
-	fields["request_path"] = ev.RequestPath
-	fields["interval_in_seconds"] = ev.IntervalInSeconds
-	fields["number_of_probes"] = ev.NumberOfProbes
-
 	for k, v := range fields {
 		if err := d.Set(k, v); err != nil {
 			err := fmt.Errorf("Field '%s' not valid : %s", k, err)
