@@ -22,6 +22,7 @@ type Event struct {
 	ID                string            `json:"id"`
 	Name              string            `json:"name" validate:"required"`
 	ResourceGroupName string            `json:"resource_group_name" validate:"required"`
+	Loadbalancer      string            `json:"loadbalancer"`
 	LoadbalancerID    string            `json:"loadbalancer_id"`
 	ClientID          string            `json:"azure_client_id"`
 	ClientSecret      string            `json:"azure_client_secret"`

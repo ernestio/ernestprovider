@@ -22,11 +22,15 @@ type Event struct {
 	ID                          string            `json:"id"`
 	Name                        string            `json:"name" validate:"required"`
 	ResourceGroupName           string            `json:"resource_group_name" validate:"required"`
+	Loadbalancer                string            `json:"loadbalancer"`
+	LoadbalancerID              string            `json:"loadbalancer_id"`
 	FrontendIPConfigurationName string            `json:"frontend_ip_configuration_name" structs:"fronted_ip_configuration_name"`
 	Protocol                    string            `json:"protocol"`
 	FrontendPort                int               `json:"frontend_port"`
 	BackendPort                 int               `json:"backend_port"`
+	BackendAddressPool          string            `json:"backend_address_pool"`
 	BackendAddressPoolID        string            `json:"backend_address_pool_id"`
+	Probe                       string            `json:"probe"`
 	ProbeID                     string            `json:"probe_id"`
 	EnableFloatingIP            bool              `json:"enable_floating_ip"`
 	IdleTimeoutInMinutes        int               `json:"idle_timeout_in_minutes"`
@@ -111,6 +115,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.EnableFloatingIP = d.Get("enable_floating_ip").(bool)
 	ev.IdleTimeoutInMinutes = d.Get("idle_timeout_in_minutes").(int)
 	ev.LoadDistribution = d.Get("load_distribution").(string)
+	ev.LoadbalancerID = d.Get("loadbalancer_id").(string)
 
 	return nil
 }
@@ -141,6 +146,7 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 
 	fields := make(map[string]interface{})
 
+	fields["loadbalancer_id"] = ev.LoadbalancerID
 	fields["fontend_ip_configuration_name"] = ev.FrontendIPConfigurationName
 	fields["protocol"] = ev.Protocol
 	fields["frontend_port"] = ev.FrontendPort
