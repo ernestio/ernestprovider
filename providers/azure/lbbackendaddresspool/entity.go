@@ -38,13 +38,13 @@ type Event struct {
 func New(subject, cryptoKey string, body []byte, val *event.Validator) (event.Event, error) {
 	var ev event.Resource
 	ev = &Event{CryptoKey: cryptoKey, Validator: val}
-	body = []byte(strings.Replace(string(body), `"_component":"lbs"`, `"_component":"lb"`, 1))
+	body = []byte(strings.Replace(string(body), `"_component":"lb_backend_address_pools"`, `"_component":"lb_backend_address_pool"`, 1))
 	if err := json.Unmarshal(body, &ev); err != nil {
 		err := fmt.Errorf("Error on input message : %s", err)
 		return nil, err
 	}
 
-	return azure.New(subject, "azurerm_lb", body, val, ev)
+	return azure.New(subject, "azurerm_lb_backend_address_pool", body, val, ev)
 }
 
 // SetComponents : ....
