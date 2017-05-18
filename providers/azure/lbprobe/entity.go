@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-package lb
+package lbprobe
 
 import (
 	"encoding/json"
@@ -14,27 +14,29 @@ import (
 	aes "github.com/ernestio/crypto/aes"
 	"github.com/ernestio/ernestprovider/event"
 	"github.com/ernestio/ernestprovider/providers/azure"
-	"github.com/fatih/structs"
 )
 
 // Event : This is the Ernest representation of an azure lb
 type Event struct {
 	event.Base
-	ID                       string                    `json:"id"`
-	Name                     string                    `json:"name" validate:"required"`
-	ResourceGroupName        string                    `json:"resource_group_name" validate:"required"`
-	Location                 string                    `json:"location"`
-	FrontendIPConfigurations []FrontendIPConfiguration `json:"frontend_ip_configurations" validate:"required"`
-	Tags                     map[string]string         `json:"tags"`
-	ClientID                 string                    `json:"azure_client_id"`
-	ClientSecret             string                    `json:"azure_client_secret"`
-	TenantID                 string                    `json:"azure_tenant_id"`
-	SubscriptionID           string                    `json:"azure_subscription_id"`
-	Environment              string                    `json:"environment"`
-	ErrorMessage             string                    `json:"error,omitempty"`
-	Components               []json.RawMessage         `json:"components"`
-	CryptoKey                string                    `json:"-"`
-	Validator                *event.Validator          `json:"-"`
+	ID                string            `json:"id"`
+	Name              string            `json:"name" validate:"required"`
+	ResourceGroupName string            `json:"resource_group_name" validate:"required"`
+	LoadbalancerID    string            `json:"loadbalancer_id"`
+	Protocol          string            `json:"protocol"`
+	Port              int               `json:"port"`
+	RequestPath       string            `json:"request_path"`
+	IntervalInSeconds int               `json:"interval_in_seconds"`
+	NumberOfProbes    int               `json:"number_of_probes"`
+	ClientID          string            `json:"azure_client_id"`
+	ClientSecret      string            `json:"azure_client_secret"`
+	TenantID          string            `json:"azure_tenant_id"`
+	SubscriptionID    string            `json:"azure_subscription_id"`
+	Environment       string            `json:"environment"`
+	ErrorMessage      string            `json:"error,omitempty"`
+	Components        []json.RawMessage `json:"components"`
+	CryptoKey         string            `json:"-"`
+	Validator         *event.Validator  `json:"-"`
 }
 
 // FrontendIPConfiguration ...
@@ -105,24 +107,12 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.Name = idParts[len(idParts)-1]
 	ev.ComponentID = "lb::" + ev.Name
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)
-	ev.Location = d.Get("location").(string)
-	configs := d.Get("frontend_ip_configuration").([]interface{})
-	for _, c := range configs {
-		cfg := c.(map[string]interface{})
-		ev.FrontendIPConfigurations = append(ev.FrontendIPConfigurations, FrontendIPConfiguration{
-			Name:                       cfg["name"].(string),
-			SubnetID:                   cfg["subnet_id"].(string),
-			PrivateIPAddress:           cfg["private_ip_address"].(string),
-			PrivateIPAddressAllocation: cfg["private_ip_address_allocation"].(string),
-			PublicIPAddressID:          cfg["public_ip_address_id"].(string),
-		})
-	}
-
-	tags := make(map[string]string, 0)
-	for k, v := range d.Get("tags").(map[string]interface{}) {
-		tags[k] = v.(string)
-	}
-	ev.Tags = tags
+	ev.LoadbalancerID = d.Get("loadbalancer_id").(string)
+	ev.Protocol = d.Get("protocol").(string)
+	ev.Port = d.Get("port").(int)
+	ev.RequestPath = d.Get("request_path").(string)
+	ev.IntervalInSeconds = d.Get("interval_in_seconds").(int)
+	ev.NumberOfProbes = d.Get("number_of_probes").(int)
 
 	return nil
 }
@@ -153,14 +143,14 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 
 	fields := make(map[string]interface{})
 	fields["name"] = ev.Name
-	fields["location"] = ev.Location
 	fields["resource_group_name"] = ev.ResourceGroupName
-	var configs []interface{}
-	for _, c := range ev.FrontendIPConfigurations {
-		configs = append(configs, structs.Map(c))
-	}
-	fields["frontend_ip_configuration"] = configs
-	fields["tags"] = ev.Tags
+	fields["loadbalancer_id"] = ev.LoadbalancerID
+	fields["protocol"] = ev.Protocol
+	fields["port"] = ev.Port
+	fields["request_path"] = ev.RequestPath
+	fields["interval_in_seconds"] = ev.IntervalInSeconds
+	fields["number_of_probes"] = ev.NumberOfProbes
+
 	for k, v := range fields {
 		if err := d.Set(k, v); err != nil {
 			err := fmt.Errorf("Field '%s' not valid : %s", k, err)
