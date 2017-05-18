@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-package lbbackendaddresspool
+package manageddisk
 
 import (
 	"encoding/json"
@@ -19,32 +19,39 @@ import (
 // Event : This is the Ernest representation of an azure lb
 type Event struct {
 	event.Base
-	ID                string            `json:"id"`
-	Name              string            `json:"name" validate:"required"`
-	ResourceGroupName string            `json:"resource_group_name" validate:"required"`
-	LoadbalancerID    string            `json:"loadbalancer_id"`
-	ClientID          string            `json:"azure_client_id"`
-	ClientSecret      string            `json:"azure_client_secret"`
-	TenantID          string            `json:"azure_tenant_id"`
-	SubscriptionID    string            `json:"azure_subscription_id"`
-	Environment       string            `json:"environment"`
-	ErrorMessage      string            `json:"error,omitempty"`
-	Components        []json.RawMessage `json:"components"`
-	CryptoKey         string            `json:"-"`
-	Validator         *event.Validator  `json:"-"`
+	ID                 string            `json:"id"`
+	Name               string            `json:"name" validate:"required"`
+	ResourceGroupName  string            `json:"resource_group_name" validate:"required"`
+	Location           string            `json:"location"`
+	StorageAccountType string            `json:"storage_account_type"`
+	CreateOption       string            `json:"create_option"`
+	SourceURI          string            `json:"source_uri"`
+	SourceResourceID   string            `json:"source_resource_id"`
+	OSType             string            `json:"os_type"`
+	DiskSizeGB         int               `json:"disk_size_gb"`
+	Tags               map[string]string `json:"tags"`
+	ClientID           string            `json:"azure_client_id"`
+	ClientSecret       string            `json:"azure_client_secret"`
+	TenantID           string            `json:"azure_tenant_id"`
+	SubscriptionID     string            `json:"azure_subscription_id"`
+	Environment        string            `json:"environment"`
+	ErrorMessage       string            `json:"error,omitempty"`
+	Components         []json.RawMessage `json:"components"`
+	CryptoKey          string            `json:"-"`
+	Validator          *event.Validator  `json:"-"`
 }
 
 // New : Constructor
 func New(subject, cryptoKey string, body []byte, val *event.Validator) (event.Event, error) {
 	var ev event.Resource
 	ev = &Event{CryptoKey: cryptoKey, Validator: val}
-	body = []byte(strings.Replace(string(body), `"_component":"lb_backend_address_pools"`, `"_component":"lb_backend_address_pool"`, 1))
+	body = []byte(strings.Replace(string(body), `"_component":"managed_disks"`, `"_component":"managed_disk"`, 1))
 	if err := json.Unmarshal(body, &ev); err != nil {
 		err := fmt.Errorf("Error on input message : %s", err)
 		return nil, err
 	}
 
-	return azure.New(subject, "azurerm_lb_backend_address_pool", body, val, ev)
+	return azure.New(subject, "azurerm_managed_disk", body, val, ev)
 }
 
 // SetComponents : ....
@@ -57,16 +64,13 @@ func (ev *Event) SetComponents(components []event.Event) {
 // ValidateID : determines if the given id is valid for this resource type
 func (ev *Event) ValidateID(id string) bool {
 	parts := strings.Split(strings.ToLower(id), "/")
-	if len(parts) != 11 {
+	if len(parts) != 9 {
 		return false
 	}
-	if parts[6] != "microsoft.network" {
+	if parts[6] != "microsoft.compute" {
 		return false
 	}
-	if parts[7] != "loadbalancers" {
-		return false
-	}
-	if parts[9] != "backendaddresspools" {
+	if parts[7] != "disks" {
 		return false
 	}
 	return true
@@ -94,7 +98,18 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.Name = idParts[len(idParts)-1]
 	ev.ComponentID = "lb::" + ev.Name
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)
-	ev.LoadbalancerID = d.Get("loadbalancer_id").(string)
+	ev.Location = d.Get("location").(string)
+	ev.StorageAccountType = d.Get("storage_account_type").(string)
+	ev.CreateOption = d.Get("create_option").(string)
+	ev.SourceURI = d.Get("source_uri").(string)
+	ev.SourceResourceID = d.Get("source_resource_id").(string)
+	ev.OSType = d.Get("os_type").(string)
+	ev.DiskSizeGB = d.Get("disk_size_gb").(int)
+	tags := make(map[string]string, 0)
+	for k, v := range d.Get("tags").(map[string]interface{}) {
+		tags[k] = v.(string)
+	}
+	ev.Tags = tags
 
 	return nil
 }
@@ -125,8 +140,15 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 
 	fields := make(map[string]interface{})
 	fields["name"] = ev.Name
+	fields["location"] = ev.Location
 	fields["resource_group_name"] = ev.ResourceGroupName
-	fields["loadbalancer_id"] = ev.LoadbalancerID
+	fields["storage_accunt_type"] = ev.StorageAccountType
+	fields["create_option"] = ev.CreateOption
+	fields["source_uri"] = ev.SourceURI
+	fields["source_resource_id"] = ev.SourceResourceID
+	fields["os_type"] = ev.OSType
+	fields["disk_size_gb"] = ev.DiskSizeGB
+	fields["tags"] = ev.Tags
 	for k, v := range fields {
 		if err := d.Set(k, v); err != nil {
 			err := fmt.Errorf("Field '%s' not valid : %s", k, err)
