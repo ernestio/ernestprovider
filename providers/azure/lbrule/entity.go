@@ -24,7 +24,7 @@ type Event struct {
 	ResourceGroupName           string            `json:"resource_group_name" validate:"required"`
 	Loadbalancer                string            `json:"loadbalancer"`
 	LoadbalancerID              string            `json:"loadbalancer_id"`
-	FrontendIPConfigurationName string            `json:"frontend_ip_configuration_name" structs:"fronted_ip_configuration_name"`
+	FrontendIPConfigurationName string            `json:"frontend_ip_configuration_name"`
 	Protocol                    string            `json:"protocol"`
 	FrontendPort                int               `json:"frontend_port"`
 	BackendPort                 int               `json:"backend_port"`
@@ -146,8 +146,9 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 
 	fields := make(map[string]interface{})
 
+	fields["name"] = ev.Name
 	fields["loadbalancer_id"] = ev.LoadbalancerID
-	fields["fontend_ip_configuration_name"] = ev.FrontendIPConfigurationName
+	fields["frontend_ip_configuration_name"] = ev.FrontendIPConfigurationName
 	fields["protocol"] = ev.Protocol
 	fields["frontend_port"] = ev.FrontendPort
 	fields["backend_port"] = ev.BackendPort
