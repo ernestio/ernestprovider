@@ -55,8 +55,8 @@ type Event struct {
 		StorageAccount   string `json:"storage_account" structs:"-"`
 		StorageContainer string `json:"storage_container" structs:"-"`
 		CreateOption     string `json:"create_option" structs:"create_option"`
-		Size             int32  `json:"disk_size_gb" structs:"disk_size_gb"`
-		Lun              int32  `json:"lun" structs:"lun"`
+		Size             *int32 `json:"disk_size_gb" structs:"disk_size_gb"`
+		Lun              *int32 `json:"lun" structs:"lun"`
 	} `json:"storage_data_disk"`
 	DeleteDataDisksOnTermination bool             `json:"delete_data_disks_on_termination"`
 	BootDiagnostics              []BootDiagnostic `json:"boot_diagnostics,omitempty"`
@@ -230,10 +230,10 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 		ev.StorageDataDisk.VhdURI = s["vhd_uri"].(string)
 		ev.StorageDataDisk.CreateOption = s["create_option"].(string)
 		if s["disk_size_gb"] != nil {
-			ev.StorageDataDisk.Size = int32(s["disk_size_gb"].(int))
+			*ev.StorageDataDisk.Size = int32(s["disk_size_gb"].(int))
 		}
 		if s["lun"] != nil {
-			ev.StorageDataDisk.Lun = int32(s["lun"].(int))
+			*ev.StorageDataDisk.Lun = int32(s["lun"].(int))
 		}
 	}
 	ev.DeleteDataDisksOnTermination = d.Get("delete_data_disks_on_termination").(bool)
