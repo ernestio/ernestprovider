@@ -73,7 +73,7 @@ type Event struct {
 		AdditionalUnattendConfig []UnattendedConfig `json:"additional_unattend_config" structs:"additional_unattend_config"`
 	} `json:"os_profile_windows_config"`
 	OSProfileLinuxConfig struct {
-		DisablePasswordAuthentication bool     `json:"disable_password_authentication" structs:"disable_password_authentication"`
+		DisablePasswordAuthentication *bool    `json:"disable_password_authentication" structs:"disable_password_authentication"`
 		SSHKeys                       []SSHKey `json:"ssh_keys" structs:"ssh_keys"`
 	} `json:"os_profile_linux_config"`
 	OSProfileSecrets    []secret          `json:"os_profile_secrets"`
@@ -281,7 +281,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	linList := d.Get("os_profile_linux_config").(*schema.Set).List()
 	if len(linList) > 0 {
 		lin := linList[0].(map[string]interface{})
-		ev.OSProfileLinuxConfig.DisablePasswordAuthentication = lin["disable_password_authentication"].(bool)
+		*ev.OSProfileLinuxConfig.DisablePasswordAuthentication = lin["disable_password_authentication"].(bool)
 		ev.OSProfileLinuxConfig.SSHKeys = make([]SSHKey, 0)
 		for _, key := range lin["ssh_keys"].([]interface{}) {
 			v := key.(map[string]interface{})
