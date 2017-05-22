@@ -357,9 +357,20 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	fields["storage_image_reference"] = []interface{}{structs.Map(ev.StorageImageReference)}
 	fields["storage_os_disk"] = []interface{}{structs.Map(ev.StorageOSDisk)}
 	fields["delete_os_disk_on_termination"] = ev.DeleteOSDiskOnTermination
-	fields["storage_data_disk"] = []interface{}{structs.Map(ev.StorageDataDisk)}
 	fields["delete_data_disks_on_termination"] = ev.DeleteDataDisksOnTermination
 	fields["os_profile"] = []interface{}{structs.Map(ev.OSProfile)}
+
+	if ev.StorageDataDisk.Size != nil {
+		ddisk := make(map[string]interface{})
+		ddisk["name"] = ev.StorageDataDisk.Name
+		ddisk["vhd_uri"] = ev.StorageDataDisk.VhdURI
+		ddisk["create_option"] = ev.StorageDataDisk.CreateOption
+		ddisk["disk_size_gb"] = *ev.StorageDataDisk.Size
+		if ev.StorageDataDisk.Lun != nil {
+			ddisk["lun"] = *ev.StorageDataDisk.Lun
+		}
+		fields["storage_data_disk"] = ddisk
+	}
 
 	var diagnostics []interface{}
 	for _, bd := range ev.BootDiagnostics {
@@ -371,13 +382,21 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	if len(ev.OSProfileWindowsConfig.WinRm) > 0 {
 		fields["os_profile_windows_config"] = []interface{}{structs.Map(ev.OSProfileWindowsConfig)}
 	}
-	fields["os_profile_linux_config"] = []interface{}{structs.Map(ev.OSProfileLinuxConfig)}
-	secrets := make([]interface{}, 0)
-	for _, v := range ev.OSProfileSecrets {
-		secrets = append(secrets, structs.Map(v))
+
+	if ev.OSProfileLinuxConfig.DisablePasswordAuthentication != nil {
+		lconfig := make(map[string]interface{})
+		lconfig["disable_password_authentication"] = *ev.OSProfileLinuxConfig.DisablePasswordAuthentication
+		fields["os_profile_linux_config"] = lconfig
 	}
 
-	fields["os_profile_secrets"] = secrets
+	if len(ev.OSProfileLinuxConfig.SSHKeys) > 0 {
+		secrets := make([]interface{}, 0)
+		for _, v := range ev.OSProfileSecrets {
+			secrets = append(secrets, structs.Map(v))
+		}
+		fields["os_profile_secrets"] = secrets
+	}
+
 	fields["network_interface_ids"] = ev.NetworkInterfaceIDs
 	fields["tags"] = ev.Tags
 	for k, v := range fields {
