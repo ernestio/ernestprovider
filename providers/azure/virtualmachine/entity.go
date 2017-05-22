@@ -369,7 +369,7 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 		if ev.StorageDataDisk.Lun != nil {
 			ddisk["lun"] = *ev.StorageDataDisk.Lun
 		}
-		fields["storage_data_disk"] = ddisk
+		fields["storage_data_disk"] = []interface{}{ddisk}
 	}
 
 	var diagnostics []interface{}
@@ -386,7 +386,7 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	if ev.OSProfileLinuxConfig.DisablePasswordAuthentication != nil {
 		lconfig := make(map[string]interface{})
 		lconfig["disable_password_authentication"] = *ev.OSProfileLinuxConfig.DisablePasswordAuthentication
-		fields["os_profile_linux_config"] = lconfig
+		fields["os_profile_linux_config"] = []interface{}{lconfig}
 	}
 
 	if len(ev.OSProfileLinuxConfig.SSHKeys) > 0 {
