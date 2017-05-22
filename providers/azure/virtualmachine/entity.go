@@ -75,7 +75,7 @@ type Event struct {
 	OSProfileLinuxConfig struct {
 		DisablePasswordAuthentication *bool    `json:"disable_password_authentication" structs:"disable_password_authentication"`
 		SSHKeys                       []SSHKey `json:"ssh_keys" structs:"ssh_keys"`
-	} `json:"os_profile_linux_config"`
+	} `json:"os_profile_linux_config" structs:"os_profile_linux_config"`
 	OSProfileSecrets    []secret          `json:"os_profile_secrets"`
 	NetworkInterfaces   []string          `json:"network_interfaces"`
 	NetworkInterfaceIDs []string          `json:"network_interface_ids"`
@@ -383,18 +383,23 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 		fields["os_profile_windows_config"] = []interface{}{structs.Map(ev.OSProfileWindowsConfig)}
 	}
 
+	for i := range ev.OSProfileLinuxConfig.SSHKeys {
+		ev.OSProfileLinuxConfig.SSHKeys[i].Path = strings.Replace(ev.OSProfileLinuxConfig.SSHKeys[i].Path, "\\u003c", "<", -1)
+		ev.OSProfileLinuxConfig.SSHKeys[i].KeyData = strings.Replace(ev.OSProfileLinuxConfig.SSHKeys[i].KeyData, "\\u003c", "<", -1)
+		ev.OSProfileLinuxConfig.SSHKeys[i].Path = strings.Replace(ev.OSProfileLinuxConfig.SSHKeys[i].Path, "\\u003e", ">", -1)
+		ev.OSProfileLinuxConfig.SSHKeys[i].KeyData = strings.Replace(ev.OSProfileLinuxConfig.SSHKeys[i].KeyData, "\\u003e", ">", -1)
+	}
+
+	secrets := make([]interface{}, 0)
+	for _, v := range ev.OSProfileSecrets {
+		secrets = append(secrets, structs.Map(v))
+	}
+	fields["os_profile_secrets"] = secrets
+
 	if ev.OSProfileLinuxConfig.DisablePasswordAuthentication != nil {
 		lconfig := make(map[string]interface{})
 		lconfig["disable_password_authentication"] = *ev.OSProfileLinuxConfig.DisablePasswordAuthentication
 		fields["os_profile_linux_config"] = []interface{}{lconfig}
-	}
-
-	if len(ev.OSProfileLinuxConfig.SSHKeys) > 0 {
-		secrets := make([]interface{}, 0)
-		for _, v := range ev.OSProfileSecrets {
-			secrets = append(secrets, structs.Map(v))
-		}
-		fields["os_profile_secrets"] = secrets
 	}
 
 	fields["network_interface_ids"] = ev.NetworkInterfaceIDs
