@@ -55,8 +55,8 @@ type Event struct {
 		StorageAccount   string `json:"storage_account" structs:"-"`
 		StorageContainer string `json:"storage_container" structs:"-"`
 		CreateOption     string `json:"create_option" structs:"create_option"`
-		Size             int32  `json:"disk_size_gb" structs:"disk_size_gb"`
-		Lun              int32  `json:"lun" structs:"lun"`
+		Size             *int32 `json:"disk_size_gb" structs:"disk_size_gb"`
+		Lun              *int32 `json:"lun" structs:"lun"`
 	} `json:"storage_data_disk"`
 	DeleteDataDisksOnTermination bool             `json:"delete_data_disks_on_termination"`
 	BootDiagnostics              []BootDiagnostic `json:"boot_diagnostics,omitempty"`
@@ -73,7 +73,7 @@ type Event struct {
 		AdditionalUnattendConfig []UnattendedConfig `json:"additional_unattend_config" structs:"additional_unattend_config"`
 	} `json:"os_profile_windows_config"`
 	OSProfileLinuxConfig struct {
-		DisablePasswordAuthentication bool     `json:"disable_password_authentication" structs:"disable_password_authentication"`
+		DisablePasswordAuthentication *bool    `json:"disable_password_authentication" structs:"disable_password_authentication"`
 		SSHKeys                       []SSHKey `json:"ssh_keys" structs:"ssh_keys"`
 	} `json:"os_profile_linux_config" structs:"os_profile_linux_config"`
 	OSProfileSecrets    []secret          `json:"os_profile_secrets"`
@@ -230,10 +230,10 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 		ev.StorageDataDisk.VhdURI = s["vhd_uri"].(string)
 		ev.StorageDataDisk.CreateOption = s["create_option"].(string)
 		if s["disk_size_gb"] != nil {
-			ev.StorageDataDisk.Size = int32(s["disk_size_gb"].(int))
+			*ev.StorageDataDisk.Size = int32(s["disk_size_gb"].(int))
 		}
 		if s["lun"] != nil {
-			ev.StorageDataDisk.Lun = int32(s["lun"].(int))
+			*ev.StorageDataDisk.Lun = int32(s["lun"].(int))
 		}
 	}
 	ev.DeleteDataDisksOnTermination = d.Get("delete_data_disks_on_termination").(bool)
@@ -281,7 +281,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	linList := d.Get("os_profile_linux_config").(*schema.Set).List()
 	if len(linList) > 0 {
 		lin := linList[0].(map[string]interface{})
-		ev.OSProfileLinuxConfig.DisablePasswordAuthentication = lin["disable_password_authentication"].(bool)
+		*ev.OSProfileLinuxConfig.DisablePasswordAuthentication = lin["disable_password_authentication"].(bool)
 		ev.OSProfileLinuxConfig.SSHKeys = make([]SSHKey, 0)
 		for _, key := range lin["ssh_keys"].([]interface{}) {
 			v := key.(map[string]interface{})
@@ -357,9 +357,20 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	fields["storage_image_reference"] = []interface{}{structs.Map(ev.StorageImageReference)}
 	fields["storage_os_disk"] = []interface{}{structs.Map(ev.StorageOSDisk)}
 	fields["delete_os_disk_on_termination"] = ev.DeleteOSDiskOnTermination
-	fields["storage_data_disk"] = []interface{}{structs.Map(ev.StorageDataDisk)}
 	fields["delete_data_disks_on_termination"] = ev.DeleteDataDisksOnTermination
 	fields["os_profile"] = []interface{}{structs.Map(ev.OSProfile)}
+
+	if ev.StorageDataDisk.Size != nil {
+		ddisk := make(map[string]interface{})
+		ddisk["name"] = ev.StorageDataDisk.Name
+		ddisk["vhd_uri"] = ev.StorageDataDisk.VhdURI
+		ddisk["create_option"] = ev.StorageDataDisk.CreateOption
+		ddisk["disk_size_gb"] = *ev.StorageDataDisk.Size
+		if ev.StorageDataDisk.Lun != nil {
+			ddisk["lun"] = *ev.StorageDataDisk.Lun
+		}
+		fields["storage_data_disk"] = ddisk
+	}
 
 	var diagnostics []interface{}
 	for _, bd := range ev.BootDiagnostics {
@@ -384,6 +395,12 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 		secrets = append(secrets, structs.Map(v))
 	}
 	fields["os_profile_secrets"] = secrets
+
+	if ev.OSProfileLinuxConfig.DisablePasswordAuthentication != nil {
+		lconfig := make(map[string]interface{})
+		lconfig["disable_password_authentication"] = *ev.OSProfileLinuxConfig.DisablePasswordAuthentication
+		fields["os_profile_linux_config"] = lconfig
+	}
 
 	fields["network_interface_ids"] = ev.NetworkInterfaceIDs
 	fields["tags"] = ev.Tags

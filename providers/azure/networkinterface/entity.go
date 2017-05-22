@@ -60,7 +60,7 @@ type IPConfiguration struct {
 	PrivateIPAddress                  string   `json:"private_ip_address"`
 	PrivateIPAddressAllocation        string   `json:"private_ip_address_allocation" validate:"required"`
 	PublicIPAddressID                 string   `json:"public_ip_address_id"`
-	LoadbalancerBackendAddressPools   []string `json:"load_balancer_backend_address_pools"`
+	LoadBalancerBackendAddressPools   []string `json:"load_balancer_backend_address_pools"`
 	LoadBalancerBackendAddressPoolIDs []string `json:"load_balancer_backend_address_pools_ids"`
 	LoadBalancerInboundNatRules       []string `json:"load_balancer_inbound_nat_rules_ids"`
 }
