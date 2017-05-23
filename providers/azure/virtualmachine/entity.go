@@ -383,24 +383,26 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 		fields["os_profile_windows_config"] = []interface{}{structs.Map(ev.OSProfileWindowsConfig)}
 	}
 
-	for i := range ev.OSProfileLinuxConfig.SSHKeys {
-		ev.OSProfileLinuxConfig.SSHKeys[i].Path = strings.Replace(ev.OSProfileLinuxConfig.SSHKeys[i].Path, "\\u003c", "<", -1)
-		ev.OSProfileLinuxConfig.SSHKeys[i].KeyData = strings.Replace(ev.OSProfileLinuxConfig.SSHKeys[i].KeyData, "\\u003c", "<", -1)
-		ev.OSProfileLinuxConfig.SSHKeys[i].Path = strings.Replace(ev.OSProfileLinuxConfig.SSHKeys[i].Path, "\\u003e", ">", -1)
-		ev.OSProfileLinuxConfig.SSHKeys[i].KeyData = strings.Replace(ev.OSProfileLinuxConfig.SSHKeys[i].KeyData, "\\u003e", ">", -1)
-	}
-
 	secrets := make([]interface{}, 0)
 	for _, v := range ev.OSProfileSecrets {
 		secrets = append(secrets, structs.Map(v))
 	}
 	fields["os_profile_secrets"] = secrets
 
+	lconfig := make(map[string]interface{})
 	if ev.OSProfileLinuxConfig.DisablePasswordAuthentication != nil {
-		lconfig := make(map[string]interface{})
 		lconfig["disable_password_authentication"] = *ev.OSProfileLinuxConfig.DisablePasswordAuthentication
-		fields["os_profile_linux_config"] = []interface{}{lconfig}
 	}
+	var sshkeys []interface{}
+	for i := range ev.OSProfileLinuxConfig.SSHKeys {
+		ev.OSProfileLinuxConfig.SSHKeys[i].Path = strings.Replace(ev.OSProfileLinuxConfig.SSHKeys[i].Path, "\\u003c", "<", -1)
+		ev.OSProfileLinuxConfig.SSHKeys[i].KeyData = strings.Replace(ev.OSProfileLinuxConfig.SSHKeys[i].KeyData, "\\u003c", "<", -1)
+		ev.OSProfileLinuxConfig.SSHKeys[i].Path = strings.Replace(ev.OSProfileLinuxConfig.SSHKeys[i].Path, "\\u003e", ">", -1)
+		ev.OSProfileLinuxConfig.SSHKeys[i].KeyData = strings.Replace(ev.OSProfileLinuxConfig.SSHKeys[i].KeyData, "\\u003e", ">", -1)
+		sshkeys = append(sshkeys, []interface{}{structs.Map(ev.OSProfileLinuxConfig.SSHKeys[i])})
+	}
+	lconfig["ssh_keys"] = sshkeys
+	fields["os_profile_linux_config"] = []interface{}{lconfig}
 
 	fields["network_interface_ids"] = ev.NetworkInterfaceIDs
 	fields["tags"] = ev.Tags
