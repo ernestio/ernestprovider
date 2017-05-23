@@ -238,12 +238,16 @@ func (ev *Event) mapIPConfigurations() *schema.Set {
 		conf["private_ip_address"] = c.PrivateIPAddress
 		conf["private_ip_address_allocation"] = c.PrivateIPAddressAllocation
 		conf["public_ip_address_id"] = c.PublicIPAddressID
-		l1 := schema.Set{}
+		l1 := schema.Set{
+			F: resourceArmNetworkInterfaceLoadbalancerBackendAddressPool,
+		}
 		for _, v := range c.LoadBalancerBackendAddressPoolIDs {
 			l1.Add(v)
 		}
 		conf["load_balancer_backend_address_pools_ids"] = &l1
-		l2 := schema.Set{}
+		l2 := schema.Set{
+			F: resourceArmNetworkInterfaceLoadbalancerBackendAddressPool,
+		}
 		for _, v := range c.LoadBalancerInboundNatRules {
 			l2.Add(v)
 		}
@@ -251,6 +255,10 @@ func (ev *Event) mapIPConfigurations() *schema.Set {
 		list.Add(conf)
 	}
 	return list
+}
+
+func resourceArmNetworkInterfaceLoadbalancerBackendAddressPool(v interface{}) int {
+	return hashcode.String(v.(string))
 }
 
 func resourceArmNetworkInterfaceIPConfigurationHash(v interface{}) int {
