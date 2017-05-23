@@ -60,8 +60,8 @@ type IPConfiguration struct {
 	PrivateIPAddressAllocation        string   `json:"private_ip_address_allocation" validate:"required" structs:"private_ip_address_allocation"`
 	PublicIPAddressID                 string   `json:"public_ip_address_id" structs:"public_ip_address_id"`
 	LoadBalancerBackendAddressPools   []string `json:"load_balancer_backend_address_pools" structs:"-"`
-	LoadBalancerBackendAddressPoolIDs []string `json:"load_balancer_backend_address_pools_ids" structs:"load_balancer_backend_address_pools_ids"`
-	LoadBalancerInboundNatRules       []string `json:"load_balancer_inbound_nat_rules_ids" structs:"load_balancer_inbound_nat_rules_ids"`
+	LoadBalancerBackendAddressPoolIDs []string `json:"load_balancer_backend_address_pools_ids" structs:"load_balancer_backend_address_pools_ids,omitempty"`
+	LoadBalancerInboundNatRules       []string `json:"load_balancer_inbound_nat_rules_ids" structs:"load_balancer_inbound_nat_rules_ids,omitempty"`
 }
 
 // New : Constructor
