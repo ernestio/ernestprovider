@@ -399,7 +399,8 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 		ev.OSProfileLinuxConfig.SSHKeys[i].KeyData = strings.Replace(ev.OSProfileLinuxConfig.SSHKeys[i].KeyData, "\\u003c", "<", -1)
 		ev.OSProfileLinuxConfig.SSHKeys[i].Path = strings.Replace(ev.OSProfileLinuxConfig.SSHKeys[i].Path, "\\u003e", ">", -1)
 		ev.OSProfileLinuxConfig.SSHKeys[i].KeyData = strings.Replace(ev.OSProfileLinuxConfig.SSHKeys[i].KeyData, "\\u003e", ">", -1)
-		sshkeys = append(sshkeys, []interface{}{structs.Map(ev.OSProfileLinuxConfig.SSHKeys[i])})
+		sshkeys = append(sshkeys, structs.Map(ev.OSProfileLinuxConfig.SSHKeys[i]))
+		fmt.Println("%v", sshkeys)
 	}
 	lconfig["ssh_keys"] = sshkeys
 	fields["os_profile_linux_config"] = []interface{}{lconfig}

@@ -206,9 +206,11 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	fields["private_ip_address"] = ev.PrivateIPAddress
 	fields["virtual_machine_id"] = ev.VirtualMachineID
 
-	if len(ev.IPConfigurations) > 0 {
-		fields["ip_configuration"] = []interface{}{structs.Map(ev.IPConfigurations[0])}
+	var configs []interface{}
+	for i := range ev.IPConfigurations {
+		configs = append(configs, structs.Map(ev.IPConfigurations[i]))
 	}
+	fields["ip_configuration"] = configs
 	fields["dns_servers"] = ev.DNSServers
 	fields["internal_dns_name_label"] = ev.InternalDNSNameLabel
 	fields["applied_dns_servers"] = ev.AppliedDNSServers
