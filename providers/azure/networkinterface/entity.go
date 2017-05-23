@@ -5,17 +5,18 @@
 package networkinterface
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
 
+	"github.com/r3labs/terraform/helper/hashcode"
 	"github.com/r3labs/terraform/helper/schema"
 
 	aes "github.com/ernestio/crypto/aes"
 	"github.com/ernestio/ernestprovider/event"
 	"github.com/ernestio/ernestprovider/providers/azure"
-	"github.com/fatih/structs"
 	"github.com/r3labs/terraform/builtin/providers/azurerm"
 )
 
@@ -205,12 +206,7 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	fields["mac_address"] = ev.MacAddress
 	fields["private_ip_address"] = ev.PrivateIPAddress
 	fields["virtual_machine_id"] = ev.VirtualMachineID
-
-	var configs []interface{}
-	for i := range ev.IPConfigurations {
-		configs = append(configs, structs.Map(ev.IPConfigurations[i]))
-	}
-	fields["ip_configuration"] = configs
+	fields["ip_configuration"] = ev.mapIPConfigurations()
 	fields["dns_servers"] = ev.DNSServers
 	fields["internal_dns_name_label"] = ev.InternalDNSNameLabel
 	fields["applied_dns_servers"] = ev.AppliedDNSServers
@@ -226,6 +222,68 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	}
 
 	return nil
+}
+
+func (ev *Event) mapIPConfigurations() *schema.Set {
+	list := &schema.Set{
+		F: resourceArmNetworkInterfaceIPConfigurationHash,
+	}
+	for _, c := range ev.IPConfigurations {
+		conf := map[string]interface{}{}
+		conf["name"] = c.Name
+		conf["subnet_id"] = c.SubnetID
+		conf["private_ip_address"] = c.PrivateIPAddress
+		conf["private_ip_address_allocation"] = c.PrivateIPAddressAllocation
+		conf["public_ip_address_id"] = c.PublicIPAddressID
+		l1 := schema.Set{
+			F: resourceHashArnString,
+		}
+		for _, v := range c.LoadBalancerBackendAddressPoolIDs {
+			l1.Add(v)
+		}
+		conf["load_balancer_backend_address_pools_ids"] = &l1
+		l2 := schema.Set{
+			F: resourceHashArnString,
+		}
+		for _, v := range c.LoadBalancerInboundNatRules {
+			l2.Add(v)
+		}
+		conf["load_balancer_inbound_nat_rules_ids"] = &l2
+		list.Add(conf)
+	}
+	return list
+}
+
+func resourceArmNetworkInterfaceIPConfigurationHash(v interface{}) int {
+	var buf bytes.Buffer
+	m := v.(map[string]interface{})
+	buf.WriteString(fmt.Sprintf("%s-", m["name"].(string)))
+	buf.WriteString(fmt.Sprintf("%s-", m["subnet_id"].(string)))
+	if m["private_ip_address"] != nil {
+		buf.WriteString(fmt.Sprintf("%s-", m["private_ip_address"].(string)))
+	}
+	buf.WriteString(fmt.Sprintf("%s-", m["private_ip_address_allocation"].(string)))
+	if m["public_ip_address_id"] != nil {
+		buf.WriteString(fmt.Sprintf("%s-", m["public_ip_address_id"].(string)))
+	}
+	if m["load_balancer_backend_address_pools_ids"] != nil {
+		str := fmt.Sprintf("*Set(%s)", m["load_balancer_backend_address_pools_ids"].(*schema.Set))
+		buf.WriteString(fmt.Sprintf("%s-", str))
+	}
+	if m["load_balancer_inbound_nat_rules_ids"] != nil {
+		str := fmt.Sprintf("*Set(%s)", m["load_balancer_inbound_nat_rules_ids"].(*schema.Set))
+		buf.WriteString(fmt.Sprintf("%s-", str))
+	}
+
+	return hashcode.String(buf.String())
+}
+
+func resourceHashArnString(v interface{}) int {
+	var buf bytes.Buffer
+
+	buf.WriteString(fmt.Sprintf("%d-", schema.HashString(v.(string))))
+
+	return hashcode.String(buf.String())
 }
 
 // Clone : will mark the event as errored
