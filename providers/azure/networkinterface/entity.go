@@ -5,18 +5,17 @@
 package networkinterface
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
 
-	"github.com/r3labs/terraform/helper/hashcode"
 	"github.com/r3labs/terraform/helper/schema"
 
 	aes "github.com/ernestio/crypto/aes"
 	"github.com/ernestio/ernestprovider/event"
 	"github.com/ernestio/ernestprovider/providers/azure"
+	"github.com/fatih/structs"
 	"github.com/r3labs/terraform/builtin/providers/azurerm"
 )
 
@@ -32,7 +31,7 @@ type Event struct {
 	MacAddress             string            `json:"mac_address"`
 	PrivateIPAddress       string            `json:"private_ip_address"`
 	VirtualMachineID       string            `json:"virtual_machine_id"`
-	IPConfigurations       []IPConfiguration `json:"ip_configuration"` // validate:"min=1,dive"`
+	IPConfigurations       []IPConfiguration `json:"ip_configuration" structs:"ip_configuration"` // validate:"min=1,dive"`
 	DNSServers             []string          `json:"dns_servers" validate:"dive,ip"`
 	InternalDNSNameLabel   string            `json:"internal_dns_name_label"`
 	AppliedDNSServers      []string          `json:"applied_dns_servers"`
@@ -53,16 +52,16 @@ type Event struct {
 
 // IPConfiguration : ...
 type IPConfiguration struct {
-	Name                              string   `json:"name" validate:"required"`
-	Subnet                            string   `json:"subnet" validate:"required"`
-	SubnetID                          string   `json:"subnet_id" validate:"required"`
-	PublicIPAddress                   string   `json:"public_ip_address"`
-	PrivateIPAddress                  string   `json:"private_ip_address"`
-	PrivateIPAddressAllocation        string   `json:"private_ip_address_allocation" validate:"required"`
-	PublicIPAddressID                 string   `json:"public_ip_address_id"`
-	LoadBalancerBackendAddressPools   []string `json:"load_balancer_backend_address_pools"`
-	LoadBalancerBackendAddressPoolIDs []string `json:"load_balancer_backend_address_pools_ids"`
-	LoadBalancerInboundNatRules       []string `json:"load_balancer_inbound_nat_rules_ids"`
+	Name                              string   `json:"name" validate:"required" structs:"name"`
+	Subnet                            string   `json:"subnet" validate:"required" structs:"-"`
+	SubnetID                          string   `json:"subnet_id" validate:"required" structs:"subnet_id"`
+	PublicIPAddress                   string   `json:"public_ip_address" structs:"-"`
+	PrivateIPAddress                  string   `json:"private_ip_address" structs:"private_ip_address"`
+	PrivateIPAddressAllocation        string   `json:"private_ip_address_allocation" validate:"required" structs:"private_ip_address_allocation"`
+	PublicIPAddressID                 string   `json:"public_ip_address_id" structs:"public_ip_address_id"`
+	LoadBalancerBackendAddressPools   []string `json:"load_balancer_backend_address_pools" structs:"-"`
+	LoadBalancerBackendAddressPoolIDs []string `json:"load_balancer_backend_address_pools_ids" structs:"load_balancer_backend_address_pools_ids"`
+	LoadBalancerInboundNatRules       []string `json:"load_balancer_inbound_nat_rules_ids" structs:"load_balancer_inbound_nat_rules_ids"`
 }
 
 // New : Constructor
@@ -136,9 +135,6 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 
 	configs := []IPConfiguration{}
 
-	x := d.Get("ip_configuration").(*schema.Set)
-	fmt.Println("%w", x)
-
 	cli, _ := ev.GenericEvent.Client()
 	list := cli.ListNetworkInterfaceConfigurations(ev.ResourceGroupName, ev.Name)
 
@@ -209,7 +205,10 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	fields["mac_address"] = ev.MacAddress
 	fields["private_ip_address"] = ev.PrivateIPAddress
 	fields["virtual_machine_id"] = ev.VirtualMachineID
-	fields["ip_configuration"] = ev.mapIPConfigurations()
+
+	if len(ev.IPConfigurations) > 0 {
+		fields["ip_configuration"] = []interface{}{structs.Map(ev.IPConfigurations[0])}
+	}
 	fields["dns_servers"] = ev.DNSServers
 	fields["internal_dns_name_label"] = ev.InternalDNSNameLabel
 	fields["applied_dns_servers"] = ev.AppliedDNSServers
@@ -225,68 +224,6 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	}
 
 	return nil
-}
-
-func (ev *Event) mapIPConfigurations() *schema.Set {
-	list := &schema.Set{
-		F: resourceArmNetworkInterfaceIPConfigurationHash,
-	}
-	for _, c := range ev.IPConfigurations {
-		conf := map[string]interface{}{}
-		conf["name"] = c.Name
-		conf["subnet_id"] = c.SubnetID
-		conf["private_ip_address"] = c.PrivateIPAddress
-		conf["private_ip_address_allocation"] = c.PrivateIPAddressAllocation
-		conf["public_ip_address_id"] = c.PublicIPAddressID
-
-		/*
-			l1 := schema.Set{
-				F: resourceArmNetworkInterfaceLoadbalancerBackendAddressPool,
-			}
-			for _, v := range c.LoadBalancerBackendAddressPoolIDs {
-				l1.Add(v)
-			}
-			conf["load_balancer_backend_address_pools_ids"] = &l1
-			l2 := schema.Set{
-				F: resourceArmNetworkInterfaceLoadbalancerBackendAddressPool,
-			}
-			for _, v := range c.LoadBalancerInboundNatRules {
-				l2.Add(v)
-			}
-			conf["load_balancer_inbound_nat_rules_ids"] = &l2
-		*/
-
-		list.Add(conf)
-	}
-	return list
-}
-
-func resourceArmNetworkInterfaceLoadbalancerBackendAddressPool(v interface{}) int {
-	return hashcode.String(v.(string))
-}
-
-func resourceArmNetworkInterfaceIPConfigurationHash(v interface{}) int {
-	var buf bytes.Buffer
-	m := v.(map[string]interface{})
-	buf.WriteString(fmt.Sprintf("%s-", m["name"].(string)))
-	buf.WriteString(fmt.Sprintf("%s-", m["subnet_id"].(string)))
-	if m["private_ip_address"] != nil {
-		buf.WriteString(fmt.Sprintf("%s-", m["private_ip_address"].(string)))
-	}
-	buf.WriteString(fmt.Sprintf("%s-", m["private_ip_address_allocation"].(string)))
-	if m["public_ip_address_id"] != nil {
-		buf.WriteString(fmt.Sprintf("%s-", m["public_ip_address_id"].(string)))
-	}
-	if m["load_balancer_backend_address_pools_ids"] != nil {
-		str := fmt.Sprintf("*Set(%s)", m["load_balancer_backend_address_pools_ids"].(*schema.Set))
-		buf.WriteString(fmt.Sprintf("%s-", str))
-	}
-	if m["load_balancer_inbound_nat_rules_ids"] != nil {
-		str := fmt.Sprintf("*Set(%s)", m["load_balancer_inbound_nat_rules_ids"].(*schema.Set))
-		buf.WriteString(fmt.Sprintf("%s-", str))
-	}
-
-	return hashcode.String(buf.String())
 }
 
 // Clone : will mark the event as errored
