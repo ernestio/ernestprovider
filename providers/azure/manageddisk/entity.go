@@ -28,7 +28,7 @@ type Event struct {
 	SourceURI          string            `json:"source_uri"`
 	SourceResourceID   string            `json:"source_resource_id"`
 	OSType             string            `json:"os_type"`
-	DiskSizeGB         int               `json:"disk_size_gb"`
+	DiskSizeGB         int32             `json:"disk_size_gb"`
 	Tags               map[string]string `json:"tags"`
 	ClientID           string            `json:"azure_client_id"`
 	ClientSecret       string            `json:"azure_client_secret"`
@@ -104,7 +104,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.SourceURI = d.Get("source_uri").(string)
 	ev.SourceResourceID = d.Get("source_resource_id").(string)
 	ev.OSType = d.Get("os_type").(string)
-	ev.DiskSizeGB = d.Get("disk_size_gb").(int)
+	ev.DiskSizeGB = d.Get("disk_size_gb").(int32)
 	tags := make(map[string]string, 0)
 	for k, v := range d.Get("tags").(map[string]interface{}) {
 		tags[k] = v.(string)

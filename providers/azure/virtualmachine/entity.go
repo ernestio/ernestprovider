@@ -238,8 +238,6 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	}
 	ev.DeleteDataDisksOnTermination = d.Get("delete_data_disks_on_termination").(bool)
 
-	// TODO diagnostics_profile -> TypeSet
-
 	bootDiagnostics := make([]BootDiagnostic, 0)
 	for _, v := range d.Get("boot_diagnostics").([]interface{}) {
 		x := v.(map[string]interface{})
