@@ -29,6 +29,7 @@ type Event struct {
 		Publisher string `json:"publisher"`
 		Product   string `json:"product"`
 	} `json:"plan"`
+	AvailabilitySet       string `json:"availability_set"`
 	AvailabilitySetID     string `json:"availability_set_id"`
 	LicenseType           string `json:"license_type"`
 	VMSize                string `json:"vm_size"`
