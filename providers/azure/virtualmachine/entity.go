@@ -115,8 +115,8 @@ type SSHKey struct {
 
 // BootDiagnostic ...
 type BootDiagnostic struct {
-	Enabled bool   `json:"enabled"`
-	URI     string `json:"storage_uri"`
+	Enabled bool   `json:"enabled" structs:"enabled"`
+	URI     string `json:"storage_uri" structs:"storage_uri"`
 }
 
 // UnattendedConfig ...
