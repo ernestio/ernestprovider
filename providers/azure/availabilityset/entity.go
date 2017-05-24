@@ -61,16 +61,13 @@ func (ev *Event) SetComponents(components []event.Event) {
 // ValidateID : determines if the given id is valid for this resource type
 func (ev *Event) ValidateID(id string) bool {
 	parts := strings.Split(strings.ToLower(id), "/")
-	if len(parts) != 11 {
+	if len(parts) != 8 {
 		return false
 	}
-	if parts[6] != "microsoft.network" {
+	if parts[6] != "microsoft.compute" {
 		return false
 	}
-	if parts[7] != "loadbalancers" {
-		return false
-	}
-	if parts[9] != "probes" {
+	if parts[7] != "availabilitysets" {
 		return false
 	}
 	return true
