@@ -358,7 +358,9 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	fields["name"] = ev.Name
 	fields["resource_group_name"] = ev.ResourceGroupName
 	fields["location"] = ev.Location
-	fields["plan"] = []interface{}{structs.Map(ev.Plan)}
+	if ev.Plan.Name != "" && ev.Plan.Product != "" && ev.Plan.Publisher != "" {
+		fields["plan"] = []interface{}{structs.Map(ev.Plan)}
+	}
 	fields["availability_set_id"] = ev.AvailabilitySetID
 	fields["license_type"] = ev.LicenseType
 	fields["vm_size"] = ev.VMSize
