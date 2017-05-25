@@ -25,10 +25,10 @@ type Event struct {
 	ResourceGroupName string `json:"resource_group_name" validate:"required"`
 	Location          string `json:"location" validate:"required"`
 	Plan              struct {
-		Name      string `json:"name"`
-		Publisher string `json:"publisher"`
-		Product   string `json:"product"`
-	} `json:"plan"`
+		Name      string `json:"name" structs:"name"`
+		Publisher string `json:"publisher" structs:"publisher"`
+		Product   string `json:"product" structs:"product"`
+	} `json:"plan" structs:"plan"`
 	AvailabilitySet       string `json:"availability_set"`
 	AvailabilitySetID     string `json:"availability_set_id"`
 	LicenseType           string `json:"license_type"`
@@ -358,6 +358,7 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	fields["name"] = ev.Name
 	fields["resource_group_name"] = ev.ResourceGroupName
 	fields["location"] = ev.Location
+	fields["plan"] = []interface{}{structs.Map(ev.Plan)}
 	fields["availability_set_id"] = ev.AvailabilitySetID
 	fields["license_type"] = ev.LicenseType
 	fields["vm_size"] = ev.VMSize
