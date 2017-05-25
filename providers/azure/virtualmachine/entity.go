@@ -40,14 +40,15 @@ type Event struct {
 		Version   string `json:"version" structs:"version"`
 	} `json:"storage_image_reference" validate:"dive"`
 	StorageOSDisk struct {
-		Name             string `json:"name" structs:"name"`
-		VhdURI           string `json:"vhd_uri" structs:"vhd_uri"`
-		StorageAccount   string `json:"storage_account" structs:"-"`
-		StorageContainer string `json:"storage_container" structs:"-"`
-		CreateOption     string `json:"create_option" structs:"create_option"`
-		OSType           string `json:"os_type" structs:"os_type"`
-		ImageURI         string `json:"image_uri" structs:"image_uri"`
-		Caching          string `json:"caching" structs:"caching"`
+		Name               string `json:"name" structs:"name"`
+		VhdURI             string `json:"vhd_uri" structs:"vhd_uri"`
+		StorageAccount     string `json:"storage_account" structs:"-"`
+		StorageContainer   string `json:"storage_container" structs:"-"`
+		StorageAccountType string `json:"managed_disk_type" structs:"managed_disk_type"`
+		CreateOption       string `json:"create_option" structs:"create_option"`
+		OSType             string `json:"os_type" structs:"os_type"`
+		ImageURI           string `json:"image_uri" structs:"image_uri"`
+		Caching            string `json:"caching" structs:"caching"`
 	} `json:"storage_os_disk" validate:"dive"`
 	DeleteOSDiskOnTermination bool `json:"delete_os_disk_on_termination"`
 	StorageDataDisk           struct {
