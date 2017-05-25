@@ -144,8 +144,12 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	fields["resource_group_name"] = ev.ResourceGroupName
 	fields["storage_account_type"] = ev.StorageAccountType
 	fields["create_option"] = ev.CreateOption
-	fields["source_uri"] = ev.SourceURI
-	fields["source_resource_id"] = ev.SourceResourceID
+	if ev.SourceURI != "" {
+		fields["source_uri"] = ev.SourceURI
+	}
+	if ev.SourceResourceID != "" {
+		fields["source_resource_id"] = ev.SourceResourceID
+	}
 	fields["os_type"] = ev.OSType
 	fields["disk_size_gb"] = ev.DiskSizeGB
 	fields["tags"] = ev.Tags
