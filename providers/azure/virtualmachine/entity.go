@@ -413,7 +413,10 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 		sshkeys = append(sshkeys, structs.Map(ev.OSProfileLinuxConfig.SSHKeys[i]))
 	}
 	lconfig["ssh_keys"] = sshkeys
-	fields["os_profile_linux_config"] = []interface{}{lconfig}
+
+	if ev.OSProfileLinuxConfig.DisablePasswordAuthentication != nil || len(ev.OSProfileLinuxConfig.SSHKeys) > 0 {
+		fields["os_profile_linux_config"] = []interface{}{lconfig}
+	}
 
 	fields["network_interface_ids"] = ev.NetworkInterfaceIDs
 	fields["tags"] = ev.Tags
