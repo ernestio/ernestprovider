@@ -16,6 +16,7 @@ import (
 	"github.com/ernestio/ernestprovider/providers/azure/lbprobe"
 	"github.com/ernestio/ernestprovider/providers/azure/lbrule"
 	"github.com/ernestio/ernestprovider/providers/azure/localnetworkgateway"
+	"github.com/ernestio/ernestprovider/providers/azure/manageddisk"
 	"github.com/ernestio/ernestprovider/providers/azure/networkinterface"
 	"github.com/ernestio/ernestprovider/providers/azure/publicip"
 	"github.com/ernestio/ernestprovider/providers/azure/resourcegroup"
@@ -124,6 +125,8 @@ func getAzureEvent(subject string, data []byte, key string) (event.Event, error)
 		ev, err = subnet.New(subject, key, data, val)
 	case "network_interface", "network_interfaces":
 		ev, err = networkinterface.New(subject, key, data, val)
+	case "managed_disk", "managed_disks":
+		ev, err = manageddisk.New(subject, key, data, val)
 	case "storage_account", "storage_accounts":
 		ev, err = storageaccount.New(subject, key, data, val)
 	case "storage_container", "storage_containers":

@@ -142,7 +142,7 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	fields["name"] = ev.Name
 	fields["location"] = ev.Location
 	fields["resource_group_name"] = ev.ResourceGroupName
-	fields["storage_accunt_type"] = ev.StorageAccountType
+	fields["storage_account_type"] = ev.StorageAccountType
 	fields["create_option"] = ev.CreateOption
 	fields["source_uri"] = ev.SourceURI
 	fields["source_resource_id"] = ev.SourceResourceID

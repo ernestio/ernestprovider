@@ -50,13 +50,14 @@ type Event struct {
 	} `json:"storage_os_disk" validate:"dive"`
 	DeleteOSDiskOnTermination bool `json:"delete_os_disk_on_termination"`
 	StorageDataDisk           struct {
-		Name             string `json:"name" structs:"name"`
-		VhdURI           string `json:"vhd_uri" structs:"vhd_uri"`
-		StorageAccount   string `json:"storage_account" structs:"-"`
-		StorageContainer string `json:"storage_container" structs:"-"`
-		CreateOption     string `json:"create_option" structs:"create_option"`
-		Size             *int32 `json:"disk_size_gb" structs:"disk_size_gb"`
-		Lun              *int32 `json:"lun" structs:"lun"`
+		Name               string `json:"name" structs:"name"`
+		VhdURI             string `json:"vhd_uri" structs:"vhd_uri"`
+		StorageAccount     string `json:"storage_account" structs:"-"`
+		StorageAccountType string `json:"managed_disk_type" structs:"managed_disk_type"`
+		StorageContainer   string `json:"storage_container" structs:"-"`
+		CreateOption       string `json:"create_option" structs:"create_option"`
+		Size               *int32 `json:"disk_size_gb" structs:"disk_size_gb"`
+		Lun                *int32 `json:"lun" structs:"lun"`
 	} `json:"storage_data_disk"`
 	DeleteDataDisksOnTermination bool             `json:"delete_data_disks_on_termination"`
 	BootDiagnostics              []BootDiagnostic `json:"boot_diagnostics,omitempty"`
