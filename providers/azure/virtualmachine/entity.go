@@ -45,6 +45,8 @@ type Event struct {
 		StorageAccount     string `json:"storage_account" structs:"-"`
 		StorageContainer   string `json:"storage_container" structs:"-"`
 		StorageAccountType string `json:"managed_disk_type" structs:"managed_disk_type"`
+		ManagedDisk        string `json:"managed_disk" structs:"-"`
+		ManagedDiskID      string `json:"managed_disk_id" structs:"managed_disk_id"`
 		CreateOption       string `json:"create_option" structs:"create_option"`
 		OSType             string `json:"os_type" structs:"os_type"`
 		ImageURI           string `json:"image_uri" structs:"image_uri"`
@@ -57,6 +59,8 @@ type Event struct {
 		StorageAccount     string `json:"storage_account" structs:"-"`
 		StorageAccountType string `json:"managed_disk_type" structs:"managed_disk_type"`
 		StorageContainer   string `json:"storage_container" structs:"-"`
+		ManagedDisk        string `json:"managed_disk" structs:"-"`
+		ManagedDiskID      string `json:"managed_disk_id" structs:"managed_disk_id"`
 		CreateOption       string `json:"create_option" structs:"create_option"`
 		Size               *int32 `json:"disk_size_gb" structs:"disk_size_gb"`
 		Lun                *int32 `json:"lun" structs:"lun"`
@@ -223,6 +227,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 		ev.StorageOSDisk.OSType = s["os_type"].(string)
 		ev.StorageOSDisk.ImageURI = s["image_uri"].(string)
 		ev.StorageOSDisk.Caching = s["caching"].(string)
+		ev.StorageOSDisk.ManagedDiskID = s["managed_disk_id"].(string)
 	}
 	ev.DeleteOSDiskOnTermination = d.Get("delete_os_disk_on_termination").(bool)
 
@@ -232,6 +237,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 		ev.StorageDataDisk.Name = s["name"].(string)
 		ev.StorageDataDisk.VhdURI = s["vhd_uri"].(string)
 		ev.StorageDataDisk.CreateOption = s["create_option"].(string)
+		ev.StorageDataDisk.ManagedDiskID = s["managed_disk_id"].(string)
 		if s["disk_size_gb"] != nil {
 			*ev.StorageDataDisk.Size = int32(s["disk_size_gb"].(int))
 		}
@@ -367,6 +373,7 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 		ddisk["vhd_uri"] = ev.StorageDataDisk.VhdURI
 		ddisk["create_option"] = ev.StorageDataDisk.CreateOption
 		ddisk["disk_size_gb"] = *ev.StorageDataDisk.Size
+		ddisk["managed_disk_id"] = ev.StorageDataDisk.ManagedDiskID
 		if ev.StorageDataDisk.Lun != nil {
 			ddisk["lun"] = *ev.StorageDataDisk.Lun
 		}
@@ -401,7 +408,6 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 		ev.OSProfileLinuxConfig.SSHKeys[i].Path = strings.Replace(ev.OSProfileLinuxConfig.SSHKeys[i].Path, "\\u003e", ">", -1)
 		ev.OSProfileLinuxConfig.SSHKeys[i].KeyData = strings.Replace(ev.OSProfileLinuxConfig.SSHKeys[i].KeyData, "\\u003e", ">", -1)
 		sshkeys = append(sshkeys, structs.Map(ev.OSProfileLinuxConfig.SSHKeys[i]))
-		fmt.Println("%v", sshkeys)
 	}
 	lconfig["ssh_keys"] = sshkeys
 	fields["os_profile_linux_config"] = []interface{}{lconfig}
