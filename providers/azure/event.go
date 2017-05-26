@@ -142,8 +142,13 @@ func (ev *Event) Create() error {
 		ev.Log("error", err.Error())
 		return err
 	}
-	ev.Resource.SetID(ev.ResourceData.Id())
-	ev.Log("debug", "Created resource group : "+ev.Resource.GetID())
+	if ev.Resource.ValidateID(ev.ResourceData.Id()) == true {
+		_ = ev.Resource.ResourceDataToEvent(ev.ResourceData)
+	} else {
+		ev.Log("warn", "Id not valid...")
+		ev.Resource.SetID(ev.ResourceData.Id())
+	}
+	ev.Log("debug", "Created resource : "+ev.Resource.GetID())
 
 	return nil
 }

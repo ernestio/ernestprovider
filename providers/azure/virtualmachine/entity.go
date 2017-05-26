@@ -239,10 +239,12 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 		ev.StorageDataDisk.CreateOption = s["create_option"].(string)
 		ev.StorageDataDisk.ManagedDiskID = s["managed_disk_id"].(string)
 		if s["disk_size_gb"] != nil {
-			*ev.StorageDataDisk.Size = int32(s["disk_size_gb"].(int))
+			x := int32(s["disk_size_gb"].(int))
+			ev.StorageDataDisk.Size = &x
 		}
 		if s["lun"] != nil {
-			*ev.StorageDataDisk.Lun = int32(s["lun"].(int))
+			x := int32(s["lun"].(int))
+			ev.StorageDataDisk.Lun = &x
 		}
 	}
 	ev.DeleteDataDisksOnTermination = d.Get("delete_data_disks_on_termination").(bool)
@@ -288,7 +290,8 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	linList := d.Get("os_profile_linux_config").(*schema.Set).List()
 	if len(linList) > 0 {
 		lin := linList[0].(map[string]interface{})
-		*ev.OSProfileLinuxConfig.DisablePasswordAuthentication = lin["disable_password_authentication"].(bool)
+		x := lin["disable_password_authentication"].(bool)
+		ev.OSProfileLinuxConfig.DisablePasswordAuthentication = &x
 		ev.OSProfileLinuxConfig.SSHKeys = make([]SSHKey, 0)
 		for _, key := range lin["ssh_keys"].([]interface{}) {
 			v := key.(map[string]interface{})
