@@ -227,7 +227,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 		ev.StorageOSDisk.OSType = s["os_type"].(string)
 		ev.StorageOSDisk.ImageURI = s["image_uri"].(string)
 		ev.StorageOSDisk.Caching = s["caching"].(string)
-		ev.StorageOSDisk.ManagedDiskID = s["managed_disk_id"].(string)
+		ev.StorageOSDisk.ManagedDisk = s["name"].(string)
 		parts := strings.Split(ev.ID, "/")
 		parts[7] = "disks"
 		parts[8] = ev.StorageOSDisk.Name
@@ -241,6 +241,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 		ev.StorageDataDisk.Name = s["name"].(string)
 		ev.StorageDataDisk.VhdURI = s["vhd_uri"].(string)
 		ev.StorageDataDisk.CreateOption = s["create_option"].(string)
+		ev.StorageDataDisk.ManagedDisk = s["name"].(string)
 		ev.StorageDataDisk.ManagedDiskID = s["managed_disk_id"].(string)
 		if s["disk_size_gb"] != nil {
 			x := int32(s["disk_size_gb"].(int))
