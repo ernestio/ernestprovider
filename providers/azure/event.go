@@ -172,6 +172,13 @@ func (ev *Event) Update() error {
 		return err
 	}
 
+	if ev.Resource.ValidateID(ev.ResourceData.Id()) == true {
+		_ = ev.Resource.ResourceDataToEvent(ev.ResourceData)
+	} else {
+		ev.Log("warn", "Id not valid...")
+		ev.Resource.SetID(ev.ResourceData.Id())
+	}
+
 	return nil
 }
 
