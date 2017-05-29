@@ -228,6 +228,10 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 		ev.StorageOSDisk.ImageURI = s["image_uri"].(string)
 		ev.StorageOSDisk.Caching = s["caching"].(string)
 		ev.StorageOSDisk.ManagedDiskID = s["managed_disk_id"].(string)
+		parts := strings.Split(ev.ID, "/")
+		parts[7] = "disks"
+		parts[8] = ev.StorageOSDisk.Name
+		ev.StorageOSDisk.ManagedDiskID = strings.Join(parts, "/")
 	}
 	ev.DeleteOSDiskOnTermination = d.Get("delete_os_disk_on_termination").(bool)
 
