@@ -98,6 +98,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.Location = d.Get("location").(string)
 	ev.PlatformUpdateDomainCount = d.Get("platform_update_domain_count").(int)
 	ev.PlatformFaultDomainCount = d.Get("platform_fault_domain_count").(int)
+	ev.Managed = d.Get("managed").(bool)
 
 	tags := make(map[string]string, 0)
 	for k, v := range d.Get("tags").(map[string]interface{}) {
@@ -137,6 +138,7 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	fields["location"] = ev.Location
 	fields["platform_update_domain_count"] = ev.PlatformUpdateDomainCount
 	fields["platform_fault_domain_count"] = ev.PlatformFaultDomainCount
+	fields["managed"] = ev.Managed
 	fields["tags"] = ev.Tags
 	for k, v := range fields {
 		if err := d.Set(k, v); err != nil {
