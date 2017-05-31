@@ -140,15 +140,22 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	list := cli.ListNetworkInterfaceConfigurations(ev.ResourceGroupName, ev.Name)
 
 	for _, mo := range list {
-		configs = append(configs, IPConfiguration{
-			Name:                              mo["name"],
-			SubnetID:                          mo["subnet_id"],
-			PrivateIPAddress:                  mo["private_ip_address"],
-			PrivateIPAddressAllocation:        mo["private_ip_address_allocation"],
-			PublicIPAddressID:                 mo["public_ip_address_id"],
-			LoadBalancerBackendAddressPoolIDs: strings.Split(mo["load_balancer_backend_address_pools_ids"], ","),
-			LoadBalancerInboundNatRules:       strings.Split(mo["load_balancer_inbound_nat_rules_ids"], ","),
-		})
+		parts := strings.Split(mo["public_ip_address_id"], "/")
+		parts = strings.Split(parts[len(parts)-1], "-")
+		parts = parts[:len(parts)-1]
+		name := strings.Join(parts, "-")
+
+		if name == ev.Name {
+			configs = append(configs, IPConfiguration{
+				Name:                              mo["name"],
+				SubnetID:                          mo["subnet_id"],
+				PrivateIPAddress:                  mo["private_ip_address"],
+				PrivateIPAddressAllocation:        mo["private_ip_address_allocation"],
+				PublicIPAddressID:                 mo["public_ip_address_id"],
+				LoadBalancerBackendAddressPoolIDs: strings.Split(mo["load_balancer_backend_address_pools_ids"], ","),
+				LoadBalancerInboundNatRules:       strings.Split(mo["load_balancer_inbound_nat_rules_ids"], ","),
+			})
+		}
 	}
 	ev.IPConfigurations = configs
 	ev.DNSServers = make([]string, 0)
