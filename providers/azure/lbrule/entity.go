@@ -104,7 +104,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	idParts := strings.Split(d.Id(), "/")
 	ev.ID = d.Id()
 	ev.Name = idParts[len(idParts)-1]
-	ev.ComponentID = "lb::" + ev.Name
+	ev.ComponentID = "lb_rule::" + ev.Name
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)
 	ev.FrontendIPConfigurationName = d.Get("frontend_ip_configuration_name").(string)
 	ev.Protocol = d.Get("protocol").(string)

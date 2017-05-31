@@ -93,7 +93,7 @@ func (ev *Event) SetState(state string) {
 func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.ID = d.Id()
 	ev.Name = d.Get("name").(string)
-	ev.ComponentID = "sql_firewallrule::" + ev.Name
+	ev.ComponentID = "sql_firewall_rule::" + ev.Name
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)
 	ev.ServerName = d.Get("server_name").(string)
 	ev.StartIPAddress = d.Get("start_ip_address").(string)

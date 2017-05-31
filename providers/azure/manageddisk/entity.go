@@ -96,7 +96,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	idParts := strings.Split(d.Id(), "/")
 	ev.ID = d.Id()
 	ev.Name = idParts[len(idParts)-1]
-	ev.ComponentID = "lb::" + ev.Name
+	ev.ComponentID = "managed_disk::" + ev.Name
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)
 	ev.Location = d.Get("location").(string)
 	ev.StorageAccountType = d.Get("storage_account_type").(string)

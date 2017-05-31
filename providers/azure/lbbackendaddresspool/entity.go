@@ -93,7 +93,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	idParts := strings.Split(d.Id(), "/")
 	ev.ID = d.Id()
 	ev.Name = idParts[len(idParts)-1]
-	ev.ComponentID = "lb::" + ev.Name
+	ev.ComponentID = "lb_backend_address_pool::" + ev.Name
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)
 	ev.LoadbalancerID = d.Get("loadbalancer_id").(string)
 
