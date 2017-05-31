@@ -279,16 +279,19 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 		ev.OSProfileWindowsConfig.ProvisionVMAgent = win["provision_vm_agent"].(bool)
 		ev.OSProfileWindowsConfig.EnableAutomaticUpgrades = win["enable_automatic_upgrades"].(bool)
 
-		for i, v := range win["win_rm"].([]map[string]interface{}) {
-			ev.OSProfileWindowsConfig.WinRm[i].Protocol = v["protocol"].(string)
-			ev.OSProfileWindowsConfig.WinRm[i].CertificateURL = v["certificate_url"].(string)
+		if win["win_rm"] != nil {
+			for i, v := range win["win_rm"].([]map[string]interface{}) {
+				ev.OSProfileWindowsConfig.WinRm[i].Protocol = v["protocol"].(string)
+				ev.OSProfileWindowsConfig.WinRm[i].CertificateURL = v["certificate_url"].(string)
+			}
 		}
-
-		for i, v := range win["additional_unattend_config"].([]map[string]interface{}) {
-			ev.OSProfileWindowsConfig.AdditionalUnattendConfig[i].Pass = v["pass"].(string)
-			ev.OSProfileWindowsConfig.AdditionalUnattendConfig[i].Component = v["component"].(string)
-			ev.OSProfileWindowsConfig.AdditionalUnattendConfig[i].SettingName = v["setting_name"].(string)
-			ev.OSProfileWindowsConfig.AdditionalUnattendConfig[i].Content = v["content"].(string)
+		if win["additional_unattend_config"] != nil {
+			for i, v := range win["additional_unattend_config"].([]map[string]interface{}) {
+				ev.OSProfileWindowsConfig.AdditionalUnattendConfig[i].Pass = v["pass"].(string)
+				ev.OSProfileWindowsConfig.AdditionalUnattendConfig[i].Component = v["component"].(string)
+				ev.OSProfileWindowsConfig.AdditionalUnattendConfig[i].SettingName = v["setting_name"].(string)
+				ev.OSProfileWindowsConfig.AdditionalUnattendConfig[i].Content = v["content"].(string)
+			}
 		}
 	}
 
