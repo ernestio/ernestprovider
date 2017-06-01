@@ -73,12 +73,12 @@ type Event struct {
 		AdminPassword string `json:"admin_password" structs:"admin_password"`
 		CustomData    string `json:"custom_data" structs:"custom_data"`
 	} `json:"os_profile"`
-	OSProfileWindowsConfig struct {
+	OSProfileWindowsConfig *struct {
 		ProvisionVMAgent         bool               `json:"provision_vm_agent" structs:"provision_vm_agent"`
 		EnableAutomaticUpgrades  bool               `json:"enable_automatic_upgrades" structs:"enable_automatic_upgrades"`
 		WinRm                    []WinRM            `json:"winrm,omitempty" structs:"winrm,omitempty"`
 		AdditionalUnattendConfig []UnattendedConfig `json:"additional_unattend_config,omitempty" structs:"additional_unattend_config,omitempty"`
-	} `json:"os_profile_windows_config"`
+	} `json:"os_profile_windows_config,omitempty"`
 	OSProfileLinuxConfig struct {
 		DisablePasswordAuthentication *bool    `json:"disable_password_authentication" structs:"disable_password_authentication"`
 		SSHKeys                       []SSHKey `json:"ssh_keys" structs:"ssh_keys"`
@@ -401,7 +401,9 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	}
 
 	fields["boot_diagnostics"] = diagnostics
-	fields["os_profile_windows_config"] = []interface{}{structs.Map(ev.OSProfileWindowsConfig)}
+	if ev.OSProfileWindowsConfig != nil {
+		fields["os_profile_windows_config"] = []interface{}{structs.Map(ev.OSProfileWindowsConfig)}
+	}
 
 	secrets := make([]interface{}, 0)
 	for _, v := range ev.OSProfileSecrets {
