@@ -76,8 +76,8 @@ type Event struct {
 	OSProfileWindowsConfig struct {
 		ProvisionVMAgent         bool               `json:"provision_vm_agent" structs:"provision_vm_agent"`
 		EnableAutomaticUpgrades  bool               `json:"enable_automatic_upgrades" structs:"enable_automatic_upgrades"`
-		WinRm                    []WinRM            `json:"winrm" structs:"winrm"`
-		AdditionalUnattendConfig []UnattendedConfig `json:"additional_unattend_config" structs:"additional_unattend_config"`
+		WinRm                    []WinRM            `json:"winrm,omitempty" structs:"winrm,omitempty"`
+		AdditionalUnattendConfig []UnattendedConfig `json:"additional_unattend_config,omitempty" structs:"additional_unattend_config,omitempty"`
 	} `json:"os_profile_windows_config"`
 	OSProfileLinuxConfig struct {
 		DisablePasswordAuthentication *bool    `json:"disable_password_authentication" structs:"disable_password_authentication"`
@@ -128,10 +128,10 @@ type BootDiagnostic struct {
 
 // UnattendedConfig ...
 type UnattendedConfig struct {
-	Pass        string `json:"pass" structs:"pass"`
-	Component   string `json:"component" structs:"component"`
-	SettingName string `json:"setting_name" structs:"setting_name"`
-	Content     string `json:"content" structs:"content"`
+	Pass        string `json:"pass" structs:"pass,omitempty"`
+	Component   string `json:"component" structs:"component,omitempty"`
+	SettingName string `json:"setting_name" structs:"setting_name,omitempty"`
+	Content     string `json:"content" structs:"content,omitempty"`
 }
 
 // New : Constructor
@@ -401,10 +401,7 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	}
 
 	fields["boot_diagnostics"] = diagnostics
-
-	if len(ev.OSProfileWindowsConfig.WinRm) > 0 {
-		fields["os_profile_windows_config"] = []interface{}{structs.Map(ev.OSProfileWindowsConfig)}
-	}
+	fields["os_profile_windows_config"] = []interface{}{structs.Map(ev.OSProfileWindowsConfig)}
 
 	secrets := make([]interface{}, 0)
 	for _, v := range ev.OSProfileSecrets {
