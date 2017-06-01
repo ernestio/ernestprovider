@@ -111,7 +111,7 @@ type vaultCertificate struct {
 // WinRM ...
 type WinRM struct {
 	Protocol       string `json:"protocol" structs:"protocol"`
-	CertificateURL string `json:"certificate_url" structs:"certification_url"`
+	CertificateURL string `json:"certificate_url" structs:"certification_url,omitempty"`
 }
 
 // SSHKey ...
