@@ -286,7 +286,8 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 			}
 		}
 		if win["additional_unattend_config"] != nil {
-			for i, v := range win["additional_unattend_config"].([]map[string]interface{}) {
+			for i, value := range win["additional_unattend_config"].([]interface{}) {
+				v := value.(map[string]interface{})
 				ev.OSProfileWindowsConfig.AdditionalUnattendConfig[i].Pass = v["pass"].(string)
 				ev.OSProfileWindowsConfig.AdditionalUnattendConfig[i].Component = v["component"].(string)
 				ev.OSProfileWindowsConfig.AdditionalUnattendConfig[i].SettingName = v["setting_name"].(string)
