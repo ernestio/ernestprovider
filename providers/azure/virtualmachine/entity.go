@@ -73,13 +73,8 @@ type Event struct {
 		AdminPassword string `json:"admin_password" structs:"admin_password"`
 		CustomData    string `json:"custom_data" structs:"custom_data"`
 	} `json:"os_profile"`
-	OSProfileWindowsConfig *struct {
-		ProvisionVMAgent         bool               `json:"provision_vm_agent" structs:"provision_vm_agent"`
-		EnableAutomaticUpgrades  bool               `json:"enable_automatic_upgrades" structs:"enable_automatic_upgrades"`
-		WinRm                    []WinRM            `json:"winrm,omitempty" structs:"winrm,omitempty"`
-		AdditionalUnattendConfig []UnattendedConfig `json:"additional_unattend_config,omitempty" structs:"additional_unattend_config,omitempty"`
-	} `json:"os_profile_windows_config,omitempty"`
-	OSProfileLinuxConfig struct {
+	OSProfileWindowsConfig *OSProfileWindowsConfig `json:"os_profile_windows_config,omitempty"`
+	OSProfileLinuxConfig   struct {
 		DisablePasswordAuthentication *bool    `json:"disable_password_authentication" structs:"disable_password_authentication"`
 		SSHKeys                       []SSHKey `json:"ssh_keys" structs:"ssh_keys"`
 	} `json:"os_profile_linux_config" structs:"os_profile_linux_config"`
@@ -96,6 +91,14 @@ type Event struct {
 	Components          []json.RawMessage `json:"components"`
 	CryptoKey           string            `json:"-"`
 	Validator           *event.Validator  `json:"-"`
+}
+
+// OSProfileWindowsConfig ...
+type OSProfileWindowsConfig struct {
+	ProvisionVMAgent         bool               `json:"provision_vm_agent" structs:"provision_vm_agent"`
+	EnableAutomaticUpgrades  bool               `json:"enable_automatic_upgrades" structs:"enable_automatic_upgrades"`
+	WinRm                    []WinRM            `json:"winrm,omitempty" structs:"winrm,omitempty"`
+	AdditionalUnattendConfig []UnattendedConfig `json:"additional_unattend_config,omitempty" structs:"additional_unattend_config,omitempty"`
 }
 
 type secret struct {
