@@ -230,11 +230,13 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 		ev.StorageOSDisk.OSType = s["os_type"].(string)
 		ev.StorageOSDisk.ImageURI = s["image_uri"].(string)
 		ev.StorageOSDisk.Caching = s["caching"].(string)
-		ev.StorageOSDisk.ManagedDisk = s["name"].(string)
-		parts := strings.Split(ev.ID, "/")
-		parts[7] = "disks"
-		parts[8] = ev.StorageOSDisk.Name
-		ev.StorageOSDisk.ManagedDiskID = strings.Join(parts, "/")
+		if ev.StorageOSDisk.VhdURI == "" {
+			ev.StorageOSDisk.ManagedDisk = s["name"].(string)
+			parts := strings.Split(ev.ID, "/")
+			parts[7] = "disks"
+			parts[8] = ev.StorageOSDisk.Name
+			ev.StorageOSDisk.ManagedDiskID = strings.Join(parts, "/")
+		}
 	}
 	ev.DeleteOSDiskOnTermination = d.Get("delete_os_disk_on_termination").(bool)
 
@@ -244,8 +246,10 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 		ev.StorageDataDisk.Name = s["name"].(string)
 		ev.StorageDataDisk.VhdURI = s["vhd_uri"].(string)
 		ev.StorageDataDisk.CreateOption = s["create_option"].(string)
-		ev.StorageDataDisk.ManagedDisk = s["name"].(string)
-		ev.StorageDataDisk.ManagedDiskID = s["managed_disk_id"].(string)
+		if ev.StorageDataDisk.VhdURI == "" {
+			ev.StorageDataDisk.ManagedDisk = s["name"].(string)
+			ev.StorageDataDisk.ManagedDiskID = s["managed_disk_id"].(string)
+		}
 		if s["disk_size_gb"] != nil {
 			x := int32(s["disk_size_gb"].(int))
 			ev.StorageDataDisk.Size = &x
@@ -381,7 +385,6 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	fields["vm_size"] = ev.VMSize
 	fields["storage_image_reference"] = []interface{}{structs.Map(ev.StorageImageReference)}
 	fields["storage_os_disk"] = []interface{}{structs.Map(ev.StorageOSDisk)}
-	fields["delete_os_disk_on_termination"] = ev.DeleteOSDiskOnTermination
 	fields["delete_data_disks_on_termination"] = ev.DeleteDataDisksOnTermination
 	fields["os_profile"] = []interface{}{structs.Map(ev.OSProfile)}
 
@@ -391,7 +394,9 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 		ddisk["vhd_uri"] = ev.StorageDataDisk.VhdURI
 		ddisk["create_option"] = ev.StorageDataDisk.CreateOption
 		ddisk["disk_size_gb"] = *ev.StorageDataDisk.Size
-		ddisk["managed_disk_id"] = ev.StorageDataDisk.ManagedDiskID
+		if ddisk["vhd_uri"] == "" {
+			ddisk["managed_disk_id"] = ev.StorageDataDisk.ManagedDiskID
+		}
 		if ev.StorageDataDisk.Lun != nil {
 			ddisk["lun"] = *ev.StorageDataDisk.Lun
 		}
