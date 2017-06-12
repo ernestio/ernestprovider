@@ -109,13 +109,13 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	configs := d.Get("frontend_ip_configuration").([]interface{})
 	for _, c := range configs {
 		cfg := c.(map[string]interface{})
-		ev.FrontendIPConfigurations = append(ev.FrontendIPConfigurations, FrontendIPConfiguration{
-			Name:                       cfg["name"].(string),
-			SubnetID:                   cfg["subnet_id"].(string),
-			PrivateIPAddress:           cfg["private_ip_address"].(string),
-			PrivateIPAddressAllocation: cfg["private_ip_address_allocation"].(string),
-			PublicIPAddressID:          cfg["public_ip_address_id"].(string),
-		})
+		for i := range ev.FrontendIPConfigurations {
+			if cfg["name"] == ev.FrontendIPConfigurations[i].Name {
+				ev.FrontendIPConfigurations[i].SubnetID = cfg["subnet_id"].(string)
+				ev.FrontendIPConfigurations[i].PrivateIPAddress = cfg["private_ip_address"].(string)
+				ev.FrontendIPConfigurations[i].PublicIPAddressID = cfg["public_ip_address_id"].(string)
+			}
+		}
 	}
 
 	tags := make(map[string]string, 0)
