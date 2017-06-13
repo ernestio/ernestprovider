@@ -140,12 +140,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	list := cli.ListNetworkInterfaceConfigurations(ev.ResourceGroupName, ev.Name)
 
 	for _, mo := range list {
-		parts := strings.Split(mo["public_ip_address_id"], "/")
-		parts = strings.Split(parts[len(parts)-1], "-")
-		parts = parts[:len(parts)-1]
-		name := strings.Join(parts, "-")
-
-		if name == ev.Name {
+		if mo["interface"] == ev.Name {
 			configs = append(configs, IPConfiguration{
 				Name:                              mo["name"],
 				SubnetID:                          mo["subnet_id"],
