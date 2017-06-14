@@ -386,6 +386,7 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	fields["storage_image_reference"] = []interface{}{structs.Map(ev.StorageImageReference)}
 	fields["storage_os_disk"] = []interface{}{structs.Map(ev.StorageOSDisk)}
 	fields["delete_data_disks_on_termination"] = ev.DeleteDataDisksOnTermination
+	fields["delete_os_disk_on_termination"] = ev.DeleteOSDiskOnTermination
 	fields["os_profile"] = []interface{}{structs.Map(ev.OSProfile)}
 
 	if ev.StorageDataDisk.Size != nil {
