@@ -133,7 +133,7 @@ func getAzureEvent(subject string, data []byte, key string) (event.Event, error)
 		ev, err = storagecontainer.New(subject, key, data, val)
 	case "virtual_machine", "virtual_machines":
 		ev, err = virtualmachine.New(subject, key, data, val)
-	case "availability_set", "availability_setss":
+	case "availability_set", "availability_sets":
 		ev, err = availabilityset.New(subject, key, data, val)
 	case "lb", "lbs":
 		ev, err = lb.New(subject, key, data, val)
