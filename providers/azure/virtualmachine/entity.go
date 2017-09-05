@@ -283,6 +283,8 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	winList := d.Get("os_profile_windows_config").(*schema.Set).List()
 	if len(winList) > 0 {
 		win := winList[0].(map[string]interface{})
+		ev.OSProfileWindowsConfig = &OSProfileWindowsConfig{}
+
 		ev.OSProfileWindowsConfig.ProvisionVMAgent = win["provision_vm_agent"].(bool)
 		ev.OSProfileWindowsConfig.EnableAutomaticUpgrades = win["enable_automatic_upgrades"].(bool)
 

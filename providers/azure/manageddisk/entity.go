@@ -104,7 +104,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.SourceURI = d.Get("source_uri").(string)
 	ev.SourceResourceID = d.Get("source_resource_id").(string)
 	ev.OSType = d.Get("os_type").(string)
-	ev.DiskSizeGB = d.Get("disk_size_gb").(int32)
+	ev.DiskSizeGB = int32(d.Get("disk_size_gb").(int))
 	tags := make(map[string]string, 0)
 	for k, v := range d.Get("tags").(map[string]interface{}) {
 		tags[k] = v.(string)
