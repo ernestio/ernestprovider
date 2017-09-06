@@ -141,15 +141,20 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 
 	for _, mo := range list {
 		if mo["interface"] == ev.Name {
-			configs = append(configs, IPConfiguration{
-				Name:                              mo["name"],
-				SubnetID:                          mo["subnet_id"],
-				PrivateIPAddress:                  mo["private_ip_address"],
-				PrivateIPAddressAllocation:        mo["private_ip_address_allocation"],
-				PublicIPAddressID:                 mo["public_ip_address_id"],
-				LoadBalancerBackendAddressPoolIDs: strings.Split(mo["load_balancer_backend_address_pools_ids"], ","),
-				LoadBalancerInboundNatRules:       strings.Split(mo["load_balancer_inbound_nat_rules_ids"], ","),
-			})
+			c := IPConfiguration{
+				Name:                       mo["name"],
+				SubnetID:                   mo["subnet_id"],
+				PrivateIPAddress:           mo["private_ip_address"],
+				PrivateIPAddressAllocation: mo["private_ip_address_allocation"],
+				PublicIPAddressID:          mo["public_ip_address_id"],
+			}
+			if mo["load_balancer_backend_address_pools_ids"] != "" {
+				c.LoadBalancerBackendAddressPoolIDs = strings.Split(mo["load_balancer_backend_address_pools_ids"], ",")
+			}
+			if mo["load_balancer_inbound_nat_rules_ids"] != "" {
+				c.LoadBalancerInboundNatRules = strings.Split(mo["load_balancer_inbound_nat_rules_ids"], ",")
+			}
+			configs = append(configs, c)
 		}
 	}
 	ev.IPConfigurations = configs

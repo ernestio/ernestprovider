@@ -105,11 +105,14 @@ func (ev *Event) SetState(state string) {
 // ResourceDataToEvent : Translates a ResourceData on a valid Ernest Event
 func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.ID = d.Id()
+
+	parts := strings.Split(ev.ID, "/")
+
 	ev.Name = d.Get("name").(string)
 	ev.ComponentID = "sql_database::" + ev.Name
 	ev.Location = d.Get("location").(string)
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)
-	ev.ServerName = d.Get("server_name").(string)
+	ev.ServerName = parts[len(parts)-3]
 	ev.CreateMode = d.Get("create_mode").(string)
 	ev.SourceDatabaseID = d.Get("source_database_id").(string)
 	ev.RestorePointInTime = d.Get("restore_point_in_time").(string)
@@ -125,10 +128,13 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.DefaultSecondaryLocation = d.Get("default_secondary_location").(string)
 
 	tags := make(map[string]string, 0)
+
 	for k, v := range d.Get("tags").(map[string]interface{}) {
 		tags[k] = v.(string)
 	}
+
 	ev.Tags = tags
+
 	return nil
 }
 
