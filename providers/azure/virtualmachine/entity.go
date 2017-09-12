@@ -91,6 +91,7 @@ type Event struct {
 	Components          []json.RawMessage `json:"components"`
 	CryptoKey           string            `json:"-"`
 	Validator           *event.Validator  `json:"-"`
+	GenericEvent        event.Event       `json:"-" validate:"-"`
 }
 
 // OSProfileWindowsConfig ...
@@ -139,15 +140,15 @@ type UnattendedConfig struct {
 
 // New : Constructor
 func New(subject, cryptoKey string, body []byte, val *event.Validator) (event.Event, error) {
-	var ev event.Resource
-	ev = &Event{CryptoKey: cryptoKey, Validator: val}
+	ev := &Event{CryptoKey: cryptoKey, Validator: val}
 	body = []byte(strings.Replace(string(body), `"_component":"virtual_machines"`, `"_component":"virtual_machine"`, 1))
 	if err := json.Unmarshal(body, &ev); err != nil {
 		err := fmt.Errorf("Error on input message : %s", err)
 		return nil, err
 	}
 
-	return azure.New(subject, "azurerm_virtual_machine", body, val, ev)
+	ev.GenericEvent, _ = azure.New(subject, "azurerm_virtual_machine", body, val, ev)
+	return ev.GenericEvent, nil
 }
 
 // SetComponents : ....
@@ -341,6 +342,14 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	for _, id := range d.Get("network_interface_ids").(*schema.Set).List() {
 		ev.NetworkInterfaceIDs = append(ev.NetworkInterfaceIDs, id.(string))
 	}
+
+	// Patch storage image reference if is broken
+	cli, _ := ev.GenericEvent.Client()
+	sir := cli.GetVMStorageImageReference(ev.ResourceGroupName, ev.Name)
+	ev.StorageImageReference.Publisher = sir["publisher"].(string)
+	ev.StorageImageReference.Offer = sir["offer"].(string)
+	ev.StorageImageReference.Sku = sir["sku"].(string)
+	ev.StorageImageReference.Version = sir["version"].(string)
 
 	tags := make(map[string]string, 0)
 	for k, v := range d.Get("tags").(map[string]interface{}) {
