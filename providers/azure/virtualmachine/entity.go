@@ -192,45 +192,62 @@ func (ev *Event) SetState(state string) {
 func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.ID = d.Id()
 	if ev.ID == "" {
-		ev.Name = d.Get("name").(string)
+		ev.Name = d.Content["name"].(string)
 	} else {
 		parts := strings.Split(ev.ID, "/")
 		ev.Name = parts[8]
 	}
 	ev.ComponentID = "virtual_machine::" + ev.Name
-	ev.ResourceGroupName = d.Get("resource_group_name").(string)
-	ev.Location = d.Get("location").(string)
+	ev.ResourceGroupName = d.Content["resource_group_name"].(string)
+	ev.Location = *d.Content["location"].(*string)
 
-	plan := d.Get("plan").(*schema.Set).List()
-	if len(plan) > 0 {
-		planConfig := plan[0].(map[string]interface{})
-		ev.Plan.Name = planConfig["name"].(string)
-		ev.Plan.Publisher = planConfig["publisher"].(string)
-		ev.Plan.Product = planConfig["product"].(string)
+	if d.Content["plan"] != nil {
+		plan := d.Content["plan"].(*schema.Set).List()
+		if len(plan) > 0 {
+			planConfig := plan[0].(map[string]interface{})
+			ev.Plan.Name = planConfig["name"].(string)
+			ev.Plan.Publisher = planConfig["publisher"].(string)
+			ev.Plan.Product = planConfig["product"].(string)
+		}
 	}
 
-	ev.AvailabilitySetID = d.Get("availability_set_id").(string)
-	ev.LicenseType = d.Get("license_type").(string)
-	ev.VMSize = d.Get("vm_size").(string)
-
-	storageImageReference := d.Get("storage_image_reference").(*schema.Set).List()
-	if len(storageImageReference) > 0 {
-		sir := storageImageReference[0].(map[string]interface{})
-		ev.StorageImageReference.Publisher = sir["publisher"].(string)
-		ev.StorageImageReference.Offer = sir["offer"].(string)
-		ev.StorageImageReference.Sku = sir["sku"].(string)
-		ev.StorageImageReference.Version = sir["version"].(string)
+	if d.Content["availability_set_id"] != nil {
+		ev.AvailabilitySetID = d.Content["availability_set_id"].(string)
+	}
+	if d.Content["license_type"] != nil {
+		ev.LicenseType = d.Content["license_type"].(string)
+	}
+	if d.Content["vm_size"] != nil {
+		ev.VMSize = d.Content["vm_size"].(string)
 	}
 
-	storageOSDisk := d.Get("storage_os_disk").(*schema.Set).List()
+	if d.Content["storage_image_reference"] != nil {
+		storageImageReference := d.Content["storage_image_reference"].(*schema.Set).List()
+		if len(storageImageReference) > 0 {
+			sir := storageImageReference[0].(map[string]interface{})
+			ev.StorageImageReference.Publisher = sir["publisher"].(string)
+			ev.StorageImageReference.Offer = sir["offer"].(string)
+			ev.StorageImageReference.Sku = sir["sku"].(string)
+			ev.StorageImageReference.Version = sir["version"].(string)
+		}
+	}
+
+	storageOSDisk := d.Content["storage_os_disk"].(*schema.Set).List()
 	if len(storageOSDisk) > 0 {
 		s := storageOSDisk[0].(map[string]interface{})
 		ev.StorageOSDisk.Name = s["name"].(string)
 		ev.StorageOSDisk.VhdURI = s["vhd_uri"].(string)
 		ev.StorageOSDisk.CreateOption = s["create_option"].(string)
-		ev.StorageOSDisk.OSType = s["os_type"].(string)
-		ev.StorageOSDisk.ImageURI = s["image_uri"].(string)
-		ev.StorageOSDisk.Caching = s["caching"].(string)
+
+		if s["os_type"] != nil {
+			ev.StorageOSDisk.OSType = s["os_type"].(string)
+		}
+		if s["image_uri"] != nil {
+			ev.StorageOSDisk.ImageURI = s["image_uri"].(string)
+		}
+		if s["caching"] != nil {
+			ev.StorageOSDisk.Caching = fmt.Sprintf("%s", s["caching"])
+		}
 		if ev.StorageOSDisk.VhdURI == "" {
 			ev.StorageOSDisk.ManagedDisk = s["name"].(string)
 			parts := strings.Split(ev.ID, "/")
@@ -239,91 +256,112 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 			ev.StorageOSDisk.ManagedDiskID = strings.Join(parts, "/")
 		}
 	}
-	ev.DeleteOSDiskOnTermination = d.Get("delete_os_disk_on_termination").(bool)
+	if d.Content["delete_os_disk_on_termination"] != nil {
+		ev.DeleteOSDiskOnTermination = d.Content["delete_os_disk_on_termination"].(bool)
+	}
 
-	storageDataDisk := d.Get("storage_data_disk").([]interface{})
-	if len(storageDataDisk) > 0 {
-		s := storageDataDisk[0].(map[string]interface{})
-		ev.StorageDataDisk.Name = s["name"].(string)
-		ev.StorageDataDisk.VhdURI = s["vhd_uri"].(string)
-		ev.StorageDataDisk.CreateOption = s["create_option"].(string)
-		if ev.StorageDataDisk.VhdURI == "" {
-			ev.StorageDataDisk.ManagedDisk = s["name"].(string)
-			ev.StorageDataDisk.ManagedDiskID = s["managed_disk_id"].(string)
-		}
-		if s["disk_size_gb"] != nil {
-			x := int32(s["disk_size_gb"].(int))
-			ev.StorageDataDisk.Size = &x
-		}
-		if s["lun"] != nil {
-			x := int32(s["lun"].(int))
-			ev.StorageDataDisk.Lun = &x
+	if d.Content["storage_data_disk"] != nil {
+		storageDataDisk := d.Content["storage_data_disk"].([]interface{})
+		if len(storageDataDisk) > 0 {
+			s := storageDataDisk[0].(map[string]interface{})
+			ev.StorageDataDisk.Name = s["name"].(string)
+			ev.StorageDataDisk.VhdURI = s["vhd_uri"].(string)
+			ev.StorageDataDisk.CreateOption = s["create_option"].(string)
+			if ev.StorageDataDisk.VhdURI == "" {
+				ev.StorageDataDisk.ManagedDisk = s["name"].(string)
+				ev.StorageDataDisk.ManagedDiskID = s["managed_disk_id"].(string)
+			}
+			if s["disk_size_gb"] != nil {
+				x := int32(s["disk_size_gb"].(int))
+				ev.StorageDataDisk.Size = &x
+			}
+			if s["lun"] != nil {
+				x := int32(s["lun"].(int))
+				ev.StorageDataDisk.Lun = &x
+			}
 		}
 	}
-	ev.DeleteDataDisksOnTermination = d.Get("delete_data_disks_on_termination").(bool)
+	if d.Content["delete_data_disks_on_termination"] != nil {
+		ev.DeleteDataDisksOnTermination = d.Content["delete_data_disks_on_termination"].(bool)
+	}
 
 	bootDiagnostics := make([]BootDiagnostic, 0)
-	for _, v := range d.Get("boot_diagnostics").([]interface{}) {
-		x := v.(map[string]interface{})
-		bootDiagnostics = append(bootDiagnostics, BootDiagnostic{
-			Enabled: x["enabled"].(bool),
-			URI:     x["storage_uri"].(string),
-		})
+	if d.Content["boot_diagnostics"] != nil {
+		for _, v := range d.Content["boot_diagnostics"].([]interface{}) {
+			x := v.(map[string]interface{})
+			bootDiagnostics = append(bootDiagnostics, BootDiagnostic{
+				Enabled: x["enabled"].(bool),
+				URI:     x["storage_uri"].(string),
+			})
+		}
 	}
 	ev.BootDiagnostics = bootDiagnostics
 
-	osProfile := d.Get("os_profile").(*schema.Set).List()
-	if len(osProfile) > 0 {
-		s := osProfile[0].(map[string]interface{})
-		ev.OSProfile.ComputerName = s["computer_name"].(string)
-		ev.OSProfile.AdminUsername = s["admin_username"].(string)
-		ev.OSProfile.AdminPassword = s["admin_password"].(string)
-		ev.OSProfile.CustomData = s["custom_data"].(string)
-	}
-
-	winList := d.Get("os_profile_windows_config").(*schema.Set).List()
-	if len(winList) > 0 {
-		win := winList[0].(map[string]interface{})
-		ev.OSProfileWindowsConfig = &OSProfileWindowsConfig{}
-
-		ev.OSProfileWindowsConfig.ProvisionVMAgent = win["provision_vm_agent"].(bool)
-		ev.OSProfileWindowsConfig.EnableAutomaticUpgrades = win["enable_automatic_upgrades"].(bool)
-
-		if win["win_rm"] != nil {
-			for i, v := range win["win_rm"].([]map[string]interface{}) {
-				ev.OSProfileWindowsConfig.WinRm[i].Protocol = v["protocol"].(string)
-				ev.OSProfileWindowsConfig.WinRm[i].CertificateURL = v["certificate_url"].(string)
+	if d.Content["os_profile"] != nil {
+		osProfile := d.Content["os_profile"].(*schema.Set).List()
+		if len(osProfile) > 0 {
+			s := osProfile[0].(map[string]interface{})
+			if s["computer_name"] != nil {
+				ev.OSProfile.ComputerName = s["computer_name"].(string)
 			}
-		}
-		if win["additional_unattend_config"] != nil {
-			for i, value := range win["additional_unattend_config"].([]interface{}) {
-				v := value.(map[string]interface{})
-				ev.OSProfileWindowsConfig.AdditionalUnattendConfig[i].Pass = v["pass"].(string)
-				ev.OSProfileWindowsConfig.AdditionalUnattendConfig[i].Component = v["component"].(string)
-				ev.OSProfileWindowsConfig.AdditionalUnattendConfig[i].SettingName = v["setting_name"].(string)
-				ev.OSProfileWindowsConfig.AdditionalUnattendConfig[i].Content = v["content"].(string)
+			if s["admin_username"] != nil {
+				ev.OSProfile.AdminUsername = s["admin_username"].(string)
+			}
+			if s["admin_password"] != nil {
+				ev.OSProfile.AdminPassword = s["admin_password"].(string)
+			}
+			if s["custom_data"] != nil {
+				ev.OSProfile.CustomData = s["custom_data"].(string)
 			}
 		}
 	}
 
-	linList := d.Get("os_profile_linux_config").(*schema.Set).List()
-	if len(linList) > 0 {
-		lin := linList[0].(map[string]interface{})
-		x := lin["disable_password_authentication"].(bool)
-		ev.OSProfileLinuxConfig.DisablePasswordAuthentication = &x
-		ev.OSProfileLinuxConfig.SSHKeys = make([]SSHKey, 0)
-		for _, key := range lin["ssh_keys"].([]interface{}) {
-			v := key.(map[string]interface{})
-			ev.OSProfileLinuxConfig.SSHKeys = append(ev.OSProfileLinuxConfig.SSHKeys, SSHKey{
-				Path:    v["path"].(string),
-				KeyData: v["key_data"].(string),
-			})
+	if d.Content["os_profile_windows_config"] != nil {
+		winList := d.Content["os_profile_windows_config"].([]interface{})
+		if len(winList) > 0 {
+			win := winList[0].(map[string]interface{})
+			ev.OSProfileWindowsConfig = &OSProfileWindowsConfig{}
+
+			ev.OSProfileWindowsConfig.ProvisionVMAgent = win["provision_vm_agent"].(bool)
+			ev.OSProfileWindowsConfig.EnableAutomaticUpgrades = win["enable_automatic_upgrades"].(bool)
+
+			if win["win_rm"] != nil {
+				for i, v := range win["win_rm"].([]map[string]interface{}) {
+					ev.OSProfileWindowsConfig.WinRm[i].Protocol = v["protocol"].(string)
+					ev.OSProfileWindowsConfig.WinRm[i].CertificateURL = v["certificate_url"].(string)
+				}
+			}
+			if win["additional_unattend_config"] != nil {
+				for i, value := range win["additional_unattend_config"].([]interface{}) {
+					v := value.(map[string]interface{})
+					ev.OSProfileWindowsConfig.AdditionalUnattendConfig[i].Pass = v["pass"].(string)
+					ev.OSProfileWindowsConfig.AdditionalUnattendConfig[i].Component = v["component"].(string)
+					ev.OSProfileWindowsConfig.AdditionalUnattendConfig[i].SettingName = v["setting_name"].(string)
+					ev.OSProfileWindowsConfig.AdditionalUnattendConfig[i].Content = v["content"].(string)
+				}
+			}
+		}
+	}
+
+	if d.Content["os_profile_linux_config"] != nil {
+		linList := d.Content["os_profile_linux_config"].(*schema.Set).List()
+		if len(linList) > 0 {
+			lin := linList[0].(map[string]interface{})
+			x := lin["disable_password_authentication"].(bool)
+			ev.OSProfileLinuxConfig.DisablePasswordAuthentication = &x
+			ev.OSProfileLinuxConfig.SSHKeys = make([]SSHKey, 0)
+			for _, key := range lin["ssh_keys"].([]interface{}) {
+				v := key.(map[string]interface{})
+				ev.OSProfileLinuxConfig.SSHKeys = append(ev.OSProfileLinuxConfig.SSHKeys, SSHKey{
+					Path:    v["path"].(string),
+					KeyData: v["key_data"].(string),
+				})
+			}
 		}
 	}
 
 	ev.OSProfileSecrets = make([]secret, 0)
-	for _, val := range d.Get("os_profile_secrets").(*schema.Set).List() {
-		v := val.(map[string]interface{})
+	for _, v := range d.Content["os_profile_secrets"].([]map[string]interface{}) {
 		certs := []vaultCertificate{}
 		for _, wal := range v["vault_certificates"].(*schema.Set).List() {
 			w := wal.(map[string]interface{})
@@ -339,21 +377,17 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	}
 
 	ev.NetworkInterfaceIDs = make([]string, 0)
-	for _, id := range d.Get("network_interface_ids").(*schema.Set).List() {
-		ev.NetworkInterfaceIDs = append(ev.NetworkInterfaceIDs, id.(string))
+	if d.Content["network_interface_ids"] != nil {
+		for _, id := range d.Content["network_interface_ids"].([]string) {
+			ev.NetworkInterfaceIDs = append(ev.NetworkInterfaceIDs, id)
+		}
 	}
 
-	// Patch storage image reference if is broken
-	cli, _ := ev.GenericEvent.Client()
-	sir := cli.GetVMStorageImageReference(ev.ResourceGroupName, ev.Name)
-	ev.StorageImageReference.Publisher = sir["publisher"].(string)
-	ev.StorageImageReference.Offer = sir["offer"].(string)
-	ev.StorageImageReference.Sku = sir["sku"].(string)
-	ev.StorageImageReference.Version = sir["version"].(string)
-
 	tags := make(map[string]string, 0)
-	for k, v := range d.Get("tags").(map[string]interface{}) {
-		tags[k] = v.(string)
+	tt := d.Content["tags"].(*map[string]*string)
+	for k, v := range *tt {
+		val := *v
+		tags[k] = fmt.Sprintf("%s", val)
 	}
 	ev.Tags = tags
 
