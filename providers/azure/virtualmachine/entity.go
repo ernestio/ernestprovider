@@ -236,7 +236,9 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	if len(storageOSDisk) > 0 {
 		s := storageOSDisk[0].(map[string]interface{})
 		ev.StorageOSDisk.Name = s["name"].(string)
-		ev.StorageOSDisk.VhdURI = s["vhd_uri"].(string)
+		if s["vhd_uri"] != nil {
+			ev.StorageOSDisk.VhdURI = s["vhd_uri"].(string)
+		}
 		ev.StorageOSDisk.CreateOption = s["create_option"].(string)
 
 		if s["os_type"] != nil {
@@ -255,9 +257,6 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 			parts[8] = ev.StorageOSDisk.Name
 			ev.StorageOSDisk.ManagedDiskID = strings.Join(parts, "/")
 		}
-	}
-	if d.Content["delete_os_disk_on_termination"] != nil {
-		ev.DeleteOSDiskOnTermination = d.Content["delete_os_disk_on_termination"].(bool)
 	}
 
 	if d.Content["storage_data_disk"] != nil {
@@ -280,9 +279,6 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 				ev.StorageDataDisk.Lun = &x
 			}
 		}
-	}
-	if d.Content["delete_data_disks_on_termination"] != nil {
-		ev.DeleteDataDisksOnTermination = d.Content["delete_data_disks_on_termination"].(bool)
 	}
 
 	bootDiagnostics := make([]BootDiagnostic, 0)
@@ -391,11 +387,20 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 		}
 	}
 
+	ev.DeleteOSDiskOnTermination = false
+	ev.DeleteDataDisksOnTermination = false
 	tags := make(map[string]string, 0)
 	tt := d.Content["tags"].(*map[string]*string)
 	for k, v := range *tt {
 		val := *v
-		tags[k] = fmt.Sprintf("%s", val)
+		value := fmt.Sprintf("%s", val)
+		tags[k] = fmt.Sprintf("%s", value)
+		if k == "delete_os_disk_on_termination" && value == "true" {
+			ev.DeleteOSDiskOnTermination = true
+		}
+		if k == "delete_data_disks_on_termination" && value == "true" {
+			ev.DeleteDataDisksOnTermination = true
+		}
 	}
 	ev.Tags = tags
 
@@ -491,7 +496,12 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 		fields["os_profile_linux_config"] = []interface{}{lconfig}
 	}
 
-	fields["network_interface_ids"] = ev.NetworkInterfaceIDs
+	if ev.DeleteDataDisksOnTermination {
+		ev.Tags["delete_data_disks_on_termination"] = "true"
+	}
+	if ev.DeleteOSDiskOnTermination {
+		ev.Tags["delete_os_disk_on_termination"] = "true"
+	}
 	fields["tags"] = ev.Tags
 	for k, v := range fields {
 		if err := d.Set(k, v); err != nil {
