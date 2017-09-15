@@ -325,11 +325,19 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 			ev.OSProfileWindowsConfig.ProvisionVMAgent = win["provision_vm_agent"].(bool)
 			ev.OSProfileWindowsConfig.EnableAutomaticUpgrades = win["enable_automatic_upgrades"].(bool)
 
-			if win["win_rm"] != nil {
-				for i, v := range win["win_rm"].([]map[string]interface{}) {
-					ev.OSProfileWindowsConfig.WinRm[i].Protocol = v["protocol"].(string)
-					ev.OSProfileWindowsConfig.WinRm[i].CertificateURL = v["certificate_url"].(string)
+			if win["winrm"] != nil {
+				rms := []WinRM{}
+				for _, v := range win["winrm"].([]map[string]interface{}) {
+					winrm := WinRM{}
+					if val, ok := v["protocol"]; ok {
+						winrm.Protocol = fmt.Sprintf("%s", val)
+					}
+					if val, ok := v["certificate_url"]; ok {
+						winrm.CertificateURL = fmt.Sprintf("%s", val)
+					}
+					rms = append(rms, winrm)
 				}
+				ev.OSProfileWindowsConfig.WinRm = rms
 			}
 			if win["additional_unattend_config"] != nil {
 				for i, value := range win["additional_unattend_config"].([]interface{}) {
