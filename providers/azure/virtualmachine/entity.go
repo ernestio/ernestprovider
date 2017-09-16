@@ -199,7 +199,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	}
 	ev.ComponentID = "virtual_machine::" + ev.Name
 	ev.ResourceGroupName = d.Content["resource_group_name"].(string)
-	ev.Location = *d.Content["location"].(*string)
+	ev.Location = d.Content["location"].(string)
 
 	if d.Content["plan"] != nil {
 		plan := d.Content["plan"].(*schema.Set).List()
@@ -218,7 +218,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 		ev.LicenseType = d.Content["license_type"].(string)
 	}
 	if d.Content["vm_size"] != nil {
-		ev.VMSize = d.Content["vm_size"].(string)
+		ev.VMSize = fmt.Sprintf("%s", d.Content["vm_size"])
 	}
 
 	if d.Content["storage_image_reference"] != nil {
@@ -239,7 +239,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 		if s["vhd_uri"] != nil {
 			ev.StorageOSDisk.VhdURI = s["vhd_uri"].(string)
 		}
-		ev.StorageOSDisk.CreateOption = s["create_option"].(string)
+		ev.StorageOSDisk.CreateOption = fmt.Sprintf("%s", s["create_option"])
 
 		if s["os_type"] != nil {
 			ev.StorageOSDisk.OSType = s["os_type"].(string)
@@ -348,18 +348,20 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	}
 
 	if d.Content["os_profile_linux_config"] != nil {
-		linList := d.Content["os_profile_linux_config"].(*schema.Set).List()
+		linList := d.Content["os_profile_linux_config"].([]interface{})
 		if len(linList) > 0 {
 			lin := linList[0].(map[string]interface{})
 			x := lin["disable_password_authentication"].(bool)
 			ev.OSProfileLinuxConfig.DisablePasswordAuthentication = &x
 			ev.OSProfileLinuxConfig.SSHKeys = make([]SSHKey, 0)
-			for _, key := range lin["ssh_keys"].([]interface{}) {
-				v := key.(map[string]interface{})
-				ev.OSProfileLinuxConfig.SSHKeys = append(ev.OSProfileLinuxConfig.SSHKeys, SSHKey{
-					Path:    v["path"].(string),
-					KeyData: v["key_data"].(string),
-				})
+			if lin["ssh_keys"] != nil {
+				for _, key := range lin["ssh_keys"].([]interface{}) {
+					v := key.(map[string]interface{})
+					ev.OSProfileLinuxConfig.SSHKeys = append(ev.OSProfileLinuxConfig.SSHKeys, SSHKey{
+						Path:    v["path"].(string),
+						KeyData: v["key_data"].(string),
+					})
+				}
 			}
 		}
 	}
@@ -390,9 +392,8 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.DeleteOSDiskOnTermination = false
 	ev.DeleteDataDisksOnTermination = false
 	tags := make(map[string]string, 0)
-	tt := d.Content["tags"].(*map[string]*string)
-	for k, v := range *tt {
-		val := *v
+	tt := d.Content["tags"].(map[string]interface{})
+	for k, val := range tt {
 		value := fmt.Sprintf("%s", val)
 		tags[k] = fmt.Sprintf("%s", value)
 		if k == "delete_os_disk_on_termination" && value == "true" {
@@ -492,6 +493,7 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	}
 	lconfig["ssh_keys"] = sshkeys
 
+	fields["network_interface_ids"] = ev.NetworkInterfaceIDs
 	if ev.OSProfileLinuxConfig.DisablePasswordAuthentication != nil || len(ev.OSProfileLinuxConfig.SSHKeys) > 0 {
 		fields["os_profile_linux_config"] = []interface{}{lconfig}
 	}
