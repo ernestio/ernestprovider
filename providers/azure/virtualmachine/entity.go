@@ -357,8 +357,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 			ev.OSProfileLinuxConfig.DisablePasswordAuthentication = &x
 			ev.OSProfileLinuxConfig.SSHKeys = make([]SSHKey, 0)
 			if lin["ssh_keys"] != nil {
-				for _, key := range lin["ssh_keys"].([]interface{}) {
-					v := key.(map[string]interface{})
+				for _, v := range lin["ssh_keys"].([]map[string]interface{}) {
 					ev.OSProfileLinuxConfig.SSHKeys = append(ev.OSProfileLinuxConfig.SSHKeys, SSHKey{
 						Path:    v["path"].(string),
 						KeyData: v["key_data"].(string),
