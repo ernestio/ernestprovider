@@ -106,16 +106,19 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.ComponentID = "lb::" + ev.Name
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)
 	ev.Location = d.Get("location").(string)
-	configs := d.Get("frontend_ip_configuration").([]interface{})
-	for _, c := range configs {
-		cfg := c.(map[string]interface{})
-		for i := range ev.FrontendIPConfigurations {
-			if cfg["name"] == ev.FrontendIPConfigurations[i].Name {
-				ev.FrontendIPConfigurations[i].SubnetID = cfg["subnet_id"].(string)
-				ev.FrontendIPConfigurations[i].PrivateIPAddress = cfg["private_ip_address"].(string)
-				ev.FrontendIPConfigurations[i].PublicIPAddressID = cfg["public_ip_address_id"].(string)
-			}
+	if d.Content["frontend_ip_configuration"] != nil {
+		ips := []FrontendIPConfiguration{}
+		for _, c := range d.Content["frontend_ip_configuration"].([]interface{}) {
+			cfg := c.(map[string]interface{})
+
+			ips = append(ips, FrontendIPConfiguration{
+				SubnetID:          fmt.Sprintf("%s", cfg["subnet_id"]),
+				Name:              fmt.Sprintf("%s", cfg["name"]),
+				PrivateIPAddress:  fmt.Sprintf("%s", cfg["private_ip_address"]),
+				PublicIPAddressID: fmt.Sprintf("%s", cfg["public_ip_address_id"]),
+			})
 		}
+		ev.FrontendIPConfigurations = ips
 	}
 
 	tags := make(map[string]string, 0)
