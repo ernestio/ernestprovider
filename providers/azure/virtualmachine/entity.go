@@ -250,6 +250,8 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 		if s["caching"] != nil {
 			ev.StorageOSDisk.Caching = fmt.Sprintf("%s", s["caching"])
 		}
+
+		ev.StorageOSDisk.StorageAccountType = fmt.Sprintf("%s", s["managed_disk_type"])
 		if ev.StorageOSDisk.VhdURI == "" {
 			ev.StorageOSDisk.ManagedDisk = s["name"].(string)
 			parts := strings.Split(ev.ID, "/")
