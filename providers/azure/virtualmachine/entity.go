@@ -395,12 +395,12 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	tt := d.Content["tags"].(map[string]interface{})
 	for k, val := range tt {
 		value := fmt.Sprintf("%s", val)
-		tags[k] = fmt.Sprintf("%s", value)
 		if k == "delete_os_disk_on_termination" && value == "true" {
 			ev.DeleteOSDiskOnTermination = true
-		}
-		if k == "delete_data_disks_on_termination" && value == "true" {
+		} else if k == "delete_data_disks_on_termination" && value == "true" {
 			ev.DeleteDataDisksOnTermination = true
+		} else {
+			tags[k] = fmt.Sprintf("%s", value)
 		}
 	}
 	ev.Tags = tags
