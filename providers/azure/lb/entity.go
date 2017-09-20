@@ -110,13 +110,17 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 		ips := []FrontendIPConfiguration{}
 		for _, c := range d.Content["frontend_ip_configuration"].([]interface{}) {
 			cfg := c.(map[string]interface{})
+			f := FrontendIPConfiguration{}
+			f.SubnetID = fmt.Sprintf("%s", cfg["subnet_id"])
+			f.Name = fmt.Sprintf("%s", cfg["name"])
+			if cfg["private_ip_address"] != nil {
+				f.PrivateIPAddress = fmt.Sprintf("%s", cfg["private_ip_address"])
+			}
+			if cfg["public_ip_address_id"] != nil {
+				f.PublicIPAddressID = fmt.Sprintf("%s", cfg["public_ip_address_id"])
+			}
 
-			ips = append(ips, FrontendIPConfiguration{
-				SubnetID:          fmt.Sprintf("%s", cfg["subnet_id"]),
-				Name:              fmt.Sprintf("%s", cfg["name"]),
-				PrivateIPAddress:  fmt.Sprintf("%s", cfg["private_ip_address"]),
-				PublicIPAddressID: fmt.Sprintf("%s", cfg["public_ip_address_id"]),
-			})
+			ips = append(ips, f)
 		}
 		ev.FrontendIPConfigurations = ips
 	}
