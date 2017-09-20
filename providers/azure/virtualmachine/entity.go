@@ -320,33 +320,37 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 		winList := d.Content["os_profile_windows_config"].([]interface{})
 		if len(winList) > 0 {
 			win := winList[0].(map[string]interface{})
-			ev.OSProfileWindowsConfig = &OSProfileWindowsConfig{}
+			if win["provision_vm_agent"].(bool) != false && win["enable_automatic_upgrades"].(bool) != false {
+				ev.OSProfileWindowsConfig = &OSProfileWindowsConfig{}
 
-			ev.OSProfileWindowsConfig.ProvisionVMAgent = win["provision_vm_agent"].(bool)
-			ev.OSProfileWindowsConfig.EnableAutomaticUpgrades = win["enable_automatic_upgrades"].(bool)
+				ev.OSProfileWindowsConfig.ProvisionVMAgent = win["provision_vm_agent"].(bool)
+				ev.OSProfileWindowsConfig.EnableAutomaticUpgrades = win["enable_automatic_upgrades"].(bool)
 
-			if win["winrm"] != nil {
-				rms := []WinRM{}
-				for _, v := range win["winrm"].([]map[string]interface{}) {
-					winrm := WinRM{}
-					if val, ok := v["protocol"]; ok {
-						winrm.Protocol = fmt.Sprintf("%s", val)
+				if win["winrm"] != nil {
+					rms := []WinRM{}
+					for _, v := range win["winrm"].([]map[string]interface{}) {
+						winrm := WinRM{}
+						if val, ok := v["protocol"]; ok {
+							winrm.Protocol = fmt.Sprintf("%s", val)
+						}
+						if val, ok := v["certificate_url"]; ok {
+							winrm.CertificateURL = fmt.Sprintf("%s", val)
+						}
+						rms = append(rms, winrm)
 					}
-					if val, ok := v["certificate_url"]; ok {
-						winrm.CertificateURL = fmt.Sprintf("%s", val)
+					ev.OSProfileWindowsConfig.WinRm = rms
+				}
+				if win["additional_unattend_config"] != nil {
+					for i, value := range win["additional_unattend_config"].([]interface{}) {
+						v := value.(map[string]interface{})
+						ev.OSProfileWindowsConfig.AdditionalUnattendConfig[i].Pass = v["pass"].(string)
+						ev.OSProfileWindowsConfig.AdditionalUnattendConfig[i].Component = v["component"].(string)
+						ev.OSProfileWindowsConfig.AdditionalUnattendConfig[i].SettingName = v["setting_name"].(string)
+						ev.OSProfileWindowsConfig.AdditionalUnattendConfig[i].Content = v["content"].(string)
 					}
-					rms = append(rms, winrm)
 				}
-				ev.OSProfileWindowsConfig.WinRm = rms
-			}
-			if win["additional_unattend_config"] != nil {
-				for i, value := range win["additional_unattend_config"].([]interface{}) {
-					v := value.(map[string]interface{})
-					ev.OSProfileWindowsConfig.AdditionalUnattendConfig[i].Pass = v["pass"].(string)
-					ev.OSProfileWindowsConfig.AdditionalUnattendConfig[i].Component = v["component"].(string)
-					ev.OSProfileWindowsConfig.AdditionalUnattendConfig[i].SettingName = v["setting_name"].(string)
-					ev.OSProfileWindowsConfig.AdditionalUnattendConfig[i].Content = v["content"].(string)
-				}
+			} else {
+				ev.OSProfileWindowsConfig = nil
 			}
 		}
 	}
