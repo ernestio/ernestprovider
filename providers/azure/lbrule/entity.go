@@ -115,7 +115,9 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.EnableFloatingIP = d.Get("enable_floating_ip").(bool)
 	ev.IdleTimeoutInMinutes = d.Get("idle_timeout_in_minutes").(int)
 	ev.LoadDistribution = d.Get("load_distribution").(string)
-	ev.LoadbalancerID = d.Get("loadbalancer_id").(string)
+	parts := strings.Split(ev.ID, "/")
+	ev.LoadbalancerID = strings.Join(parts[0:9], "/")
+	ev.Loadbalancer = parts[8]
 
 	return nil
 }

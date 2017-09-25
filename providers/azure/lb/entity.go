@@ -119,6 +119,9 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 			if cfg["public_ip_address_id"] != nil {
 				f.PublicIPAddressID = fmt.Sprintf("%s", cfg["public_ip_address_id"])
 			}
+			if cfg["private_ip_address_allocation"] != nil {
+				f.PrivateIPAddressAllocation = fmt.Sprintf("%s", cfg["private_ip_address_allocation"])
+			}
 
 			ips = append(ips, f)
 		}

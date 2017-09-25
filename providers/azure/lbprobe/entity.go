@@ -95,17 +95,18 @@ func (ev *Event) SetState(state string) {
 
 // ResourceDataToEvent : Translates a ResourceData on a valid Ernest Event
 func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
-	idParts := strings.Split(d.Id(), "/")
 	ev.ID = d.Id()
-	ev.Name = idParts[len(idParts)-1]
-	ev.ComponentID = "lb_probe::" + ev.Name
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)
-	ev.LoadbalancerID = d.Get("loadbalancer_id").(string)
 	ev.Protocol = d.Get("protocol").(string)
 	ev.Port = d.Get("port").(int)
 	ev.RequestPath = d.Get("request_path").(string)
 	ev.IntervalInSeconds = d.Get("interval_in_seconds").(int)
 	ev.NumberOfProbes = d.Get("number_of_probes").(int)
+	parts := strings.Split(ev.ID, "/")
+	ev.LoadbalancerID = strings.Join(parts[0:9], "/")
+	ev.Loadbalancer = parts[8]
+	ev.Name = parts[len(parts)-1]
+	ev.ComponentID = "lb_probe::" + ev.Name
 
 	return nil
 }
