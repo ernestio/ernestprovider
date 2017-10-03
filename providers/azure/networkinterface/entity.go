@@ -148,8 +148,10 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 				PrivateIPAddressAllocation: mo["private_ip_address_allocation"],
 				PublicIPAddressID:          mo["public_ip_address_id"],
 			}
-			if mo["load_balancer_backend_address_pools_ids"] != "" {
-				c.LoadBalancerBackendAddressPoolIDs = strings.Split(mo["load_balancer_backend_address_pools_ids"], ",")
+			c.LoadBalancerBackendAddressPoolIDs = d.Content["lb_pools"].([]string)
+			for _, v := range c.LoadBalancerBackendAddressPoolIDs {
+				parts := strings.Split(v, "/")
+				c.LoadBalancerBackendAddressPools = append(c.LoadBalancerBackendAddressPools, parts[len(parts)-1])
 			}
 			if mo["load_balancer_inbound_nat_rules_ids"] != "" {
 				c.LoadBalancerInboundNatRules = strings.Split(mo["load_balancer_inbound_nat_rules_ids"], ",")
