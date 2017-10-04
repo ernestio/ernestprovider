@@ -97,6 +97,9 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.ResourceGroupName = parts[0]
 	ev.StorageAccountName = parts[1]
 	ev.ContainerAccessType = parts[3]
+	if ev.ContainerAccessType == "" {
+		ev.ContainerAccessType = "private"
+	}
 
 	properties := make(map[string]string, 0)
 	for k, v := range d.Get("properties").(map[string]interface{}) {
