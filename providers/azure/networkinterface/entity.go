@@ -172,7 +172,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	}
 
 	ev.InternalFQDN = d.Get("internal_fqdn").(string)
-	ev.EnableIPForwarding = d.Get("enable_ip_forwarding").(bool)
+	ev.EnableIPForwarding = *(d.Content["enable_ip_forwarding"].(*bool))
 
 	tags := d.Get("tags").(map[string]interface{})
 	ev.Tags = make(map[string]string, 0)
