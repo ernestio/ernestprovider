@@ -129,7 +129,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.ComponentID = "network_interface::" + ev.Name
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)
 	ev.Location = d.Get("location").(string)
-	ev.NetworkSecurityGroupID = d.Get("network_security_group_id").(string)
+	ev.NetworkSecurityGroupID = d.Content["network_security_group_id"].(string)
 	ev.MacAddress = d.Get("mac_address").(string)
 	ev.PrivateIPAddress = d.Get("private_ip_address").(string)
 	ev.VirtualMachineID = d.Get("virtual_machine_id").(string)
