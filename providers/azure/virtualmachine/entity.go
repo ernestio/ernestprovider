@@ -24,6 +24,7 @@ type Event struct {
 	Name              string `json:"name" validate:"required"`
 	ResourceGroupName string `json:"resource_group_name" validate:"required"`
 	Location          string `json:"location" validate:"required"`
+	Powered           bool   `json:"powered"`
 	Plan              struct {
 		Name      string `json:"name" structs:"name"`
 		Publisher string `json:"publisher" structs:"publisher"`
@@ -140,7 +141,7 @@ type UnattendedConfig struct {
 
 // New : Constructor
 func New(subject, cryptoKey string, body []byte, val *event.Validator) (event.Event, error) {
-	ev := &Event{CryptoKey: cryptoKey, Validator: val}
+	ev := &Event{CryptoKey: cryptoKey, Validator: val, Powered: true}
 	body = []byte(strings.Replace(string(body), `"_component":"virtual_machines"`, `"_component":"virtual_machine"`, 1))
 	if err := json.Unmarshal(body, &ev); err != nil {
 		err := fmt.Errorf("Error on input message : %s", err)
@@ -200,6 +201,7 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.ComponentID = "virtual_machine::" + ev.Name
 	ev.ResourceGroupName = d.Content["resource_group_name"].(string)
 	ev.Location = d.Content["location"].(string)
+	ev.Powered = d.Content["powered"].(bool)
 
 	if d.Content["plan"] != nil {
 		plan := d.Content["plan"].(*schema.Set).List()
@@ -443,6 +445,7 @@ func (ev *Event) EventToResourceData(d *schema.ResourceData) error {
 	fields["name"] = ev.Name
 	fields["resource_group_name"] = ev.ResourceGroupName
 	fields["location"] = ev.Location
+	fields["powered"] = ev.Powered
 	if ev.Plan.Name != "" && ev.Plan.Product != "" && ev.Plan.Publisher != "" {
 		fields["plan"] = []interface{}{structs.Map(ev.Plan)}
 	}
