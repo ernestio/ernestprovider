@@ -1,7 +1,5 @@
 # ERNEST PROVIDER
 
-# Please avoid using this software as it is under development
-
 master : [![CircleCI](https://circleci.com/gh/ernestio/ernestconnector/tree/master.svg?style=svg)](https://circleci.com/gh/ernestio/ernestprovider/tree/master) | develop : [![CircleCI](https://circleci.com/gh/ernestio/ernestprovider/tree/develop.svg?style=svg)](https://circleci.com/gh/ernestio/ernestprovider/tree/develop)
 
 This library aims to be a wrapper on top of provider go sdk, so it concentrates all provider specific logic on ernest.
