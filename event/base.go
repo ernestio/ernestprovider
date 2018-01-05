@@ -10,16 +10,16 @@ import (
 
 // Base : common Event method container
 type Base struct {
-	ProviderType  string `json:"_provider"`
-	ComponentType string `json:"_component"`
-	ComponentID   string `json:"_component_id"`
-	State         string `json:"_state"`
-	Action        string `json:"_action"`
-	Service       string `json:"service"`
-	ErrorMessage  string `json:"error,omitempty"`
-	Subject       string `json:"-"`
-	Body          []byte `json:"-"`
-	CryptoKey     string `json:"-"`
+	ProviderType  string `json:"_provider" diff:"-"`
+	ComponentType string `json:"_component" diff:"-"`
+	ComponentID   string `json:"_component_id" diff:"-"`
+	State         string `json:"_state" diff:"-"`
+	Action        string `json:"_action" diff:"-"`
+	Service       string `json:"service" diff:"-"`
+	ErrorMessage  string `json:"error,omitempty" diff:"-"`
+	Subject       string `json:"-" diff:"-"`
+	Body          []byte `json:"-" diff:"-"`
+	CryptoKey     string `json:"-" diff:"-"`
 }
 
 // Log : ...

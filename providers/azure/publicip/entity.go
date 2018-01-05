@@ -19,27 +19,27 @@ import (
 // Event : This is the Ernest representation of an azure publicip
 type Event struct {
 	event.Base
-	ID                        string            `json:"id"`
-	Name                      string            `json:"name" validate:"required"`
-	Location                  string            `json:"location" validate:"required"`
-	ResourceGroupName         string            `json:"resource_group_name" validate:"required"`
-	LoadBalancer              string            `json:"lb"`
-	PublicIPAddressAllocation string            `json:"public_ip_address_allocation" validate:"required"`
-	IdleTimeoutInMinutes      int               `json:"idle_timeout_in_minutes"`
-	DomainNameLabel           string            `json:"domain_name_label"`
-	ReverseFQDN               string            `json:"reverse_fqdn"`
-	FQDN                      string            `json:"fqdn"`
-	IP                        string            `json:"ip_address"`
-	Tags                      map[string]string `json:"tags"`
-	ClientID                  string            `json:"azure_client_id"`
-	ClientSecret              string            `json:"azure_client_secret"`
-	TenantID                  string            `json:"azure_tenant_id"`
-	SubscriptionID            string            `json:"azure_subscription_id"`
-	Environment               string            `json:"environment"`
-	ErrorMessage              string            `json:"error,omitempty"`
-	Components                []json.RawMessage `json:"components"`
-	CryptoKey                 string            `json:"-"`
-	Validator                 *event.Validator  `json:"-"`
+	ID                        string            `json:"id" diff:"-"`
+	Name                      string            `json:"name" validate:"required" diff:"-"`
+	Location                  string            `json:"location" validate:"required" diff:"location"`
+	ResourceGroupName         string            `json:"resource_group_name" validate:"required" diff:"-"`
+	LoadBalancer              string            `json:"lb" diff:"-"`
+	PublicIPAddressAllocation string            `json:"public_ip_address_allocation" validate:"required" diff:"-"`
+	IdleTimeoutInMinutes      int               `json:"idle_timeout_in_minutes" diff:"-"`
+	DomainNameLabel           string            `json:"domain_name_label" diff:"-"`
+	ReverseFQDN               string            `json:"reverse_fqdn" diff:"-"`
+	FQDN                      string            `json:"fqdn" diff:"-"`
+	IP                        string            `json:"ip_address" diff:"-"`
+	Tags                      map[string]string `json:"tags" diff:"-"`
+	ClientID                  string            `json:"azure_client_id" diff:"-"`
+	ClientSecret              string            `json:"azure_client_secret" diff:"-"`
+	TenantID                  string            `json:"azure_tenant_id" diff:"-"`
+	SubscriptionID            string            `json:"azure_subscription_id" diff:"-"`
+	Environment               string            `json:"environment" diff:"-"`
+	ErrorMessage              string            `json:"error,omitempty" diff:"-"`
+	Components                []json.RawMessage `json:"components" diff:"-"`
+	CryptoKey                 string            `json:"-" diff:"-"`
+	Validator                 *event.Validator  `json:"-" diff:"-"`
 }
 
 // New : Constructor

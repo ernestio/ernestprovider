@@ -19,34 +19,34 @@ import (
 // Event : This is the Ernest representation of an azure subnet
 type Event struct {
 	event.Base
-	ID                            string            `json:"id"`
-	Name                          string            `json:"name" validate:"required"`
-	Location                      string            `json:"location"`
-	ResourceGroupName             string            `json:"resource_group_name" validate:"required"`
-	ServerName                    string            `json:"server_name" validate:"required"`
-	CreateMode                    string            `json:"create_mode"`
-	SourceDatabaseID              string            `json:"source_database_id"`
-	RestorePointInTime            string            `json:"restore_point_in_time"`
-	Edition                       string            `json:"edition"`
-	Collation                     string            `json:"collation"`
-	MaxSizeBytes                  string            `json:"max_size_bytes"`
-	RequestedServiceObjectiveID   string            `json:"requested_service_objective_id"`
-	RequestedServiceObjectiveName string            `json:"requested_service_objective_name"`
-	SourceDatabaseDeletionData    string            `json:"source_database_deletion_date"`
-	ElasticPoolName               string            `json:"elastic_pool_name"`
-	Encryption                    string            `json:"encryption"`
-	CreationDate                  string            `json:"creation_date"`
-	DefaultSecondaryLocation      string            `json:"default_secondary_location"`
-	Tags                          map[string]string `json:"tags"`
-	ClientID                      string            `json:"azure_client_id"`
-	ClientSecret                  string            `json:"azure_client_secret"`
-	TenantID                      string            `json:"azure_tenant_id"`
-	SubscriptionID                string            `json:"azure_subscription_id"`
-	Environment                   string            `json:"environment"`
-	ErrorMessage                  string            `json:"error,omitempty"`
-	Components                    []json.RawMessage `json:"components"`
-	CryptoKey                     string            `json:"-"`
-	Validator                     *event.Validator  `json:"-"`
+	ID                            string            `json:"id" diff:"-"`
+	Name                          string            `json:"name" validate:"required" diff:"-"`
+	Location                      string            `json:"location" diff:"-"`
+	ResourceGroupName             string            `json:"resource_group_name" validate:"required" diff:"-"`
+	ServerName                    string            `json:"server_name" validate:"required" diff:"-"`
+	CreateMode                    string            `json:"create_mode" diff:"create_mode"`
+	SourceDatabaseID              string            `json:"source_database_id" diff:"source_database_id"`
+	RestorePointInTime            string            `json:"restore_point_in_time" diff:"restore_point_in_time"`
+	Edition                       string            `json:"edition" diff:"edition"`
+	Collation                     string            `json:"collation" diff:"collation"`
+	MaxSizeBytes                  string            `json:"max_size_bytes" diff:"max_size_bytes"`
+	RequestedServiceObjectiveID   string            `json:"requested_service_objective_id" diff:"requested_service_objective_id"`
+	RequestedServiceObjectiveName string            `json:"requested_service_objective_name" diff:"requested_service_objective_name"`
+	SourceDatabaseDeletionData    string            `json:"source_database_deletion_date" diff:"source_database_deletion_date"`
+	ElasticPoolName               string            `json:"elastic_pool_name" diff:"-"`
+	Encryption                    string            `json:"encryption" diff:"-"`
+	CreationDate                  string            `json:"creation_date" diff:"-"`
+	DefaultSecondaryLocation      string            `json:"default_secondary_location" diff:"-"`
+	Tags                          map[string]string `json:"tags" diff:"tags"`
+	ClientID                      string            `json:"azure_client_id" diff:"-"`
+	ClientSecret                  string            `json:"azure_client_secret" diff:"-"`
+	TenantID                      string            `json:"azure_tenant_id" diff:"-"`
+	SubscriptionID                string            `json:"azure_subscription_id" diff:"-"`
+	Environment                   string            `json:"environment" diff:"-"`
+	ErrorMessage                  string            `json:"error,omitempty" diff:"-"`
+	Components                    []json.RawMessage `json:"components" diff:"-"`
+	CryptoKey                     string            `json:"-" diff:"-"`
+	Validator                     *event.Validator  `json:"-" diff:"-"`
 }
 
 // New : Constructor
