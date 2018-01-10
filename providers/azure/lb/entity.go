@@ -39,7 +39,7 @@ type Event struct {
 
 // FrontendIPConfiguration ...
 type FrontendIPConfiguration struct {
-	Name                       string `json:"name" validate:"required" structs:"name"diff:"name,identifier"`
+	Name                       string `json:"name" validate:"required" structs:"name"diff:"name"`
 	Subnet                     string `json:"subnet" structs:"-" diff:"subnet"`
 	SubnetID                   string `json:"subnet_id" structs:"subnet_id" diff:"-"`
 	PrivateIPAddress           string `json:"private_ip_address" structs:"private_ip_address" diff:"private_ip_address"`

@@ -41,7 +41,7 @@ type Event struct {
 
 // Subnet ..
 type Subnet struct {
-	Name              string `json:"name" diff:"name,identifier"`
+	Name              string `json:"name" diff:"name"`
 	AddressPrefix     string `json:"address_prefix" diff:"address_prefix"`
 	SecurityGroupName string `json:"security_group_name" diff:"security_group_name"`
 	SecurityGroup     string `json:"security_group" diff:"security_group"`

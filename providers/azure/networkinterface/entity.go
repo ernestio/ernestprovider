@@ -53,7 +53,7 @@ type Event struct {
 
 // IPConfiguration : ...
 type IPConfiguration struct {
-	Name                              string   `json:"name" validate:"required" structs:"name" diff:"name,identifier"`
+	Name                              string   `json:"name" validate:"required" structs:"name" diff:"name"`
 	Subnet                            string   `json:"subnet" validate:"required" structs:"-" diff:"-"`
 	SubnetID                          string   `json:"subnet_id" validate:"required" structs:"subnet_id" diff:"-"`
 	PublicIPAddress                   string   `json:"public_ip_address" structs:"-" diff:"public_ip_address"`

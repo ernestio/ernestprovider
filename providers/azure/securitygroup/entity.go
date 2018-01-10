@@ -38,7 +38,7 @@ type Event struct {
 
 // SecurityRule ...
 type SecurityRule struct {
-	Name                     string `json:"name" diff:"name,identifier"`
+	Name                     string `json:"name" diff:"name"`
 	Description              string `json:"description" diff:"description"`
 	Protocol                 string `json:"protocol" diff:"protocol"`
 	SourcePort               string `json:"source_port_range" diff:"source_port_range"`
