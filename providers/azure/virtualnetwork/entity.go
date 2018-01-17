@@ -22,7 +22,7 @@ type Event struct {
 	event.Base
 	ID                string            `json:"id" diff:"-"`
 	Name              string            `json:"name" validate:"required" diff:"-"`
-	AddressSpace      []string          `json:"address_space" validate:"min=1" diff:"-"`
+	AddressSpace      []string          `json:"address_space" validate:"min=1" diff:"address_space,immutable"`
 	DNSServerNames    []string          `json:"dns_server_names" validate:"dive,ip" diff:"dns_server_names"`
 	Subnets           []Subnet          `json:"subnets" validate:"min=1" diff:"subnets"`
 	Location          string            `json:"location" diff:"-"`

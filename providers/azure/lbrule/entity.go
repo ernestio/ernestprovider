@@ -22,7 +22,7 @@ type Event struct {
 	ID                          string            `json:"id" diff:"-"`
 	Name                        string            `json:"name" validate:"required" diff:"-"`
 	ResourceGroupName           string            `json:"resource_group_name" validate:"required" diff:"-"`
-	Loadbalancer                string            `json:"loadbalancer" diff:"-"`
+	Loadbalancer                string            `json:"loadbalancer" diff:"loadbalancer,immutable"`
 	LoadbalancerID              string            `json:"loadbalancer_id" diff:"-"`
 	FrontendIPConfigurationName string            `json:"frontend_ip_configuration_name" diff:"frontend_ip_configuration_name"`
 	Protocol                    string            `json:"protocol" diff:"protocol"`

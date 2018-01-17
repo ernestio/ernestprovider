@@ -22,7 +22,7 @@ type Event struct {
 	ID                string            `json:"id" diff:"-"`
 	Name              string            `json:"name" validate:"required" diff:"-"`
 	ResourceGroupName string            `json:"resource_group_name" validate:"required" diff:"-"`
-	ServerName        string            `json:"server_name" validate:"required" diff:"-"`
+	ServerName        string            `json:"server_name" validate:"required" diff:"server_name,immutable"`
 	StartIPAddress    string            `json:"start_ip_address" validate:"required" diff:"start_ip_address"`
 	EndIPAddress      string            `json:"end_ip_address" validate:"required" diff:"end_ip_address"`
 	ClientID          string            `json:"azure_client_id" diff:"-"`

@@ -24,12 +24,12 @@ type Event struct {
 	Location                  string            `json:"location" validate:"required" diff:"location"`
 	ResourceGroupName         string            `json:"resource_group_name" validate:"required" diff:"-"`
 	LoadBalancer              string            `json:"lb" diff:"-"`
-	PublicIPAddressAllocation string            `json:"public_ip_address_allocation" validate:"required" diff:"-"`
-	IdleTimeoutInMinutes      int               `json:"idle_timeout_in_minutes" diff:"-"`
-	DomainNameLabel           string            `json:"domain_name_label" diff:"-"`
-	ReverseFQDN               string            `json:"reverse_fqdn" diff:"-"`
-	FQDN                      string            `json:"fqdn" diff:"-"`
-	IP                        string            `json:"ip_address" diff:"-"`
+	PublicIPAddressAllocation string            `json:"public_ip_address_allocation" validate:"required" diff:"public_ip_address_allocation,immutable"`
+	IdleTimeoutInMinutes      int               `json:"idle_timeout_in_minutes" diff:"idle_timeout_in_minutes,immutable"`
+	DomainNameLabel           string            `json:"domain_name_label" diff:"domain_name_label,immutable"`
+	ReverseFQDN               string            `json:"reverse_fqdn" diff:"reverse_fqdn,immutable"`
+	FQDN                      string            `json:"fqdn" diff:"fqdn,immutable"`
+	IP                        string            `json:"ip_address" diff:"ip_address,immutable"`
 	Tags                      map[string]string `json:"tags" diff:"-"`
 	ClientID                  string            `json:"azure_client_id" diff:"-"`
 	ClientSecret              string            `json:"azure_client_secret" diff:"-"`

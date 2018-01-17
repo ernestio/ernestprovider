@@ -23,8 +23,8 @@ type Event struct {
 	Name              string            `json:"name" validate:"required" diff:"-"`
 	ResourceGroupName string            `json:"resource_group_name" validate:"required" diff:"-"`
 	Location          string            `json:"location" validate:"required" diff:"-"`
-	GatewayAddress    string            `json:"gateway_address" validate:"required" diff:"-"`
-	AddressSpace      []string          `json:"address_space" diff:"-"`
+	GatewayAddress    string            `json:"gateway_address" validate:"required" diff:"gateway_address,immutable"`
+	AddressSpace      []string          `json:"address_space" diff:"address_space,immutable"`
 	ClientID          string            `json:"azure_client_id" diff:"-"`
 	ClientSecret      string            `json:"azure_client_secret" diff:"-"`
 	TenantID          string            `json:"azure_tenant_id" diff:"-"`

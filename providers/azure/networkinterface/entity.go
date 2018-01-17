@@ -30,14 +30,14 @@ type Event struct {
 	NetworkSecurityGroup   string            `json:"network_security_group" diff:"network_security_group"`
 	NetworkSecurityGroupID string            `json:"network_security_group_id" diff:"-"`
 	MacAddress             string            `json:"mac_address" diff:"-"`
-	PrivateIPAddress       string            `json:"private_ip_address" diff:"-"`
+	PrivateIPAddress       string            `json:"private_ip_address" diff:"private_ip_address,immutable"`
 	VirtualMachineID       string            `json:"virtual_machine_id" diff:"-"`
 	IPConfigurations       []IPConfiguration `json:"ip_configuration" structs:"ip_configuration" diff:"ip_configuration"` // validate:"min=1,dive"`
 	DNSServers             []string          `json:"dns_servers" validate:"dive,ip" diff:"dns_servers"`
 	InternalDNSNameLabel   string            `json:"internal_dns_name_label" diff:"internal_dns_name_label"`
 	AppliedDNSServers      []string          `json:"applied_dns_servers" diff:"-"`
 	InternalFQDN           string            `json:"internal_fqdn" diff:"-"`
-	EnableIPForwarding     bool              `json:"enable_ip_forwarding" diff:"-"`
+	EnableIPForwarding     bool              `json:"enable_ip_forwarding" diff:"enable_ip_forwarding,immutable"`
 	Tags                   map[string]string `json:"tags" diff:"tags"`
 	ClientID               string            `json:"azure_client_id" diff:"-"`
 	ClientSecret           string            `json:"azure_client_secret" diff:"-"`
