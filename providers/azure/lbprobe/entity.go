@@ -19,25 +19,25 @@ import (
 // Event : This is the Ernest representation of an azure lb
 type Event struct {
 	event.Base
-	ID                string            `json:"id"`
-	Name              string            `json:"name" validate:"required"`
-	ResourceGroupName string            `json:"resource_group_name" validate:"required"`
-	Loadbalancer      string            `json:"loadbalancer"`
-	LoadbalancerID    string            `json:"loadbalancer_id"`
-	Protocol          string            `json:"protocol"`
-	Port              int               `json:"port"`
-	RequestPath       string            `json:"request_path"`
-	IntervalInSeconds int               `json:"interval_in_seconds"`
-	NumberOfProbes    int               `json:"number_of_probes"`
-	ClientID          string            `json:"azure_client_id"`
-	ClientSecret      string            `json:"azure_client_secret"`
-	TenantID          string            `json:"azure_tenant_id"`
-	SubscriptionID    string            `json:"azure_subscription_id"`
-	Environment       string            `json:"environment"`
-	ErrorMessage      string            `json:"error,omitempty"`
-	Components        []json.RawMessage `json:"components"`
-	CryptoKey         string            `json:"-"`
-	Validator         *event.Validator  `json:"-"`
+	ID                string            `json:"id" diff:"-"`
+	Name              string            `json:"name" validate:"required" diff:"-"`
+	ResourceGroupName string            `json:"resource_group_name" validate:"required" diff:"-"`
+	Loadbalancer      string            `json:"loadbalancer" diff:"-"`
+	LoadbalancerID    string            `json:"loadbalancer_id" diff:"-"`
+	Protocol          string            `json:"protocol" diff:"protocol"`
+	Port              int               `json:"port" diff:"port"`
+	RequestPath       string            `json:"request_path" diff:"request_path"`
+	IntervalInSeconds int               `json:"interval_in_seconds" diff:"interval_in_seconds"`
+	NumberOfProbes    int               `json:"number_of_probes" diff:"number_of_probes"`
+	ClientID          string            `json:"azure_client_id" diff:"-"`
+	ClientSecret      string            `json:"azure_client_secret" diff:"-"`
+	TenantID          string            `json:"azure_tenant_id" diff:"-"`
+	SubscriptionID    string            `json:"azure_subscription_id" diff:"-"`
+	Environment       string            `json:"environment" diff:"-"`
+	ErrorMessage      string            `json:"error,omitempty" diff:"-"`
+	Components        []json.RawMessage `json:"components" diff:"-"`
+	CryptoKey         string            `json:"-" diff:"-"`
+	Validator         *event.Validator  `json:"-" diff:"-"`
 }
 
 // New : Constructor

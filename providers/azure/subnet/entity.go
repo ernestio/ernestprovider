@@ -19,24 +19,24 @@ import (
 // Event : This is the Ernest representation of an azure subnet
 type Event struct {
 	event.Base
-	ID                     string            `json:"id"`
-	Name                   string            `json:"name" validate:"required"`
-	ResourceGroupName      string            `json:"resource_group_name" validate:"required"`
-	VirtualNetworkName     string            `json:"virtual_network_name" validate:"required"`
-	AddressPrefix          string            `json:"address_prefix"  validate:"required"`
-	NetworkSecurityGroup   string            `json:"network_security_group"`
-	NetworkSecurityGroupID string            `json:"network_security_group_id"`
-	RouteTable             string            `json:"route_table_id"`
-	IPConfigurations       []string          `json:"ip_configurations"`
-	ClientID               string            `json:"azure_client_id"`
-	ClientSecret           string            `json:"azure_client_secret"`
-	TenantID               string            `json:"azure_tenant_id"`
-	SubscriptionID         string            `json:"azure_subscription_id"`
-	Environment            string            `json:"environment"`
-	ErrorMessage           string            `json:"error,omitempty"`
-	Components             []json.RawMessage `json:"components"`
-	CryptoKey              string            `json:"-"`
-	Validator              *event.Validator  `json:"-"`
+	ID                     string            `json:"id" diff:"-"`
+	Name                   string            `json:"name" validate:"required" diff:"-"`
+	ResourceGroupName      string            `json:"resource_group_name" validate:"required" diff:"-"`
+	VirtualNetworkName     string            `json:"virtual_network_name" validate:"required" diff:"virtual_network_name,immutable"`
+	AddressPrefix          string            `json:"address_prefix"  validate:"required" diff:"address_prefix,immutable"`
+	NetworkSecurityGroup   string            `json:"network_security_group" diff:"network_security_group"`
+	NetworkSecurityGroupID string            `json:"network_security_group_id" diff:"-"`
+	RouteTable             string            `json:"route_table_id" diff:"-"`
+	IPConfigurations       []string          `json:"ip_configurations" diff:"ip_configurations,immutable"`
+	ClientID               string            `json:"azure_client_id" diff:"-"`
+	ClientSecret           string            `json:"azure_client_secret" diff:"-"`
+	TenantID               string            `json:"azure_tenant_id" diff:"-"`
+	SubscriptionID         string            `json:"azure_subscription_id" diff:"-"`
+	Environment            string            `json:"environment" diff:"-"`
+	ErrorMessage           string            `json:"error,omitempty" diff:"-"`
+	Components             []json.RawMessage `json:"components" diff:"-"`
+	CryptoKey              string            `json:"-" diff:"-"`
+	Validator              *event.Validator  `json:"-" diff:"-"`
 }
 
 // New : Constructor

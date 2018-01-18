@@ -7,12 +7,12 @@ package event
 // Collection : collection of events
 type Collection struct {
 	*Base
-	Service        string  `json:"service"`
-	ClientID       string  `json:"azure_client_id"`
-	ClientSecret   string  `json:"azure_client_secret"`
-	TenantID       string  `json:"azure_tenant_id"`
-	SubscriptionID string  `json:"azure_subscription_id"`
-	Environment    string  `json:"environment"`
-	ResourceGroup  string  `json:"resource_group"`
-	Resources      []Event `json:"components"`
+	Service        string  `json:"service" diff:"-"`
+	ClientID       string  `json:"azure_client_id" diff:"-"`
+	ClientSecret   string  `json:"azure_client_secret" diff:"-"`
+	TenantID       string  `json:"azure_tenant_id" diff:"-"`
+	SubscriptionID string  `json:"azure_subscription_id" diff:"-"`
+	Environment    string  `json:"environment" diff:"-"`
+	ResourceGroup  string  `json:"resource_group" diff:"-"`
+	Resources      []Event `json:"components" diff:"-"`
 }

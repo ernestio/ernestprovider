@@ -20,31 +20,31 @@ import (
 //         network
 type Event struct {
 	event.Base
-	ID                string            `json:"id"`
-	Name              string            `json:"name" validate:"required"`
-	AddressSpace      []string          `json:"address_space" validate:"min=1"`
-	DNSServerNames    []string          `json:"dns_server_names" validate:"dive,ip"`
-	Subnets           []Subnet          `json:"subnets" validate:"min=1"`
-	Location          string            `json:"location"`
-	ResourceGroupName string            `json:"resource_group_name"`
-	Tags              map[string]string `json:"tags"`
-	ClientID          string            `json:"azure_client_id"`
-	ClientSecret      string            `json:"azure_client_secret"`
-	TenantID          string            `json:"azure_tenant_id"`
-	SubscriptionID    string            `json:"azure_subscription_id"`
-	Environment       string            `json:"environment"`
-	ErrorMessage      string            `json:"error,omitempty"`
-	Components        []json.RawMessage `json:"components"`
-	CryptoKey         string            `json:"-"`
-	Validator         *event.Validator  `json:"-"`
+	ID                string            `json:"id" diff:"-"`
+	Name              string            `json:"name" validate:"required" diff:"-"`
+	AddressSpace      []string          `json:"address_space" validate:"min=1" diff:"address_space,immutable"`
+	DNSServerNames    []string          `json:"dns_server_names" validate:"dive,ip" diff:"dns_server_names"`
+	Subnets           []Subnet          `json:"subnets" validate:"min=1" diff:"subnets"`
+	Location          string            `json:"location" diff:"-"`
+	ResourceGroupName string            `json:"resource_group_name" diff:"-"`
+	Tags              map[string]string `json:"tags" diff:"tags"`
+	ClientID          string            `json:"azure_client_id" diff:"-"`
+	ClientSecret      string            `json:"azure_client_secret" diff:"-"`
+	TenantID          string            `json:"azure_tenant_id" diff:"-"`
+	SubscriptionID    string            `json:"azure_subscription_id" diff:"-"`
+	Environment       string            `json:"environment" diff:"-"`
+	ErrorMessage      string            `json:"error,omitempty" diff:"-"`
+	Components        []json.RawMessage `json:"components" diff:"-"`
+	CryptoKey         string            `json:"-" diff:"-"`
+	Validator         *event.Validator  `json:"-" diff:"-"`
 }
 
 // Subnet ..
 type Subnet struct {
-	Name              string `json:"name"`
-	AddressPrefix     string `json:"address_prefix"`
-	SecurityGroupName string `json:"security_group_name"`
-	SecurityGroup     string `json:"security_group"`
+	Name              string `json:"name" diff:"name"`
+	AddressPrefix     string `json:"address_prefix" diff:"address_prefix"`
+	SecurityGroupName string `json:"security_group_name" diff:"security_group_name"`
+	SecurityGroup     string `json:"security_group" diff:"security_group"`
 }
 
 // New : Constructor

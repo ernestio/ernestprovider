@@ -20,20 +20,20 @@ import (
 type Event struct {
 	event.Base
 	ID                string            `json:"id"`
-	Name              string            `json:"name" validate:"required"`
-	ResourceGroupName string            `json:"resource_group_name" validate:"required"`
-	Location          string            `json:"location" validate:"required"`
-	GatewayAddress    string            `json:"gateway_address" validate:"required"`
-	AddressSpace      []string          `json:"address_space"`
-	ClientID          string            `json:"azure_client_id"`
-	ClientSecret      string            `json:"azure_client_secret"`
-	TenantID          string            `json:"azure_tenant_id"`
-	SubscriptionID    string            `json:"azure_subscription_id"`
-	Environment       string            `json:"environment"`
-	ErrorMessage      string            `json:"error,omitempty"`
-	Components        []json.RawMessage `json:"components"`
-	CryptoKey         string            `json:"-"`
-	Validator         *event.Validator  `json:"-"`
+	Name              string            `json:"name" validate:"required" diff:"-"`
+	ResourceGroupName string            `json:"resource_group_name" validate:"required" diff:"-"`
+	Location          string            `json:"location" validate:"required" diff:"-"`
+	GatewayAddress    string            `json:"gateway_address" validate:"required" diff:"gateway_address,immutable"`
+	AddressSpace      []string          `json:"address_space" diff:"address_space,immutable"`
+	ClientID          string            `json:"azure_client_id" diff:"-"`
+	ClientSecret      string            `json:"azure_client_secret" diff:"-"`
+	TenantID          string            `json:"azure_tenant_id" diff:"-"`
+	SubscriptionID    string            `json:"azure_subscription_id" diff:"-"`
+	Environment       string            `json:"environment" diff:"-"`
+	ErrorMessage      string            `json:"error,omitempty" diff:"-"`
+	Components        []json.RawMessage `json:"components" diff:"-"`
+	CryptoKey         string            `json:"-" diff:"-"`
+	Validator         *event.Validator  `json:"-" diff:"-"`
 }
 
 // New : Constructor
