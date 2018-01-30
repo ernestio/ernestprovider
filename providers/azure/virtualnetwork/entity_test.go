@@ -6,14 +6,15 @@ import (
 	"testing"
 
 	"github.com/ernestio/ernestprovider/event"
+	types "github.com/ernestio/ernestprovider/providers/azure/types/virtualnetwork"
 )
 
 func validEvent() Event {
-	var subnets []Subnet
+	var subnets []types.Subnet
 	var dns []string
 	var address []string
 
-	subnets = append(subnets, Subnet{
+	subnets = append(subnets, types.Subnet{
 		Name:          "subnet",
 		AddressPrefix: "10.2.0.1/24",
 	})
@@ -22,10 +23,12 @@ func validEvent() Event {
 	dns = append(dns, "10.2.0.1/24")
 
 	return Event{
-		Name:           "supu",
-		AddressSpace:   address,
-		DNSServerNames: dns,
-		Subnets:        subnets,
+		Event: types.Event{
+			Name:           "supu",
+			AddressSpace:   address,
+			DNSServerNames: dns,
+			Subnets:        subnets,
+		},
 	}
 }
 
@@ -62,7 +65,7 @@ func TestEmptyAddressSpace(t *testing.T) {
 
 func TestEmptySubnets(t *testing.T) {
 	ev := validEvent()
-	ev.Subnets = []Subnet{}
+	ev.Subnets = []types.Subnet{}
 	val := event.NewValidator()
 	err := val.Validate(ev)
 
