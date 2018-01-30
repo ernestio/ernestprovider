@@ -4,7 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ernestio/ernestprovider/event"
+	types "github.com/ernestio/ernestprovider/types/azure/subnet"
+	"github.com/ernestio/ernestprovider/validator"
 )
 
 func validEvent() Event {
@@ -13,20 +14,22 @@ func validEvent() Event {
 	configs = append(configs, "B")
 
 	return Event{
-		Name:                 "supu",
-		ResourceGroupName:    "group",
-		VirtualNetworkName:   "vn_name",
-		AddressPrefix:        "prefix",
-		NetworkSecurityGroup: "sec",
-		RouteTable:           "route",
-		IPConfigurations:     configs,
+		Event: types.Event{
+			Name:                 "supu",
+			ResourceGroupName:    "group",
+			VirtualNetworkName:   "vn_name",
+			AddressPrefix:        "prefix",
+			NetworkSecurityGroup: "sec",
+			RouteTable:           "route",
+			IPConfigurations:     configs,
+		},
 	}
 }
 
 func TestRequiredName(t *testing.T) {
 	ev := validEvent()
 	ev.Name = ""
-	val := event.NewValidator()
+	val := validator.NewValidator()
 	err := val.Validate(ev)
 
 	if err == nil {
@@ -41,7 +44,7 @@ func TestRequiredName(t *testing.T) {
 func TestRequiredResourceGroupName(t *testing.T) {
 	ev := validEvent()
 	ev.ResourceGroupName = ""
-	val := event.NewValidator()
+	val := validator.NewValidator()
 	err := val.Validate(ev)
 
 	if err == nil {
@@ -56,7 +59,7 @@ func TestRequiredResourceGroupName(t *testing.T) {
 func TestRequiredVirtualNetworkName(t *testing.T) {
 	ev := validEvent()
 	ev.VirtualNetworkName = ""
-	val := event.NewValidator()
+	val := validator.NewValidator()
 	err := val.Validate(ev)
 
 	if err == nil {
@@ -71,7 +74,7 @@ func TestRequiredVirtualNetworkName(t *testing.T) {
 func TestRequiredAddressPrefix(t *testing.T) {
 	ev := validEvent()
 	ev.AddressPrefix = ""
-	val := event.NewValidator()
+	val := validator.NewValidator()
 	err := val.Validate(ev)
 
 	if err == nil {
@@ -86,7 +89,7 @@ func TestRequiredAddressPrefix(t *testing.T) {
 func TestHappyPath(t *testing.T) {
 	ev := validEvent()
 
-	val := event.NewValidator()
+	val := validator.NewValidator()
 	err := val.Validate(ev)
 	if err != nil {
 		println(err.Error())

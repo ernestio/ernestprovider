@@ -14,134 +14,24 @@ import (
 	aes "github.com/ernestio/crypto/aes"
 	"github.com/ernestio/ernestprovider/event"
 	"github.com/ernestio/ernestprovider/providers/azure"
+	types "github.com/ernestio/ernestprovider/types/azure/virtualmachine"
+	"github.com/ernestio/ernestprovider/validator"
 	"github.com/fatih/structs"
 )
 
 // Event : This is the Ernest representation of an azure networkinterface
 type Event struct {
-	event.Base
-	ID                string `json:"id" diff:"-"`
-	Name              string `json:"name" validate:"required" diff:"-"`
-	ResourceGroupName string `json:"resource_group_name" validate:"required" diff:"-"`
-	Location          string `json:"location" validate:"required" diff:"-"`
-	Powered           bool   `json:"powered" diff:"powered"`
-	Plan              struct {
-		Name      string `json:"name" structs:"name" diff:"-"`
-		Publisher string `json:"publisher" structs:"publisher" diff:"-"`
-		Product   string `json:"product" structs:"product" diff:"-"`
-	} `json:"plan" structs:"plan" diff:"-"`
-	AvailabilitySet       string `json:"availability_set" diff:"-"`
-	AvailabilitySetID     string `json:"availability_set_id" diff:"-"`
-	LicenseType           string `json:"license_type" diff:"-"`
-	VMSize                string `json:"vm_size" diff:"vm_size"`
-	StorageImageReference struct {
-		Publisher string `json:"publisher" structs:"publisher" diff:"-"`
-		Offer     string `json:"offer" structs:"offer" diff:"-"`
-		Sku       string `json:"sku" structs:"sku" diff:"-"`
-		Version   string `json:"version" structs:"version" diff:"-"`
-	} `json:"storage_image_reference" validate:"dive" diff:"-"`
-	StorageOSDisk struct {
-		Name               string `json:"name" structs:"name" diff:"-"`
-		VhdURI             string `json:"vhd_uri" structs:"vhd_uri" diff:"-"`
-		StorageAccount     string `json:"storage_account" structs:"-" diff:"-"`
-		StorageContainer   string `json:"storage_container" structs:"-" diff:"-"`
-		StorageAccountType string `json:"managed_disk_type" structs:"managed_disk_type" diff:"-"`
-		ManagedDisk        string `json:"managed_disk" structs:"-" diff:"-"`
-		ManagedDiskID      string `json:"managed_disk_id" structs:"managed_disk_id" diff:"-"`
-		CreateOption       string `json:"create_option" structs:"create_option" diff:"-"`
-		OSType             string `json:"os_type" structs:"os_type" diff:"-"`
-		ImageURI           string `json:"image_uri" structs:"image_uri" diff:"-"`
-		Caching            string `json:"caching" structs:"caching" diff:"-"`
-	} `json:"storage_os_disk" validate:"dive" diff:"-"`
-	DeleteOSDiskOnTermination bool `json:"delete_os_disk_on_termination" diff:"-"`
-	StorageDataDisk           struct {
-		Name               string `json:"name" structs:"name" diff:"-"`
-		VhdURI             string `json:"vhd_uri" structs:"vhd_uri" diff:"-"`
-		StorageAccount     string `json:"storage_account" structs:"-" diff:"-"`
-		StorageAccountType string `json:"managed_disk_type" structs:"managed_disk_type" diff:"-"`
-		StorageContainer   string `json:"storage_container" structs:"-" diff:"-"`
-		ManagedDisk        string `json:"managed_disk" structs:"-" diff:"-"`
-		ManagedDiskID      string `json:"managed_disk_id" structs:"managed_disk_id" diff:"-"`
-		CreateOption       string `json:"create_option" structs:"create_option" diff:"-"`
-		Size               *int32 `json:"disk_size_gb" structs:"disk_size_gb" diff:"size"`
-		Lun                *int32 `json:"lun" structs:"lun" diff:"-"`
-	} `json:"storage_data_disk" diff:"storage_data_disk"`
-	DeleteDataDisksOnTermination bool             `json:"delete_data_disks_on_termination" diff:"-"`
-	BootDiagnostics              []BootDiagnostic `json:"boot_diagnostics,omitempty" diff:"-"`
-	OSProfile                    struct {
-		ComputerName  string `json:"computer_name" structs:"computer_name" diff:"-"`
-		AdminUsername string `json:"admin_username" structs:"admin_username" diff:"-"`
-		AdminPassword string `json:"admin_password" structs:"admin_password" diff:"-"`
-		CustomData    string `json:"custom_data" structs:"custom_data" diff:"-"`
-	} `json:"os_profile" diff:"-"`
-	OSProfileWindowsConfig *OSProfileWindowsConfig `json:"os_profile_windows_config,omitempty" diff:"-"`
-	OSProfileLinuxConfig   struct {
-		DisablePasswordAuthentication *bool    `json:"disable_password_authentication" structs:"disable_password_authentication" diff:"-"`
-		SSHKeys                       []SSHKey `json:"ssh_keys" structs:"ssh_keys" diff:"-"`
-	} `json:"os_profile_linux_config" structs:"os_profile_linux_config" diff:"-"`
-	OSProfileSecrets    []secret          `json:"os_profile_secrets" diff:"-"`
-	NetworkInterfaces   []string          `json:"network_interfaces" diff:"network_interfaces"`
-	NetworkInterfaceIDs []string          `json:"network_interface_ids" diff:"-"`
-	Tags                map[string]string `json:"tags" diff:"tags"`
-	ClientID            string            `json:"azure_client_id" diff:"-"`
-	ClientSecret        string            `json:"azure_client_secret" diff:"-"`
-	TenantID            string            `json:"azure_tenant_id" diff:"-"`
-	SubscriptionID      string            `json:"azure_subscription_id" diff:"-"`
-	Environment         string            `json:"environment" diff:"-"`
-	ErrorMessage        string            `json:"error,omitempty" diff:"-"`
-	Components          []json.RawMessage `json:"components" diff:"-"`
-	CryptoKey           string            `json:"-" diff:"-"`
-	Validator           *event.Validator  `json:"-" diff:"-"`
-	GenericEvent        event.Event       `json:"-" validate:"-" diff:"-"`
-}
-
-// OSProfileWindowsConfig ...
-type OSProfileWindowsConfig struct {
-	ProvisionVMAgent         bool               `json:"provision_vm_agent" structs:"provision_vm_agent" diff:"-"`
-	EnableAutomaticUpgrades  bool               `json:"enable_automatic_upgrades" structs:"enable_automatic_upgrades" diff:"-"`
-	WinRm                    []WinRM            `json:"winrm,omitempty" structs:"winrm,omitempty" diff:"-"`
-	AdditionalUnattendConfig []UnattendedConfig `json:"additional_unattend_config,omitempty" structs:"additional_unattend_config,omitempty" diff:"-"`
-}
-
-type secret struct {
-	SourceVaultID           string             `json:"source_vault_id" structs:"source_vault_id" diff:"-"`
-	SourceVaultCertificates []vaultCertificate `json:"vault_certificates" structs:"vault_certificates" diff:"-"`
-}
-
-type vaultCertificate struct {
-	CertificateURL   string `json:"certificate_url" structs:"certificate_url" diff:"-"`
-	CertificateStore string `json:"certificate_store" structs:"certificate_store" diff:"-"`
-}
-
-// WinRM ...
-type WinRM struct {
-	Protocol       string `json:"protocol" structs:"protocol" diff:"-"`
-	CertificateURL string `json:"certificate_url" structs:"certification_url,omitempty" diff:"-"`
-}
-
-// SSHKey ...
-type SSHKey struct {
-	Path    string `json:"path" structs:"path" diff:"-"`
-	KeyData string `json:"key_data" structs:"key_data" diff:"-"`
-}
-
-// BootDiagnostic ...
-type BootDiagnostic struct {
-	Enabled bool   `json:"enabled" structs:"enabled" diff:"-"`
-	URI     string `json:"storage_uri" structs:"storage_uri" diff:"-"`
-}
-
-// UnattendedConfig ...
-type UnattendedConfig struct {
-	Pass        string `json:"pass" structs:"pass,omitempty" diff:"-"`
-	Component   string `json:"component" structs:"component,omitempty" diff:"-"`
-	SettingName string `json:"setting_name" structs:"setting_name,omitempty" diff:"-"`
-	Content     string `json:"content" structs:"content,omitempty" diff:"-"`
+	types.Event
+	ErrorMessage string               `json:"error,omitempty" diff:"-"`
+	CryptoKey    string               `json:"-" diff:"-"`
+	Validator    *validator.Validator `json:"-" diff:"-"`
+	GenericEvent event.Event          `json:"-" validate:"-" diff:"-"`
 }
 
 // New : Constructor
-func New(subject, cryptoKey string, body []byte, val *event.Validator) (event.Event, error) {
-	ev := &Event{CryptoKey: cryptoKey, Validator: val, Powered: true}
+func New(subject, cryptoKey string, body []byte, val *validator.Validator) (event.Event, error) {
+	ev := &Event{CryptoKey: cryptoKey, Validator: val}
+	ev.Powered = true
 	body = []byte(strings.Replace(string(body), `"_component":"virtual_machines"`, `"_component":"virtual_machine"`, 1))
 	if err := json.Unmarshal(body, &ev); err != nil {
 		err := fmt.Errorf("Error on input message : %s", err)
@@ -286,11 +176,11 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 		}
 	}
 
-	bootDiagnostics := make([]BootDiagnostic, 0)
+	bootDiagnostics := make([]types.BootDiagnostic, 0)
 	if d.Content["boot_diagnostics"] != nil {
 		for _, v := range d.Content["boot_diagnostics"].([]interface{}) {
 			x := v.(map[string]interface{})
-			bootDiagnostics = append(bootDiagnostics, BootDiagnostic{
+			bootDiagnostics = append(bootDiagnostics, types.BootDiagnostic{
 				Enabled: x["enabled"].(bool),
 				URI:     x["storage_uri"].(string),
 			})
@@ -322,15 +212,15 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 		if len(winList) > 0 {
 			win := winList[0].(map[string]interface{})
 			if win["provision_vm_agent"].(bool) != false && win["enable_automatic_upgrades"].(bool) != false {
-				ev.OSProfileWindowsConfig = &OSProfileWindowsConfig{}
+				ev.OSProfileWindowsConfig = &types.OSProfileWindowsConfig{}
 
 				ev.OSProfileWindowsConfig.ProvisionVMAgent = win["provision_vm_agent"].(bool)
 				ev.OSProfileWindowsConfig.EnableAutomaticUpgrades = win["enable_automatic_upgrades"].(bool)
 
 				if win["winrm"] != nil {
-					rms := []WinRM{}
+					rms := []types.WinRM{}
 					for _, v := range win["winrm"].([]map[string]interface{}) {
-						winrm := WinRM{}
+						winrm := types.WinRM{}
 						if val, ok := v["protocol"]; ok {
 							winrm.Protocol = fmt.Sprintf("%s", val)
 						}
@@ -362,10 +252,10 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 			lin := linList[0].(map[string]interface{})
 			x := lin["disable_password_authentication"].(bool)
 			ev.OSProfileLinuxConfig.DisablePasswordAuthentication = &x
-			ev.OSProfileLinuxConfig.SSHKeys = make([]SSHKey, 0)
+			ev.OSProfileLinuxConfig.SSHKeys = make([]types.SSHKey, 0)
 			if lin["ssh_keys"] != nil {
 				for _, v := range lin["ssh_keys"].([]map[string]interface{}) {
-					ev.OSProfileLinuxConfig.SSHKeys = append(ev.OSProfileLinuxConfig.SSHKeys, SSHKey{
+					ev.OSProfileLinuxConfig.SSHKeys = append(ev.OSProfileLinuxConfig.SSHKeys, types.SSHKey{
 						Path:    v["path"].(string),
 						KeyData: v["key_data"].(string),
 					})
@@ -374,17 +264,17 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 		}
 	}
 
-	ev.OSProfileSecrets = make([]secret, 0)
+	ev.OSProfileSecrets = make([]types.Secret, 0)
 	for _, v := range d.Content["os_profile_secrets"].([]map[string]interface{}) {
-		certs := []vaultCertificate{}
+		certs := []types.VaultCertificate{}
 		for _, wal := range v["vault_certificates"].(*schema.Set).List() {
 			w := wal.(map[string]interface{})
-			certs = append(certs, vaultCertificate{
+			certs = append(certs, types.VaultCertificate{
 				CertificateURL:   w["certificate_url"].(string),
 				CertificateStore: w["certificate_store"].(string),
 			})
 		}
-		ev.OSProfileSecrets = append(ev.OSProfileSecrets, secret{
+		ev.OSProfileSecrets = append(ev.OSProfileSecrets, types.Secret{
 			SourceVaultID:           v["source_vault_id"].(string),
 			SourceVaultCertificates: certs,
 		})

@@ -14,44 +14,20 @@ import (
 	aes "github.com/ernestio/crypto/aes"
 	"github.com/ernestio/ernestprovider/event"
 	"github.com/ernestio/ernestprovider/providers/azure"
+	types "github.com/ernestio/ernestprovider/types/azure/securitygroup"
+	"github.com/ernestio/ernestprovider/validator"
 )
 
 // Event : This is the Ernest representation of an azure subnet
 type Event struct {
-	event.Base
-	ID                string            `json:"id" diff:"-"`
-	Name              string            `json:"name" validate:"required" diff:"-"`
-	Location          string            `json:"location" validate:"required" diff:"-"`
-	ResourceGroupName string            `json:"resource_group_name" validate:"required" diff:"-"`
-	SecurityRules     []SecurityRule    `json:"security_rules" diff:"security_rules"`
-	Tags              map[string]string `json:"tags" diff:"tags"`
-	ClientID          string            `json:"azure_client_id" diff:"-"`
-	ClientSecret      string            `json:"azure_client_secret" diff:"-"`
-	TenantID          string            `json:"azure_tenant_id" diff:"-"`
-	SubscriptionID    string            `json:"azure_subscription_id" diff:"-"`
-	Environment       string            `json:"environment" diff:"-"`
-	ErrorMessage      string            `json:"error,omitempty" diff:"-"`
-	Components        []json.RawMessage `json:"components" diff:"-"`
-	CryptoKey         string            `json:"-" diff:"-"`
-	Validator         *event.Validator  `json:"-" diff:"-"`
-}
-
-// SecurityRule ...
-type SecurityRule struct {
-	Name                     string `json:"name" diff:"name"`
-	Description              string `json:"description" diff:"description"`
-	Protocol                 string `json:"protocol" diff:"protocol"`
-	SourcePort               string `json:"source_port_range" diff:"source_port_range"`
-	DestinationPortRange     string `json:"destination_port_range" diff:"destination_port_range"`
-	SourceAddressPrefix      string `json:"source_address_prefix" diff:"source_address_prefix"`
-	DestinationAddressPrefix string `json:"destination_address_prefix" diff:"destination_address_prefix"`
-	Access                   string `json:"access" diff:"access"`
-	Priority                 int    `json:"priority" diff:"priority"`
-	Direction                string `json:"direction" diff:"direction"`
+	types.Event
+	ErrorMessage string               `json:"error,omitempty" diff:"-"`
+	CryptoKey    string               `json:"-" diff:"-"`
+	Validator    *validator.Validator `json:"-" diff:"-"`
 }
 
 // New : Constructor
-func New(subject, cryptoKey string, body []byte, val *event.Validator) (event.Event, error) {
+func New(subject, cryptoKey string, body []byte, val *validator.Validator) (event.Event, error) {
 	var ev event.Resource
 	ev = &Event{CryptoKey: cryptoKey, Validator: val}
 	body = []byte(strings.Replace(string(body), `"_component":"security_groups"`, `"_component":"security_group"`, 1))
@@ -107,10 +83,10 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.ComponentID = "security_group::" + ev.Name
 	ev.Location = d.Get("location").(string)
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)
-	rules := []SecurityRule{}
+	rules := []types.SecurityRule{}
 	for _, sec := range d.Get("security_rule").(*schema.Set).List() {
 		sg := sec.(map[string]interface{})
-		rules = append(rules, SecurityRule{
+		rules = append(rules, types.SecurityRule{
 			Name:                     sg["name"].(string),
 			Description:              sg["description"].(string),
 			Protocol:                 sg["protocol"].(string),

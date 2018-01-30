@@ -14,20 +14,21 @@ import (
 	aes "github.com/ernestio/crypto/aes"
 	"github.com/ernestio/ernestprovider/event"
 	"github.com/ernestio/ernestprovider/providers/azure"
-	types "github.com/ernestio/ernestprovider/providers/azure/types/virtualnetwork"
+	types "github.com/ernestio/ernestprovider/types/azure/virtualnetwork"
+	"github.com/ernestio/ernestprovider/validator"
 )
 
 // Event : This is the Ernest representation of an azure virtual
 //         network
 type Event struct {
 	types.Event
-	ErrorMessage string           `json:"error,omitempty" diff:"-"`
-	CryptoKey    string           `json:"-" diff:"-"`
-	Validator    *event.Validator `json:"-" diff:"-"`
+	ErrorMessage string               `json:"error,omitempty" diff:"-"`
+	CryptoKey    string               `json:"-" diff:"-"`
+	Validator    *validator.Validator `json:"-" diff:"-"`
 }
 
 // New : Constructor
-func New(subject, cryptoKey string, body []byte, val *event.Validator) (event.Event, error) {
+func New(subject, cryptoKey string, body []byte, val *validator.Validator) (event.Event, error) {
 	var ev event.Resource
 	ev = &Event{CryptoKey: cryptoKey, Validator: val}
 	body = []byte(strings.Replace(string(body), `"_component":"virtual_networks"`, `"_component":"virtual_network"`, 1))

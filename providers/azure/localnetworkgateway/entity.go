@@ -14,30 +14,20 @@ import (
 	aes "github.com/ernestio/crypto/aes"
 	"github.com/ernestio/ernestprovider/event"
 	"github.com/ernestio/ernestprovider/providers/azure"
+	types "github.com/ernestio/ernestprovider/types/azure/localnetworkgateway"
+	"github.com/ernestio/ernestprovider/validator"
 )
 
 // Event : This is the Ernest representation of an azure subnet
 type Event struct {
-	event.Base
-	ID                string            `json:"id"`
-	Name              string            `json:"name" validate:"required" diff:"-"`
-	ResourceGroupName string            `json:"resource_group_name" validate:"required" diff:"-"`
-	Location          string            `json:"location" validate:"required" diff:"-"`
-	GatewayAddress    string            `json:"gateway_address" validate:"required" diff:"gateway_address,immutable"`
-	AddressSpace      []string          `json:"address_space" diff:"address_space,immutable"`
-	ClientID          string            `json:"azure_client_id" diff:"-"`
-	ClientSecret      string            `json:"azure_client_secret" diff:"-"`
-	TenantID          string            `json:"azure_tenant_id" diff:"-"`
-	SubscriptionID    string            `json:"azure_subscription_id" diff:"-"`
-	Environment       string            `json:"environment" diff:"-"`
-	ErrorMessage      string            `json:"error,omitempty" diff:"-"`
-	Components        []json.RawMessage `json:"components" diff:"-"`
-	CryptoKey         string            `json:"-" diff:"-"`
-	Validator         *event.Validator  `json:"-" diff:"-"`
+	types.Event
+	ErrorMessage string               `json:"error,omitempty" diff:"-"`
+	CryptoKey    string               `json:"-" diff:"-"`
+	Validator    *validator.Validator `json:"-" diff:"-"`
 }
 
 // New : Constructor
-func New(subject, cryptoKey string, body []byte, val *event.Validator) (event.Event, error) {
+func New(subject, cryptoKey string, body []byte, val *validator.Validator) (event.Event, error) {
 	var ev event.Resource
 	ev = &Event{CryptoKey: cryptoKey, Validator: val}
 	body = []byte(strings.Replace(string(body), `"_component":"local_network_gateways"`, `"_component":"local_network_gateway"`, 1))

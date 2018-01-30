@@ -14,40 +14,21 @@ import (
 	aes "github.com/ernestio/crypto/aes"
 	"github.com/ernestio/ernestprovider/event"
 	"github.com/ernestio/ernestprovider/providers/azure"
+	types "github.com/ernestio/ernestprovider/types/azure/lbrule"
+	"github.com/ernestio/ernestprovider/validator"
 )
 
 // Event : This is the Ernest representation of an azure lb
 type Event struct {
-	event.Base
-	ID                          string            `json:"id" diff:"-"`
-	Name                        string            `json:"name" validate:"required" diff:"-"`
-	ResourceGroupName           string            `json:"resource_group_name" validate:"required" diff:"-"`
-	Loadbalancer                string            `json:"loadbalancer" diff:"loadbalancer,immutable"`
-	LoadbalancerID              string            `json:"loadbalancer_id" diff:"-"`
-	FrontendIPConfigurationName string            `json:"frontend_ip_configuration_name" diff:"frontend_ip_configuration_name"`
-	Protocol                    string            `json:"protocol" diff:"protocol"`
-	FrontendPort                int               `json:"frontend_port" diff:"frontend_port"`
-	BackendPort                 int               `json:"backend_port" diff:"backend_port"`
-	BackendAddressPool          string            `json:"backend_address_pool" diff:"backend_address_pool"`
-	BackendAddressPoolID        string            `json:"backend_address_pool_id" diff:"-"`
-	Probe                       string            `json:"probe" diff:"probe"`
-	ProbeID                     string            `json:"probe_id" diff:"-"`
-	EnableFloatingIP            bool              `json:"enable_floating_ip" diff:"enable_floating_ip"`
-	IdleTimeoutInMinutes        int               `json:"idle_timeout_in_minutes" diff:"idle_timeout_in_minutes"`
-	LoadDistribution            string            `json:"load_distribution" diff:"load_distribution"`
-	ClientID                    string            `json:"azure_client_id" diff:"-"`
-	ClientSecret                string            `json:"azure_client_secret" diff:"-"`
-	TenantID                    string            `json:"azure_tenant_id" diff:"-"`
-	SubscriptionID              string            `json:"azure_subscription_id" diff:"-"`
-	Environment                 string            `json:"environment" diff:"-"`
-	ErrorMessage                string            `json:"error,omitempty" diff:"-"`
-	Components                  []json.RawMessage `json:"components" diff:"-"`
-	CryptoKey                   string            `json:"-" diff:"-"`
-	Validator                   *event.Validator  `json:"-" diff:"-"`
+	types.Event
+	Components   []json.RawMessage    `json:"components" diff:"-"`
+	ErrorMessage string               `json:"error,omitempty" diff:"-"`
+	CryptoKey    string               `json:"-" diff:"-"`
+	Validator    *validator.Validator `json:"-" diff:"-"`
 }
 
 // New : Constructor
-func New(subject, cryptoKey string, body []byte, val *event.Validator) (event.Event, error) {
+func New(subject, cryptoKey string, body []byte, val *validator.Validator) (event.Event, error) {
 	var ev event.Resource
 	ev = &Event{CryptoKey: cryptoKey, Validator: val}
 	body = []byte(strings.Replace(string(body), `"_component":"lb_rules"`, `"_component":"lb_rule"`, 1))

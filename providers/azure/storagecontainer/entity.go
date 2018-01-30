@@ -14,30 +14,20 @@ import (
 	aes "github.com/ernestio/crypto/aes"
 	"github.com/ernestio/ernestprovider/event"
 	"github.com/ernestio/ernestprovider/providers/azure"
+	types "github.com/ernestio/ernestprovider/types/azure/storagecontainer"
+	"github.com/ernestio/ernestprovider/validator"
 )
 
 // Event : This is the Ernest representation of an azure networkinterface
 type Event struct {
-	event.Base
-	ID                  string            `json:"id" diff:"-"`
-	Name                string            `json:"name" validate:"required" diff:"-"`
-	ResourceGroupName   string            `json:"resource_group_name" validate:"required" diff:"-"`
-	StorageAccountName  string            `json:"storage_account_name" validate:"required" diff:"storage_account_name,immutable"`
-	ContainerAccessType string            `json:"container_access_type" diff:"container_access_type,immutable"`
-	Properties          map[string]string `json:"properties" diff:"properties,immutable"`
-	ClientID            string            `json:"azure_client_id" diff:"-"`
-	ClientSecret        string            `json:"azure_client_secret" diff:"-"`
-	TenantID            string            `json:"azure_tenant_id" diff:"-"`
-	SubscriptionID      string            `json:"azure_subscription_id" diff:"-"`
-	Environment         string            `json:"environment" diff:"-"`
-	ErrorMessage        string            `json:"error,omitempty" diff:"-"`
-	Components          []json.RawMessage `json:"components" diff:"-"`
-	CryptoKey           string            `json:"-" diff:"-"`
-	Validator           *event.Validator  `json:"-" diff:"-"`
+	types.Event
+	ErrorMessage string               `json:"error,omitempty" diff:"-"`
+	CryptoKey    string               `json:"-" diff:"-"`
+	Validator    *validator.Validator `json:"-" diff:"-"`
 }
 
 // New : Constructor
-func New(subject, cryptoKey string, body []byte, val *event.Validator) (event.Event, error) {
+func New(subject, cryptoKey string, body []byte, val *validator.Validator) (event.Event, error) {
 	var ev event.Resource
 	ev = &Event{CryptoKey: cryptoKey, Validator: val}
 	body = []byte(strings.Replace(string(body), `"_component":"storage_containers"`, `"_component":"storage_container"`, 1))

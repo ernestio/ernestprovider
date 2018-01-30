@@ -14,42 +14,21 @@ import (
 	aes "github.com/ernestio/crypto/aes"
 	"github.com/ernestio/ernestprovider/event"
 	"github.com/ernestio/ernestprovider/providers/azure"
+	types "github.com/ernestio/ernestprovider/types/azure/lb"
+	"github.com/ernestio/ernestprovider/validator"
 	"github.com/fatih/structs"
 )
 
 // Event : This is the Ernest representation of an azure lb
 type Event struct {
-	event.Base
-	ID                       string                    `json:"id" diff:"-"`
-	Name                     string                    `json:"name" validate:"required" diff:"-"`
-	ResourceGroupName        string                    `json:"resource_group_name" validate:"required" diff:"-"`
-	Location                 string                    `json:"location" diff:"location"`
-	FrontendIPConfigurations []FrontendIPConfiguration `json:"frontend_ip_configurations" validate:"required" diff:"frontend_ip_configurations"`
-	Tags                     map[string]string         `json:"tags" diff:"tags"`
-	ClientID                 string                    `json:"azure_client_id" diff:"-"`
-	ClientSecret             string                    `json:"azure_client_secret" diff:"-"`
-	TenantID                 string                    `json:"azure_tenant_id" diff:"-"`
-	SubscriptionID           string                    `json:"azure_subscription_id" diff:"-"`
-	Environment              string                    `json:"environment" diff:"-"`
-	ErrorMessage             string                    `json:"error,omitempty" diff:"-"`
-	Components               []json.RawMessage         `json:"components" diff:"-"`
-	CryptoKey                string                    `json:"-" diff:"-"`
-	Validator                *event.Validator          `json:"-" diff:"-"`
-}
-
-// FrontendIPConfiguration ...
-type FrontendIPConfiguration struct {
-	Name                       string `json:"name" validate:"required" structs:"name"diff:"name"`
-	Subnet                     string `json:"subnet" structs:"-" diff:"subnet"`
-	SubnetID                   string `json:"subnet_id" structs:"subnet_id" diff:"-"`
-	PrivateIPAddress           string `json:"private_ip_address" structs:"private_ip_address" diff:"private_ip_address"`
-	PrivateIPAddressAllocation string `json:"private_ip_address_allocation" structs:"private_ip_address_allocation" diff:"private_ip_address_allocation"`
-	PublicIPAddress            string `json:"public_ip_address" structs:"-" diff:"public_ip_address"`
-	PublicIPAddressID          string `json:"public_ip_address_id" structs:"public_ip_address_id" diff:"-"`
+	types.Event
+	ErrorMessage string               `json:"error,omitempty" diff:"-"`
+	CryptoKey    string               `json:"-" diff:"-"`
+	Validator    *validator.Validator `json:"-" diff:"-"`
 }
 
 // New : Constructor
-func New(subject, cryptoKey string, body []byte, val *event.Validator) (event.Event, error) {
+func New(subject, cryptoKey string, body []byte, val *validator.Validator) (event.Event, error) {
 	var ev event.Resource
 	ev = &Event{CryptoKey: cryptoKey, Validator: val}
 	body = []byte(strings.Replace(string(body), `"_component":"lbs"`, `"_component":"lb"`, 1))
@@ -107,10 +86,10 @@ func (ev *Event) ResourceDataToEvent(d *schema.ResourceData) error {
 	ev.ResourceGroupName = d.Get("resource_group_name").(string)
 	ev.Location = d.Get("location").(string)
 	if d.Content["frontend_ip_configuration"] != nil {
-		ips := []FrontendIPConfiguration{}
+		ips := []types.FrontendIPConfiguration{}
 		for _, c := range d.Content["frontend_ip_configuration"].([]interface{}) {
 			cfg := c.(map[string]interface{})
-			f := FrontendIPConfiguration{}
+			f := types.FrontendIPConfiguration{}
 			f.SubnetID = fmt.Sprintf("%s", cfg["subnet_id"])
 			f.Name = fmt.Sprintf("%s", cfg["name"])
 			if cfg["private_ip_address"] != nil {
