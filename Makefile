@@ -6,7 +6,6 @@ lint:
 
 deps:
 	go get github.com/satori/uuid
-	glide install
 
 dev-deps: deps
 	go get github.com/ernestio/ernest-config-client
