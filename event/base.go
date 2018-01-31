@@ -4,14 +4,12 @@ import (
 	"errors"
 	"log"
 
-	"github.com/ernestio/ernestprovider/types"
 	"github.com/fatih/color"
 	"github.com/r3labs/terraform/builtin/providers/azurerm"
 )
 
 // Base : common Event method container
 type Base struct {
-	types.Base
 }
 
 // Log : ...

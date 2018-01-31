@@ -21,6 +21,7 @@ import (
 // Event : This is the Ernest representation of an azure availability setb
 type Event struct {
 	types.Event
+	event.Base
 	CryptoKey string               `json:"-" diff:"-"`
 	Validator *validator.Validator `json:"-" diff:"-"`
 }

@@ -20,6 +20,7 @@ import (
 
 // Event : This is the Ernest representation of an azure lb
 type Event struct {
+	event.Base
 	types.Event
 	Components   []json.RawMessage    `json:"components" diff:"-"`
 	ErrorMessage string               `json:"error,omitempty" diff:"-"`

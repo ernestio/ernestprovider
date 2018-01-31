@@ -21,6 +21,7 @@ import (
 // Event : This is the Ernest representation of an azure resource
 //         group
 type Event struct {
+	event.Base
 	types.Event
 	ErrorMessage string               `json:"error,omitempty" diff:"-"`
 	CryptoKey    string               `json:"-" diff:"-"`
