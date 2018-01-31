@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/ernestio/ernestprovider/event"
+	"github.com/ernestio/ernestprovider/validator"
 	"github.com/fatih/color"
 	"github.com/r3labs/terraform/builtin/providers/azurerm"
 	"github.com/r3labs/terraform/helper/schema"
@@ -25,14 +26,14 @@ type Event struct {
 	ResourceData *schema.ResourceData
 	ResourceType string
 	Schema       map[string]*schema.Schema
-	Validator    *event.Validator
+	Validator    *validator.Validator
 
 	Subject string `json:"-"`
 	Body    []byte `json:"-"`
 }
 
 // New : Constructor
-func New(subject, resourceType string, body []byte, val *event.Validator, res event.Resource) (event.Event, error) {
+func New(subject, resourceType string, body []byte, val *validator.Validator, res event.Resource) (event.Event, error) {
 	var n Event
 	n = Event{Subject: subject, Body: body, Validator: val}
 	n.Provider = azurerm.Provider().(*schema.Provider)

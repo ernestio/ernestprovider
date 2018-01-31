@@ -8,24 +8,27 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ernestio/ernestprovider/event"
+	types "github.com/ernestio/ernestprovider/types/azure/storagecontainer"
+	"github.com/ernestio/ernestprovider/validator"
 )
 
 func validEvent() Event {
 	properties := make(map[string]string)
 
 	return Event{
-		Name:               "supu",
-		ResourceGroupName:  "rg_test",
-		StorageAccountName: "sa_test",
-		Properties:         properties,
+		Event: types.Event{
+			Name:               "supu",
+			ResourceGroupName:  "rg_test",
+			StorageAccountName: "sa_test",
+			Properties:         properties,
+		},
 	}
 }
 
 func TestRequiredName(t *testing.T) {
 	ev := validEvent()
 	ev.Name = ""
-	val := event.NewValidator()
+	val := validator.NewValidator()
 	err := val.Validate(ev)
 
 	if err == nil {
@@ -40,7 +43,7 @@ func TestRequiredName(t *testing.T) {
 func TestRequiredStorageAccountName(t *testing.T) {
 	ev := validEvent()
 	ev.StorageAccountName = ""
-	val := event.NewValidator()
+	val := validator.NewValidator()
 	err := val.Validate(ev)
 
 	if err == nil {
@@ -55,7 +58,7 @@ func TestRequiredStorageAccountName(t *testing.T) {
 func TestRequiredResourceGroupName(t *testing.T) {
 	ev := validEvent()
 	ev.ResourceGroupName = ""
-	val := event.NewValidator()
+	val := validator.NewValidator()
 	err := val.Validate(ev)
 
 	if err == nil {
@@ -70,7 +73,7 @@ func TestRequiredResourceGroupName(t *testing.T) {
 func TestHappyPath(t *testing.T) {
 	ev := validEvent()
 
-	val := event.NewValidator()
+	val := validator.NewValidator()
 	err := val.Validate(ev)
 	if err != nil {
 		println(err.Error())

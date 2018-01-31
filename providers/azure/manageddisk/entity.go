@@ -14,35 +14,20 @@ import (
 	aes "github.com/ernestio/crypto/aes"
 	"github.com/ernestio/ernestprovider/event"
 	"github.com/ernestio/ernestprovider/providers/azure"
+	types "github.com/ernestio/ernestprovider/types/azure/manageddisk"
+	"github.com/ernestio/ernestprovider/validator"
 )
 
 // Event : This is the Ernest representation of an azure lb
 type Event struct {
-	event.Base
-	ID                 string            `json:"id" diff:"-"`
-	Name               string            `json:"name" validate:"required" diff:"-"`
-	ResourceGroupName  string            `json:"resource_group_name" validate:"required" diff:"-"`
-	Location           string            `json:"location" diff:"-"`
-	StorageAccountType string            `json:"storage_account_type" diff:"storage_account_type"`
-	CreateOption       string            `json:"create_option" diff:"create_option"`
-	SourceURI          string            `json:"source_uri" diff:"source_uri"`
-	SourceResourceID   string            `json:"source_resource_id" diff:"-"`
-	OSType             string            `json:"os_type" diff:"os_type"`
-	DiskSizeGB         int32             `json:"disk_size_gb" diff:"disk_size_gb"`
-	Tags               map[string]string `json:"tags" diff:"-"`
-	ClientID           string            `json:"azure_client_id" diff:"-"`
-	ClientSecret       string            `json:"azure_client_secret" diff:"-"`
-	TenantID           string            `json:"azure_tenant_id" diff:"-"`
-	SubscriptionID     string            `json:"azure_subscription_id" diff:"-"`
-	Environment        string            `json:"environment" diff:"-"`
-	ErrorMessage       string            `json:"error,omitempty" diff:"-"`
-	Components         []json.RawMessage `json:"components" diff:"-"`
-	CryptoKey          string            `json:"-" diff:"-"`
-	Validator          *event.Validator  `json:"-" diff:"-"`
+	types.Event
+	ErrorMessage string               `json:"error,omitempty" diff:"-"`
+	CryptoKey    string               `json:"-" diff:"-"`
+	Validator    *validator.Validator `json:"-" diff:"-"`
 }
 
 // New : Constructor
-func New(subject, cryptoKey string, body []byte, val *event.Validator) (event.Event, error) {
+func New(subject, cryptoKey string, body []byte, val *validator.Validator) (event.Event, error) {
 	var ev event.Resource
 	ev = &Event{CryptoKey: cryptoKey, Validator: val}
 	body = []byte(strings.Replace(string(body), `"_component":"managed_disks"`, `"_component":"managed_disk"`, 1))

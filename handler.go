@@ -29,6 +29,7 @@ import (
 	"github.com/ernestio/ernestprovider/providers/azure/subnet"
 	"github.com/ernestio/ernestprovider/providers/azure/virtualmachine"
 	"github.com/ernestio/ernestprovider/providers/azure/virtualnetwork"
+	"github.com/ernestio/ernestprovider/validator"
 )
 
 // Handle : Handles the given event
@@ -113,7 +114,7 @@ func getAzureEvent(subject string, data []byte, key string) (event.Event, error)
 	var ev event.Event
 	var err error
 	parts := strings.Split(subject, ".")
-	val := event.NewValidator()
+	val := validator.NewValidator()
 	switch parts[0] {
 	case "public_ip", "public_ips":
 		ev, err = publicip.New(subject, key, data, val)

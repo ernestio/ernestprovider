@@ -5,15 +5,16 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ernestio/ernestprovider/event"
+	types "github.com/ernestio/ernestprovider/types/azure/virtualnetwork"
+	"github.com/ernestio/ernestprovider/validator"
 )
 
 func validEvent() Event {
-	var subnets []Subnet
+	var subnets []types.Subnet
 	var dns []string
 	var address []string
 
-	subnets = append(subnets, Subnet{
+	subnets = append(subnets, types.Subnet{
 		Name:          "subnet",
 		AddressPrefix: "10.2.0.1/24",
 	})
@@ -22,17 +23,19 @@ func validEvent() Event {
 	dns = append(dns, "10.2.0.1/24")
 
 	return Event{
-		Name:           "supu",
-		AddressSpace:   address,
-		DNSServerNames: dns,
-		Subnets:        subnets,
+		Event: types.Event{
+			Name:           "supu",
+			AddressSpace:   address,
+			DNSServerNames: dns,
+			Subnets:        subnets,
+		},
 	}
 }
 
 func TestRequiredName(t *testing.T) {
 	ev := validEvent()
 	ev.Name = ""
-	val := event.NewValidator()
+	val := validator.NewValidator()
 	err := val.Validate(ev)
 
 	if err == nil {
@@ -47,7 +50,7 @@ func TestRequiredName(t *testing.T) {
 func TestEmptyAddressSpace(t *testing.T) {
 	ev := validEvent()
 	ev.AddressSpace = []string{}
-	val := event.NewValidator()
+	val := validator.NewValidator()
 	err := val.Validate(ev)
 
 	if err == nil {
@@ -62,8 +65,8 @@ func TestEmptyAddressSpace(t *testing.T) {
 
 func TestEmptySubnets(t *testing.T) {
 	ev := validEvent()
-	ev.Subnets = []Subnet{}
-	val := event.NewValidator()
+	ev.Subnets = []types.Subnet{}
+	val := validator.NewValidator()
 	err := val.Validate(ev)
 
 	if err == nil {
@@ -79,7 +82,7 @@ func TestEmptySubnets(t *testing.T) {
 func TestSubnetsEmptyName(t *testing.T) {
 	ev := validEvent()
 	ev.Subnets[0].Name = ""
-	val := event.NewValidator()
+	val := validator.NewValidator()
 	err := val.Validate(ev)
 
 	if err == nil {
@@ -95,7 +98,7 @@ func TestSubnetsEmptyName(t *testing.T) {
 func TestSubnetsInvalidPrefix(t *testing.T) {
 	ev := validEvent()
 	ev.Subnets[0].AddressPrefix = "supu"
-	val := event.NewValidator()
+	val := validator.NewValidator()
 	err := val.Validate(ev)
 
 	if err == nil {
@@ -111,7 +114,7 @@ func TestSubnetsInvalidPrefix(t *testing.T) {
 func TestInvalidDNSServers(t *testing.T) {
 	ev := validEvent()
 	ev.DNSServerNames[0] = "supu"
-	val := event.NewValidator()
+	val := validator.NewValidator()
 	err := val.Validate(ev)
 
 	if err == nil {
@@ -126,7 +129,7 @@ func TestInvalidDNSServers(t *testing.T) {
 
 func TestHappyPath(t *testing.T) {
 	ev := validEvent()
-	val := event.NewValidator()
+	val := validator.NewValidator()
 	err := val.Validate(ev)
 
 	if err != nil {

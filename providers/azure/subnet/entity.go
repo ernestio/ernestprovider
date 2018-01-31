@@ -14,33 +14,20 @@ import (
 	aes "github.com/ernestio/crypto/aes"
 	"github.com/ernestio/ernestprovider/event"
 	"github.com/ernestio/ernestprovider/providers/azure"
+	types "github.com/ernestio/ernestprovider/types/azure/subnet"
+	"github.com/ernestio/ernestprovider/validator"
 )
 
 // Event : This is the Ernest representation of an azure subnet
 type Event struct {
-	event.Base
-	ID                     string            `json:"id" diff:"-"`
-	Name                   string            `json:"name" validate:"required" diff:"-"`
-	ResourceGroupName      string            `json:"resource_group_name" validate:"required" diff:"-"`
-	VirtualNetworkName     string            `json:"virtual_network_name" validate:"required" diff:"virtual_network_name,immutable"`
-	AddressPrefix          string            `json:"address_prefix"  validate:"required" diff:"address_prefix,immutable"`
-	NetworkSecurityGroup   string            `json:"network_security_group" diff:"network_security_group"`
-	NetworkSecurityGroupID string            `json:"network_security_group_id" diff:"-"`
-	RouteTable             string            `json:"route_table_id" diff:"-"`
-	IPConfigurations       []string          `json:"ip_configurations" diff:"ip_configurations,immutable"`
-	ClientID               string            `json:"azure_client_id" diff:"-"`
-	ClientSecret           string            `json:"azure_client_secret" diff:"-"`
-	TenantID               string            `json:"azure_tenant_id" diff:"-"`
-	SubscriptionID         string            `json:"azure_subscription_id" diff:"-"`
-	Environment            string            `json:"environment" diff:"-"`
-	ErrorMessage           string            `json:"error,omitempty" diff:"-"`
-	Components             []json.RawMessage `json:"components" diff:"-"`
-	CryptoKey              string            `json:"-" diff:"-"`
-	Validator              *event.Validator  `json:"-" diff:"-"`
+	types.Event
+	ErrorMessage string               `json:"error,omitempty" diff:"-"`
+	CryptoKey    string               `json:"-" diff:"-"`
+	Validator    *validator.Validator `json:"-" diff:"-"`
 }
 
 // New : Constructor
-func New(subject, cryptoKey string, body []byte, val *event.Validator) (event.Event, error) {
+func New(subject, cryptoKey string, body []byte, val *validator.Validator) (event.Event, error) {
 	var ev event.Resource
 	ev = &Event{CryptoKey: cryptoKey, Validator: val}
 	body = []byte(strings.Replace(string(body), `"_component":"subnets"`, `"_component":"subnet"`, 1))

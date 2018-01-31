@@ -4,12 +4,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ernestio/ernestprovider/event"
+	types "github.com/ernestio/ernestprovider/types/azure/networkinterface"
+	"github.com/ernestio/ernestprovider/validator"
 )
 
 func validEvent() Event {
 	var dns []string
-	var ips []IPConfiguration
+	var ips []types.IPConfiguration
 
 	tags := make(map[string]string)
 	tags["t1"] = "one"
@@ -17,7 +18,7 @@ func validEvent() Event {
 	dns = append(dns, "8.8.8.8")
 	dns = append(dns, "4.4.4.4")
 
-	ips = append(ips, IPConfiguration{
+	ips = append(ips, types.IPConfiguration{
 		Name:                       "ip",
 		SubnetID:                   "10.0.2.0/14",
 		PrivateIPAddress:           "10.0.2.1",
@@ -25,12 +26,14 @@ func validEvent() Event {
 	})
 
 	return Event{
-		Name:              "supu",
-		ResourceGroupName: "resource_group",
-		Location:          "westus",
-		IPConfigurations:  ips,
-		DNSServers:        dns,
-		Tags:              tags,
+		Event: types.Event{
+			Name:              "supu",
+			ResourceGroupName: "resource_group",
+			Location:          "westus",
+			IPConfigurations:  ips,
+			DNSServers:        dns,
+			Tags:              tags,
+		},
 	}
 }
 
@@ -38,7 +41,7 @@ func TestRequiredName(t *testing.T) {
 	ev := validEvent()
 	ev.Name = ""
 
-	val := event.NewValidator()
+	val := validator.NewValidator()
 	err := val.Validate(ev)
 
 	if err == nil {
@@ -72,7 +75,7 @@ func TestRequiredResourceGroupName(t *testing.T) {
 	ev := validEvent()
 	ev.ResourceGroupName = ""
 
-	val := event.NewValidator()
+	val := validator.NewValidator()
 	err := val.Validate(ev)
 
 	if err == nil {
@@ -157,7 +160,7 @@ func TestInvalidDNS(t *testing.T) {
 	ev := validEvent()
 	ev.DNSServers[0] = "no ip"
 
-	val := event.NewValidator()
+	val := validator.NewValidator()
 	err := val.Validate(ev)
 
 	if err == nil {
@@ -172,7 +175,7 @@ func TestInvalidDNS(t *testing.T) {
 func TestHappyPath(t *testing.T) {
 	ev := validEvent()
 
-	val := event.NewValidator()
+	val := validator.NewValidator()
 	err := val.Validate(ev)
 	if err != nil {
 		println(err.Error())
